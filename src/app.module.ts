@@ -4,6 +4,9 @@ import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule } from "@nestjs/config";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { BoardRepository } from "./apis/group/boards/board.repository";
+import { BoardsController } from "./apis/group/boards/boards.controller";
+import { BoardService } from "./apis/group/boards/boards.service";
 
 @Module({
   imports: [
@@ -27,8 +30,10 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
       synchronize: true,
       logging: true,
     }),
+
+    TypeOrmModule.forFeature([BoardRepository]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, BoardsController],
+  providers: [AppService, BoardService],
 })
 export class AppModule {}
