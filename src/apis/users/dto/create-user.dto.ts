@@ -1,0 +1,25 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { Gender } from "../entities/user.entity";
+
+export class CreateUserDto {
+  @ApiProperty({ description: "유저 이메일" })
+  email: string;
+
+  @ApiProperty({ description: "유저 비밀번호" })
+  password: string;
+
+  @ApiProperty({ description: "유저 전화번호" })
+  phone: string;
+
+  @ApiProperty({ description: "유저 이름" })
+  name: string;
+
+  @ApiProperty({ description: "유저 닉네임" })
+  nickname: string;
+
+  @ApiProperty({ description: "유저 성별 Male = Male Female = Female" })
+  gender: Gender;
+
+  @ApiProperty({ description: "유저 나이" })
+  age: number;
+}
