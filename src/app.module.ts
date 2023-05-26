@@ -7,9 +7,23 @@ import { UsersModule } from "./apis/users/users.module";
 import { AuthModule } from "./apis/auth/auth.module";
 import { CacheModule } from "@nestjs/cache-manager";
 import * as redisStore from "cache-manager-redis-store";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { BoardRepository } from "./apis/group/boards/board.repository";
+import { BoardsController } from "./apis/group/boards/boards.controller";
+import { BoardService } from "./apis/group/boards/boards.service";
+
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // SwaggerModule.forRoot({
+    //   swaggerCustomOptions: {
+    //     swaggerOptions: {
+    //       // Swagger UI 옵션
+    //     },
+    //   },
+    //   // 다양한 설정 옵션
+    // }),
     TypeOrmModule.forRoot({
       type: process.env.DATABASE_TYPE as "postgres",
       host: process.env.DATABASE_HOST,
@@ -21,6 +35,7 @@ import * as redisStore from "cache-manager-redis-store";
       synchronize: true,
       logging: true,
     }),
+
     UsersModule,
     AuthModule,
     CacheModule.register({
@@ -30,8 +45,12 @@ import * as redisStore from "cache-manager-redis-store";
       url: "redis://my-redis:6379",
       isGlobal: true,
     }),
+
+
+    TypeOrmModule.forFeature([BoardRepository]),
+
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, BoardsController],
+  providers: [AppService, BoardService],
 })
 export class AppModule {}
