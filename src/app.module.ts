@@ -11,10 +11,14 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { BoardRepository } from "./apis/group/boards/board.repository";
 import { BoardsController } from "./apis/group/boards/boards.controller";
 import { BoardService } from "./apis/group/boards/boards.service";
+import { Review } from "./apis/reviews/entities/reviews.entity";
+import { ReviewsController } from "./apis/reviews/reviews.controller";
+import { ReviewsModule } from "./apis/reviews/reviews.module";
 
 
 @Module({
   imports: [
+    ReviewsModule,
     ConfigModule.forRoot({ isGlobal: true }),
     // SwaggerModule.forRoot({
     //   swaggerCustomOptions: {

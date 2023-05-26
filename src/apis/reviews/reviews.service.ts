@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { Review } from "./entities/reviews.entity";
-import { CreateReviewInput } from "./dto/create-review.input";
+
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { CreateReviewDto } from "./dto/create-review.dto";
 
 @Injectable()
 export class ReviewsService {
@@ -27,8 +28,8 @@ export class ReviewsService {
   //     });
   //   }
 
-  create(createReviewInput: CreateReviewInput): Promise<Review> {
-    const review = this.reviewRepository.create(createReviewInput);
+  create(createReviewDto: CreateReviewDto): Promise<Review> {
+    const review = this.reviewRepository.create(createReviewDto);
     return this.reviewRepository.save(review);
   }
 
