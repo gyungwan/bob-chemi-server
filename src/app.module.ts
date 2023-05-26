@@ -3,10 +3,15 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule } from "@nestjs/config";
+import { UsersModule } from "./apis/users/users.module";
+import { AuthModule } from "./apis/auth/auth.module";
+import { CacheModule } from "@nestjs/cache-manager";
+import * as redisStore from "cache-manager-redis-store";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { BoardRepository } from "./apis/group/boards/board.repository";
 import { BoardsController } from "./apis/group/boards/boards.controller";
 import { BoardService } from "./apis/group/boards/boards.service";
+
 
 @Module({
   imports: [
@@ -31,7 +36,19 @@ import { BoardService } from "./apis/group/boards/boards.service";
       logging: true,
     }),
 
+    UsersModule,
+    AuthModule,
+    CacheModule.register({
+      store: redisStore,
+      // host: "localhost", // Redis 호스트 주소
+      // port: 6379, // Redis 포트 번호
+      url: "redis://my-redis:6379",
+      isGlobal: true,
+    }),
+
+
     TypeOrmModule.forFeature([BoardRepository]),
+
   ],
   controllers: [AppController, BoardsController],
   providers: [AppService, BoardService],
