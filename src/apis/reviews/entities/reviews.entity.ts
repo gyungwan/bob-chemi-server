@@ -1,7 +1,7 @@
 // 빠른식사(퀵매칭) - 거리 반경..
 
 import { ApiProperty } from "@nestjs/swagger";
-//import { Min } from "class-validator";
+import { IsNumber, IsString, Min } from "class-validator";
 import {
   Column,
   CreateDateColumn,
@@ -18,15 +18,18 @@ import {
 @Entity()
 export class Review {
   @PrimaryGeneratedColumn("uuid")
+  @IsString()
   @ApiProperty()
   reviewId: string;
 
   @ApiProperty()
+  @IsString()
   @Column()
   content: string;
 
-  //@Min(0)
+  @Min(0)
   @ApiProperty()
+  @IsNumber()
   @Column()
   chemiRating: number;
 
