@@ -1,4 +1,3 @@
-
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsString, Max, Min } from "class-validator";
 export class CreateReviewDto {
@@ -8,14 +7,14 @@ export class CreateReviewDto {
   @ApiProperty({
     example: 1.5,
     description: "케미 지수",
-    required: false,
+    required: true,
   })
   chemiRating: number;
 
   @ApiProperty({
     example: "친절해요",
     description: "리뷰",
-    required: false,
+    required: true,
   })
   @IsString()
   content: string;
