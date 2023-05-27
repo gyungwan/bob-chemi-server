@@ -11,7 +11,7 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { BoardRepository } from "./apis/group/boards/board.repository";
 import { BoardsController } from "./apis/group/boards/boards.controller";
 import { BoardService } from "./apis/group/boards/boards.service";
-
+import { ReviewsModule } from "./apis/reviews/reviews.module";
 
 @Module({
   imports: [
@@ -38,6 +38,7 @@ import { BoardService } from "./apis/group/boards/boards.service";
 
     UsersModule,
     AuthModule,
+    ReviewsModule,
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소
@@ -46,9 +47,7 @@ import { BoardService } from "./apis/group/boards/boards.service";
       isGlobal: true,
     }),
 
-
     TypeOrmModule.forFeature([BoardRepository]),
-
   ],
   controllers: [AppController, BoardsController],
   providers: [AppService, BoardService],

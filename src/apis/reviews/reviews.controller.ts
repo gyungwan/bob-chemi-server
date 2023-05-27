@@ -8,12 +8,14 @@ import {
   UseGuards,
   Query,
 } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 //import { AuthGuard } from "nestjs";
 import { CreateReviewInput } from "./dto/create-review.input";
 import { Review } from "./entities/reviews.entity";
 import { ReviewsService } from "./reviews.service";
 
 @Controller("reviews")
+@ApiTags("리뷰API")
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
