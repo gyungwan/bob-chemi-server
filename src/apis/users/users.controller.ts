@@ -11,8 +11,9 @@ import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import * as bcrypt from "bcrypt";
 
-@Controller("users")
+@Controller("user")
 @ApiTags("유저 API")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -27,7 +28,13 @@ export class UsersController {
     type: CreateUserDto,
   })
   async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
+    console.log(createUserDto);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const modifiedCreateUserDto = {
+      ...createUserDto,
+      password: hashedPassword,
+    };
+    return await this.usersService.create(modifiedCreateUserDto);
   }
 
   @Get()
@@ -35,10 +42,10 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
-  @Get(":id")
-  async findOne(@Param("id") id: string) {
-    return await this.usersService.findOne(+id);
-  }
+  // @Get(":id")
+  // async findOne(@Param("id") id: string) {
+  //   return await this.usersService.findOne(id);
+  // }
 
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {

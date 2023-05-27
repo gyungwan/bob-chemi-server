@@ -9,6 +9,8 @@ import {
   Inject,
   CACHE_MANAGER,
   NotFoundException,
+  UnprocessableEntityException,
+  Res,
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -18,6 +20,8 @@ import { CreateAuthDto } from "./dto/create-auth.dto";
 import { UpdateAuthDto } from "./dto/update-auth.dto";
 import { UsersService } from "../users/users.service";
 import { checkSms, sendPhone } from "./dto/sendPhone.dto";
+import { loginDto } from "./dto/login.dto";
+import { Response } from "express";
 
 @Controller("auth")
 @ApiTags("인증 API")
@@ -28,6 +32,38 @@ export class AuthController {
     private readonly usersService: UsersService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
+
+  @Post("login")
+  @ApiOperation({
+    summary: "유저 로그인",
+    description: "유저 로그인 API",
+  })
+  @ApiResponse({
+    type: loginDto,
+  })
+  async login(
+    @Body() loginDto: loginDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const user = await this.authService.validateUser({ loginDto });
+
+    await this.authService.setRefreshService({ user, res });
+
+    const accessToken = await this.authService.getAccesstoken({ user });
+    console.log("ㅁㅁㅁㅁ", accessToken);
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        nickname: user.nickname,
+        name: user.name,
+        gender: user.gender,
+        age: user.age,
+      },
+    };
+  }
 
   @Post("sms")
   @ApiOperation({
@@ -87,7 +123,7 @@ export class AuthController {
 
   @Get(":id")
   findOne(@Param("id") id: string) {
-    return this.authService.findOne(+id);
+    return this.authService.findOne(id);
   }
 
   @Patch(":id")
