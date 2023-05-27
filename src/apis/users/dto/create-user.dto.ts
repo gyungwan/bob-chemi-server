@@ -17,7 +17,10 @@ export class CreateUserDto {
   @ApiProperty({ description: "유저 닉네임" })
   nickname: string;
 
-  @ApiProperty({ description: "유저 성별 Male = Male Female = Female" })
+  @ApiProperty({
+    description: "유저 성별 Male = Male Female = Female",
+    example: "Male = Male Female = Female 두가지 중 하나 만 넘어올수 있습니다.",
+  })
   gender: Gender;
 
   @ApiProperty({ description: "유저 나이" })

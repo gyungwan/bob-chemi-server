@@ -19,16 +19,22 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
+
+
+//import { AuthGuard } from "nestjs";
+
 import { CreateReviewDto } from "./dto/create-review.dto";
 import { Review } from "./entities/reviews.entity";
 import { ReviewsService } from "./reviews.service";
 
 @ApiTags("REVIEW")
+
 @ApiResponse({ status: 200, description: "성공" })
 @ApiBadRequestResponse({ description: "잘못된 요청입니다" }) // 공통 응답코드 (i.e 400,401,402,404)
 @ApiUnauthorizedResponse({ description: "인증되지 않았습니다." }) // 공통 응답코드 (i.e 400,401,402,404)
 // 매칭되지 않았습니다. 필요
 @Controller("reviews")
+@ApiTags("리뷰API")
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
@@ -36,7 +42,10 @@ export class ReviewsController {
   //@Body()는 요청 본문에 포함된 데이터를 가져오는 데 사용(post,patch,put)
   //
 
+
   //----------------- 모든 리뷰 조회 -----------------------//
+
+  @ApiOperation({ summary: "모든 리뷰 조회" })
   @Get()
   @ApiOperation({
     summary: "모든 리뷰 조회",
@@ -73,6 +82,18 @@ export class ReviewsController {
   @Post()
   //@UseGuards(AuthGuard) // => 로그인이 && 매칭이 된 사람만 쓰기
   @ApiOperation({ summary: "리뷰 작성", description: "유저가 리뷰를 작성한다" })
+
+  //하나의 유저 리뷰 조회
+  //@ApiOperation({ summary: "한 명의 유저 리뷰 조회" })
+  //   @Get(":userId") // 앞에 reviews/:userId
+  //   fetchReview(@Param("userId") userId: string): Promise<Review[]> {
+  //     return this.reviewsService.findOne({ userId });
+  //   }
+
+  //리뷰 생성
+  //@UseGuards(AuthGuard) // => 로그인이 && 매칭이 된 사람만 쓰기
+
+  
   createReview(@Body() createReviewDto: CreateReviewDto): Promise<Review> {
     //JSON 형식의 데이터를 전송하고 해당 데이터를 객체로 변환하여 사용
     return this.reviewsService.create(createReviewDto);

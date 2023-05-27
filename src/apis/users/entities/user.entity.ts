@@ -52,15 +52,15 @@ export class User {
   //   @ApiProperty({ description: "마케팅 수신 동의 여부" })
   //   agreement_mkt: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   @ApiProperty({ description: "유저 생성일" })
   creadeAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   @ApiProperty({ description: "유저 수정일" })
   updatedAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   @ApiProperty({ description: "유저 탈퇴" })
   deletedAt: Date;
 }

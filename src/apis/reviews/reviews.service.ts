@@ -4,7 +4,6 @@ import { Review } from "./entities/reviews.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateReviewDto } from "./dto/create-review.dto";
-import { UsersService } from "../users/users.service";
 
 @Injectable()
 export class ReviewsService {

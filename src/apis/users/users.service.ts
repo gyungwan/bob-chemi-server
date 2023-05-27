@@ -20,8 +20,9 @@ export class UsersService {
       throw new ConflictException("이미 가입한 email입니다.");
     }
 
-    await this.userRepository.save(createUserDto);
-
+    const user = this.userRepository.create(createUserDto);
+    user.password = createUserDto.password;
+    await this.userRepository.save(user);
     return {
       status: {
         code: 200,
@@ -33,9 +34,10 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOneEmail({ email }) {
+    return await this.userRepository.findOne({ where: { email } });
   }
+
   async findOnePhone({ phone }: { phone: string }): Promise<string> {
     const user = await this.userRepository.findOneBy({ phone });
     return user.phone;

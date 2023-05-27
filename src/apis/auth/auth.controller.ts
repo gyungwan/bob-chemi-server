@@ -9,14 +9,19 @@ import {
   Inject,
   CACHE_MANAGER,
   NotFoundException,
+  UnprocessableEntityException,
+  Res,
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { PhoneService } from "src/common/phone/pohone.services";
 import { AuthService } from "./auth.service";
 import { CreateAuthDto } from "./dto/create-auth.dto";
 import { UpdateAuthDto } from "./dto/update-auth.dto";
 import { UsersService } from "../users/users.service";
+import { checkSms, sendPhone } from "./dto/sendPhone.dto";
+import { loginDto } from "./dto/login.dto";
+import { Response } from "express";
 
 @Controller("auth")
 @ApiTags("인증 API")
@@ -28,6 +33,39 @@ export class AuthController {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
+  @Post("login")
+  @ApiOperation({
+    summary: "유저 로그인",
+    description: "유저 로그인 API",
+  })
+  @ApiResponse({
+    type: loginDto,
+  })
+  async login(
+    @Body() loginDto: loginDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const user = await this.authService.validateUser({ loginDto });
+
+    await this.authService.setRefreshService({ user, res });
+
+    const accessToken = await this.authService.getAccesstoken({ user });
+    console.log("ㅁㅁㅁㅁ", accessToken);
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        nickname: user.nickname,
+        name: user.name,
+        gender: user.gender,
+        age: user.age,
+      },
+    };
+  }
+
+  @Post("logout")
   @Post("sms")
   @ApiOperation({
     summary: "인증번호 발송",
@@ -37,6 +75,7 @@ export class AuthController {
     description: "발송 성공 여부가 리턴됩니다",
     //type: CreateUserResponseDto,
   })
+  @ApiBody({ type: sendPhone })
   async sendSms(@Body() { phone }: { phone: string }) {
     try {
       await this.phoneService.checkPhone({ phone });
@@ -65,6 +104,7 @@ export class AuthController {
     description: "검증 성공 여부가 리턴됩니다",
     //type: CreateUserResponseDto,
   })
+  @ApiBody({ type: checkSms })
   async checkSms(@Body() { phone, token }: { phone: string; token: string }) {
     try {
       const cachePhoneToken = await this.cacheManager.get(phone);
@@ -74,14 +114,9 @@ export class AuthController {
       await this.cacheManager.set(phone, token, 180);
 
       this.cacheManager.get(phone).then((res) => console.log(res));
-    } catch (err) {
-      const cachePhoneToken = await this.cacheManager.get(phone);
-
-      if (cachePhoneToken !== token) {
-        throw new Error("인증번호가 일치하지 않습니다.");
-      }
-    }
+    } catch (err) {}
   }
+
   @Get()
   findAll() {
     return this.authService.findAll();
@@ -89,7 +124,7 @@ export class AuthController {
 
   @Get(":id")
   findOne(@Param("id") id: string) {
-    return this.authService.findOne(+id);
+    return this.authService.findOne(id);
   }
 
   @Patch(":id")
