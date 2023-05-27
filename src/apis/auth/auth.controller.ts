@@ -65,6 +65,7 @@ export class AuthController {
     };
   }
 
+  @Post("logout")
   @Post("sms")
   @ApiOperation({
     summary: "인증번호 발송",
