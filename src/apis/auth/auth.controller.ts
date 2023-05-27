@@ -11,12 +11,13 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { PhoneService } from "src/common/phone/pohone.services";
 import { AuthService } from "./auth.service";
 import { CreateAuthDto } from "./dto/create-auth.dto";
 import { UpdateAuthDto } from "./dto/update-auth.dto";
 import { UsersService } from "../users/users.service";
+import { checkSms, sendPhone } from "./dto/sendPhone.dto";
 
 @Controller("auth")
 @ApiTags("인증 API")
@@ -37,6 +38,7 @@ export class AuthController {
     description: "발송 성공 여부가 리턴됩니다",
     //type: CreateUserResponseDto,
   })
+  @ApiBody({ type: sendPhone })
   async sendSms(@Body() { phone }: { phone: string }) {
     try {
       await this.phoneService.checkPhone({ phone });
@@ -65,6 +67,7 @@ export class AuthController {
     description: "검증 성공 여부가 리턴됩니다",
     //type: CreateUserResponseDto,
   })
+  @ApiBody({ type: checkSms })
   async checkSms(@Body() { phone, token }: { phone: string; token: string }) {
     try {
       const cachePhoneToken = await this.cacheManager.get(phone);
@@ -74,14 +77,9 @@ export class AuthController {
       await this.cacheManager.set(phone, token, 180);
 
       this.cacheManager.get(phone).then((res) => console.log(res));
-    } catch (err) {
-      const cachePhoneToken = await this.cacheManager.get(phone);
-
-      if (cachePhoneToken !== token) {
-        throw new Error("인증번호가 일치하지 않습니다.");
-      }
-    }
+    } catch (err) {}
   }
+
   @Get()
   findAll() {
     return this.authService.findAll();

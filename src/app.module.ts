@@ -42,6 +42,7 @@ import { ReviewsModule } from "./apis/reviews/reviews.module";
 
     UsersModule,
     AuthModule,
+    ReviewsModule,
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소
@@ -50,9 +51,7 @@ import { ReviewsModule } from "./apis/reviews/reviews.module";
       isGlobal: true,
     }),
 
-
     TypeOrmModule.forFeature([BoardRepository]),
-
   ],
   controllers: [AppController, BoardsController],
   providers: [AppService, BoardService],

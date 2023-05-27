@@ -23,6 +23,7 @@ import { ReviewsService } from "./reviews.service";
 @ApiBadRequestResponse({ description: "잘못된 요청입니다" })
 @ApiUnauthorizedResponse()
 @Controller("reviews")
+@ApiTags("리뷰API")
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
