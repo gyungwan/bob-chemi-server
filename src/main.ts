@@ -20,7 +20,9 @@ async function bootstrap() {
     .addTag("REVIEW") //API 그룹을 나타내는데 사용
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document);
+  SwaggerModule.setup("api", app, document, {
+    //swaggerOptions: { defaultModelsExpandDepth: -1 }, 스키마 감추는 옵션
+  });
   //위의 코드를 실행하면 /api 엔드포인트에서 Swagger UI를 통해 API 문서에 액세스
 
   await app.listen(3000);
