@@ -11,6 +11,8 @@ import {
   NotFoundException,
   UnprocessableEntityException,
   Res,
+  Req,
+  UseGuards,
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -21,7 +23,8 @@ import { UpdateAuthDto } from "./dto/update-auth.dto";
 import { UsersService } from "../users/users.service";
 import { checkSms, sendPhone } from "./dto/sendPhone.dto";
 import { loginDto } from "./dto/login.dto";
-import { Response } from "express";
+import { Response, Request } from "express";
+import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
 
 @Controller("auth")
 @ApiTags("인증 API")
@@ -64,8 +67,29 @@ export class AuthController {
       },
     };
   }
-
+  @UseGuards(RestAuthAccessGuard)
   @Post("logout")
+  @ApiOperation({
+    summary: "유저 로그아웃",
+    description: "유저 로그아웃 API",
+  })
+  @ApiResponse({
+    description: "로그아웃 성공 여부가 리턴됩니다",
+    // type: LogoutResponseDto,
+  })
+  async logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
+    try {
+      // 로그아웃 로직 수행
+      const result = await this.authService.logout({ req, res });
+
+      // 로그아웃 성공 시 응답 반환
+      return res.status(200).json(result);
+    } catch (error) {
+      // 예외 발생 시 에러 응답 반환
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   @Post("sms")
   @ApiOperation({
     summary: "인증번호 발송",
@@ -115,25 +139,5 @@ export class AuthController {
 
       this.cacheManager.get(phone).then((res) => console.log(res));
     } catch (err) {}
-  }
-
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.authService.findOne(id);
-  }
-
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.authService.remove(+id);
   }
 }

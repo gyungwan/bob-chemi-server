@@ -14,12 +14,15 @@ import { BoardService } from "./apis/group/boards/boards.service";
 import { Review } from "./apis/reviews/entities/reviews.entity";
 import { ReviewsController } from "./apis/reviews/reviews.controller";
 import { ReviewsModule } from "./apis/reviews/reviews.module";
-
+import { jwtAccessStrategy } from "./common/auth/jwt-access.strategy";
+import { jwtRefreshStrategy } from "./common/auth/jwt-refresh.strategy";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
   imports: [
     ReviewsModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot(),
+    //ConfigModule.forRoot({ isGlobal: true }),
     // SwaggerModule.forRoot({
     //   swaggerCustomOptions: {
     //     swaggerOptions: {
@@ -28,6 +31,14 @@ import { ReviewsModule } from "./apis/reviews/reviews.module";
     //   },
     //   // 다양한 설정 옵션
     // }),
+    JwtModule.register({
+      secret: process.env.JWT_ACCESS_KEY, // access 토큰의 secret 값
+      signOptions: { expiresIn: "1h" },
+    }),
+    JwtModule.register({
+      secret: process.env.JWT_REFRESH_KEY, // refresh 토큰의 secret 값
+      signOptions: { expiresIn: "2w" },
+    }),
     TypeOrmModule.forRoot({
       type: process.env.DATABASE_TYPE as "postgres",
       host: process.env.DATABASE_HOST,
@@ -54,6 +65,6 @@ import { ReviewsModule } from "./apis/reviews/reviews.module";
     TypeOrmModule.forFeature([BoardRepository]),
   ],
   controllers: [AppController, BoardsController],
-  providers: [AppService, BoardService],
+  providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy, BoardService],
 })
 export class AppModule {}
