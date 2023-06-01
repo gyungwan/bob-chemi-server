@@ -2,9 +2,15 @@ import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
+import { WsAdapter } from "@nestjs/platform-ws";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // app.useWebSocketAdapter(new WsAdapter(app)); // socket 세팅
+  // app.useStaticAssets(join(__dirname, '..', 'public'))
+  // app.setBaseViewsDir(join(__dirname, '..', 'views'))
+  // app.setViewEngine('ejs')
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: false, // dto에 정의되지 않은 속성 자동 필터링
