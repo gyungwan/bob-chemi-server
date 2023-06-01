@@ -1,5 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
+
 import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity";
+
+import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
+
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Gender {
@@ -45,6 +49,9 @@ export class User {
   @ApiProperty({ description: "유저 나이" })
   age: number;
 
+  @Column({ default: 45 })
+  @ApiProperty({ description: "유저 케미지수" })
+  chemiRating: number;
   //   @Column()
   //   @ApiProperty({ description: "서비스 이용 약관 동의 여부" })
   //   agreement_use: boolean;
@@ -65,9 +72,15 @@ export class User {
   @ApiProperty({ description: "유저 탈퇴" })
   deletedAt: Date;
 
+
   @OneToMany(() => MatchingChat, (matchingChat) => matchingChat.sender)
   sentMessages: MatchingChat[];
 
   @OneToMany(() => MatchingChat, (matchingChat) => matchingChat.receiver)
   receivedMessages: MatchingChat[];
+
+  @OneToMany(() => FoodieBoard, (FoodieBoard) => FoodieBoard.user)
+  @ApiProperty({ type: () => FoodieBoard })
+  FoodieBoard: FoodieBoard[];
+
 }

@@ -8,9 +8,6 @@ import { AuthModule } from "./apis/auth/auth.module";
 import { CacheModule } from "@nestjs/cache-manager";
 import * as redisStore from "cache-manager-redis-store";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
-import { BoardRepository } from "./apis/group/boards/board.repository";
-import { BoardsController } from "./apis/group/boards/boards.controller";
-import { BoardService } from "./apis/group/boards/boards.service";
 import { Review } from "./apis/reviews/entities/reviews.entity";
 import { ReviewsController } from "./apis/reviews/reviews.controller";
 import { ReviewsModule } from "./apis/reviews/reviews.module";
@@ -19,6 +16,10 @@ import { jwtRefreshStrategy } from "./common/auth/jwt-refresh.strategy";
 import { JwtModule } from "@nestjs/jwt";
 import { MatchingChat } from "./apis/matchingchat/entities/matchingchat.entity";
 import { MatchingChatModule } from "./apis/matchingchat/matchingchat.module";
+import { FoodieBoardModule } from "./apis/foodie-board/foodie-board.module";
+import { GroupsController } from "./apis/group/groupBoard/groups.controller";
+import { GroupsService } from "./apis/group/groupBoard/groups.service";
+
 
 @Module({
   imports: [
@@ -51,11 +52,11 @@ import { MatchingChatModule } from "./apis/matchingchat/matchingchat.module";
       synchronize: true,
       logging: true,
     }),
-
     UsersModule,
     AuthModule,
     ReviewsModule,
     MatchingChatModule,
+    FoodieBoardModule,
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소
@@ -64,9 +65,8 @@ import { MatchingChatModule } from "./apis/matchingchat/matchingchat.module";
       isGlobal: true,
     }),
 
-    TypeOrmModule.forFeature([BoardRepository]),
   ],
-  controllers: [AppController, BoardsController],
-  providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy, BoardService],
+  controllers: [AppController, GroupsController],
+  providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy, GroupsService],
 })
 export class AppModule {}

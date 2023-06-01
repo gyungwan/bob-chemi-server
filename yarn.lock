@@ -790,6 +790,16 @@
     socket.io "4.6.1"
     tslib "2.5.2"
 
+
+"@nestjs/platform-ws@^9.4.2":
+  version "9.4.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-9.4.2.tgz#7fd90c12b4b1a1a28d7d950c608e3696de410719"
+  integrity sha512-JURYiQ/0yoDD/Z14szKDMts6xUP7hI/z5CSBOSAEJk+GdhKB4VW6noTgZQu8KRSZxtLj5tm73JIaOMX9P97Buw==
+  dependencies:
+    tslib "2.5.2"
+    ws "8.13.0"
+
+
 "@nestjs/schematics@^9.0.0", "@nestjs/schematics@^9.0.4":
   version "9.2.0"
   resolved "https://registry.yarnpkg.com/@nestjs/schematics/-/schematics-9.2.0.tgz#f840054b5ae4b0b4e70aa9f72c09c3cf388f2512"
