@@ -14,8 +14,10 @@ import { ReviewsModule } from "./apis/reviews/reviews.module";
 import { jwtAccessStrategy } from "./common/auth/jwt-access.strategy";
 import { jwtRefreshStrategy } from "./common/auth/jwt-refresh.strategy";
 import { JwtModule } from "@nestjs/jwt";
+import { FoodieBoardModule } from "./apis/foodie-board/foodie-board.module";
 import { GroupsController } from "./apis/group/groupBoard/groups.controller";
 import { GroupsService } from "./apis/group/groupBoard/groups.service";
+
 
 @Module({
   imports: [
@@ -49,10 +51,10 @@ import { GroupsService } from "./apis/group/groupBoard/groups.service";
       synchronize: true,
       logging: true,
     }),
-
     UsersModule,
     AuthModule,
     ReviewsModule,
+    FoodieBoardModule,
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소
@@ -60,6 +62,7 @@ import { GroupsService } from "./apis/group/groupBoard/groups.service";
       url: "redis://my-redis:6379",
       isGlobal: true,
     }),
+
   ],
   controllers: [AppController, GroupsController],
   providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy, GroupsService],
