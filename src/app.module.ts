@@ -14,6 +14,8 @@ import { ReviewsModule } from "./apis/reviews/reviews.module";
 import { jwtAccessStrategy } from "./common/auth/jwt-access.strategy";
 import { jwtRefreshStrategy } from "./common/auth/jwt-refresh.strategy";
 import { JwtModule } from "@nestjs/jwt";
+import { MatchingChat } from "./apis/matchingchat/entities/matchingchat.entity";
+import { MatchingChatModule } from "./apis/matchingchat/matchingchat.module";
 import { FoodieBoardModule } from "./apis/foodie-board/foodie-board.module";
 import { GroupsController } from "./apis/group/groupBoard/groups.controller";
 import { GroupsService } from "./apis/group/groupBoard/groups.service";
@@ -21,7 +23,6 @@ import { GroupsService } from "./apis/group/groupBoard/groups.service";
 
 @Module({
   imports: [
-    ReviewsModule,
     ConfigModule.forRoot(),
     //ConfigModule.forRoot({ isGlobal: true }),
     // SwaggerModule.forRoot({
@@ -54,6 +55,7 @@ import { GroupsService } from "./apis/group/groupBoard/groups.service";
     UsersModule,
     AuthModule,
     ReviewsModule,
+    MatchingChatModule,
     FoodieBoardModule,
     CacheModule.register({
       store: redisStore,
