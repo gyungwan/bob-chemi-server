@@ -12,6 +12,7 @@ async function bootstrap() {
       transform: false, // 요청 데이터를 dto 형식에 맞게 변환(i.e 문자열로 전송된 숫자를 숫자로 변환)
     })
   ); //전역 유효성 검사 파이프라인
+  //app.useWebSocketAdapter(new IoAdapter(app));
 
   const config = new DocumentBuilder() // swagger setup
     .setTitle("Bob - chemi Documentation") //제목

@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Gender {
   Male = "Male",
@@ -63,4 +64,10 @@ export class User {
   @Column({ nullable: true })
   @ApiProperty({ description: "유저 탈퇴" })
   deletedAt: Date;
+
+  @OneToMany(() => MatchingChat, (matchingChat) => matchingChat.sender)
+  sentMessages: MatchingChat[];
+
+  @OneToMany(() => MatchingChat, (matchingChat) => matchingChat.receiver)
+  receivedMessages: MatchingChat[];
 }

@@ -17,10 +17,11 @@ import { ReviewsModule } from "./apis/reviews/reviews.module";
 import { jwtAccessStrategy } from "./common/auth/jwt-access.strategy";
 import { jwtRefreshStrategy } from "./common/auth/jwt-refresh.strategy";
 import { JwtModule } from "@nestjs/jwt";
+import { MatchingChat } from "./apis/matchingchat/entities/matchingchat.entity";
+import { MatchingChatModule } from "./apis/matchingchat/matchingchat.module";
 
 @Module({
   imports: [
-    ReviewsModule,
     ConfigModule.forRoot(),
     //ConfigModule.forRoot({ isGlobal: true }),
     // SwaggerModule.forRoot({
@@ -54,6 +55,7 @@ import { JwtModule } from "@nestjs/jwt";
     UsersModule,
     AuthModule,
     ReviewsModule,
+    MatchingChatModule,
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소
