@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Gender {
   Male = "Male",
@@ -44,6 +45,9 @@ export class User {
   @ApiProperty({ description: "유저 나이" })
   age: number;
 
+  @Column({ default: 45 })
+  @ApiProperty({ description: "유저 케미지수" })
+  chemiRating: number;
   //   @Column()
   //   @ApiProperty({ description: "서비스 이용 약관 동의 여부" })
   //   agreement_use: boolean;
@@ -63,4 +67,8 @@ export class User {
   @Column({ nullable: true })
   @ApiProperty({ description: "유저 탈퇴" })
   deletedAt: Date;
+
+  @OneToMany(() => FoodieBoard, (FoodieBoard) => FoodieBoard.user)
+  @ApiProperty({ type: () => FoodieBoard })
+  FoodieBoard: FoodieBoard[];
 }
