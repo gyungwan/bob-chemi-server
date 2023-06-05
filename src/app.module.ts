@@ -19,7 +19,9 @@ import { MatchingChatModule } from "./apis/matchingchat/matchingchat.module";
 import { FoodieBoardModule } from "./apis/foodie-board/foodie-board.module";
 import { GroupsController } from "./apis/group/groupBoard/groups.controller";
 import { GroupsService } from "./apis/group/groupBoard/groups.service";
-
+import { GroupChatsModule } from "./apis/group/groupChat/groupChats.module";
+import { GroupsModule } from "./apis/group/groupBoard/groups.module";
+import { Repository } from "typeorm";
 
 @Module({
   imports: [
@@ -57,16 +59,18 @@ import { GroupsService } from "./apis/group/groupBoard/groups.service";
     ReviewsModule,
     MatchingChatModule,
     FoodieBoardModule,
+    GroupsModule,
+    GroupChatsModule,
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소
       // port: 6379, // Redis 포트 번호
       url: "redis://my-redis:6379",
+      // url: "redis://localhost:6379",
       isGlobal: true,
     }),
-
   ],
-  controllers: [AppController, GroupsController],
-  providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy, GroupsService],
+  controllers: [AppController],
+  providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy],
 })
 export class AppModule {}

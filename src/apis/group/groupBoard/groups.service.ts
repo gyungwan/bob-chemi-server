@@ -18,8 +18,8 @@ export class GroupsService {
   constructor(
     @InjectRepository(Group)
     private groupRepository: Repository<Group>,
-    private memberRepository: Repository<Member>,
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    private memberRepository: Repository<Member>
   ) {}
 
   //<<------------소모임 조회------------>>
