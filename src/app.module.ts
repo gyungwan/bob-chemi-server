@@ -17,11 +17,15 @@ import { JwtModule } from "@nestjs/jwt";
 import { MatchingChat } from "./apis/matchingchat/entities/matchingchat.entity";
 import { MatchingChatModule } from "./apis/matchingchat/matchingchat.module";
 import { FoodieBoardModule } from "./apis/foodie-board/foodie-board.module";
+<<<<<<< HEAD
+import { FileUploadModule } from './apis/file-upload/file-upload.module';
+=======
 import { GroupsController } from "./apis/group/groupBoard/groups.controller";
 import { GroupsService } from "./apis/group/groupBoard/groups.service";
 import { GroupChatsModule } from "./apis/group/groupChat/groupChats.module";
 import { GroupsModule } from "./apis/group/groupBoard/groups.module";
 import { Repository } from "typeorm";
+>>>>>>> main
 
 @Module({
   imports: [
@@ -69,6 +73,15 @@ import { Repository } from "typeorm";
       // url: "redis://localhost:6379",
       isGlobal: true,
     }),
+<<<<<<< HEAD
+
+    TypeOrmModule.forFeature([BoardRepository]),
+
+    FoodieBoardModule,
+
+    FileUploadModule,
+=======
+>>>>>>> main
   ],
   controllers: [AppController],
   providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy],

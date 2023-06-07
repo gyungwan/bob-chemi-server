@@ -1,6 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "src/apis/users/entities/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { FoodieImage } from "./foodieBoard-image.entity";
 
 @Entity()
 export class FoodieBoard {
@@ -30,7 +37,8 @@ export class FoodieBoard {
 
   @ManyToOne(() => User, (user) => user.FoodieBoard)
   @ApiProperty({ type: () => User })
-  user: User[];
+  user: User;
 
-  //이미지 업로드하는 부분 넣기
+  @OneToMany(() => FoodieImage, (foodieImage) => foodieImage.foodieBoard)
+  images: FoodieImage[];
 }
