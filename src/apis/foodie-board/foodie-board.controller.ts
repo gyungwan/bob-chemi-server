@@ -16,7 +16,7 @@ import { CreateFoodieBoardDto } from "./dto/create-foodie-board.dto";
 import { UpdateFoodieBoardDto } from "./dto/update-foodie-board.dto";
 import { Request } from "express";
 import { ExecutionContextHost } from "@nestjs/core/helpers/execution-context-host";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
 @Controller("foodieBoard")
 @ApiTags("맛잘알 API")
@@ -24,6 +24,10 @@ export class FoodieBoardController {
   constructor(private readonly foodieBoardService: FoodieBoardService) {}
 
   @Post()
+  @ApiOperation({
+    summary: "맛잘알 생성",
+    description: "맛잘알 생성 API",
+  })
   async create(
     @Body() createFoodieBoardDto: CreateFoodieBoardDto,
     @Req() req: Request,
