@@ -8,5 +8,5 @@ export class CreateFoodieBoardDto {
   @ApiProperty({ description: "맛집 게시물 내용" })
   content: string;
 
-  user: User[];
+  userId: string;
 }

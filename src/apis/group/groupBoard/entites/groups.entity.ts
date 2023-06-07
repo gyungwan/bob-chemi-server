@@ -5,16 +5,18 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { GroupStatus } from "./groups.status.enum";
+import { Member } from "./members.entity";
 
 @Entity()
 export class Group extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn()
   @ApiProperty({ description: "소모임 게시글 고유 ID" })
-  id: string;
+  groupId: string;
 
   @ApiProperty({ description: "소모임 게시글 제목" })
   @Column()
@@ -61,4 +63,7 @@ export class Group extends BaseEntity {
   @ApiProperty({ description: "소모임 게시글 삭제일시" })
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Member, (member) => member.group)
+  members: Member[];
 }
