@@ -2,9 +2,15 @@ import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
+import { WsAdapter } from "@nestjs/platform-ws";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // app.useWebSocketAdapter(new WsAdapter(app)); // socket 세팅
+  // app.useStaticAssets(join(__dirname, '..', 'public'))
+  // app.setBaseViewsDir(join(__dirname, '..', 'views'))
+  // app.setViewEngine('ejs')
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: false, // dto에 정의되지 않은 속성 자동 필터링
@@ -12,6 +18,7 @@ async function bootstrap() {
       transform: false, // 요청 데이터를 dto 형식에 맞게 변환(i.e 문자열로 전송된 숫자를 숫자로 변환)
     })
   ); //전역 유효성 검사 파이프라인
+  //app.useWebSocketAdapter(new IoAdapter(app));
 
   const config = new DocumentBuilder() // swagger setup
     .setTitle("Bob - chemi Documentation") //제목

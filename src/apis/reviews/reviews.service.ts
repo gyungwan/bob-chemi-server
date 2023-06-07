@@ -9,9 +9,8 @@ import { CreateReviewDto } from "./dto/create-review.dto";
 export class ReviewsService {
   constructor(
     @InjectRepository(Review)
-    private readonly reviewRepository: Repository<Review> // @Inject(forwardRef(() => UsersService))
-  ) // private readonly usersService: UsersService
-  {}
+    private readonly reviewRepository: Repository<Review> // @Inject(forwardRef(() => UsersService)) // private readonly usersService: UsersService
+  ) {}
 
   findAll({ page, order }): Promise<Review[]> {
     return this.reviewRepository.find({
@@ -31,6 +30,8 @@ export class ReviewsService {
 
   create(createReviewDto: CreateReviewDto): Promise<Review> {
     const review = this.reviewRepository.create(createReviewDto);
+    // 저장할 때 chemirating에 user의 기본 점수인 45점 + 케미점수 해주기
+    // 같은 리뷰 받은거 count 해서 sum 하기
     return this.reviewRepository.save(review);
   }
 
