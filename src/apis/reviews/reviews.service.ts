@@ -1,16 +1,19 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { Review } from "./entities/reviews.entity";
+import { EnumRating, Review } from "./entities/reviews.entity";
 
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateReviewDto } from "./dto/create-review.dto";
+import { UsersService } from "../users/users.service";
+import { identity } from "rxjs";
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(Review)
     private readonly reviewRepository: Repository<Review> // @Inject(forwardRef(() => UsersService)) // private readonly usersService: UsersService
-  ) {}
+  ) //private readonly usersService: UsersService
+  {}
 
   findAll({ page, order }): Promise<Review[]> {
     return this.reviewRepository.find({
@@ -35,6 +38,21 @@ export class ReviewsService {
     return this.reviewRepository.save(review);
   }
 
+  // async sumRating({ userId }): Promise<number> {
+  //   const userChemiRating = await this.usersService.calculateChemiRating(
+  //     userId
+  //   );
+  //   const reviews = await this.reviewRepository.find({
+  //     where: { user: userId },
+  //   });
+
+  //   let sum = userChemiRating;
+  //   reviews.forEach((review) => {
+  //     sum += parseInt(review.chemiRating);
+  //   });
+
+  //   return sum;
+  // }
   //   update(
   //     reviewId: string,
   //     updateReviewInput: UpdateReviewInput
