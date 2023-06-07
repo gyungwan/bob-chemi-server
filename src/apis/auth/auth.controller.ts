@@ -16,7 +16,7 @@ import {
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { PhoneService } from "src/common/phone/pohone.services";
+import { PhoneService } from "src/common/utils/pohone.services";
 import { AuthService } from "./auth.service";
 import { CreateAuthDto } from "./dto/create-auth.dto";
 import { UpdateAuthDto } from "./dto/update-auth.dto";

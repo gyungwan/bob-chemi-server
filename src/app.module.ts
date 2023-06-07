@@ -18,6 +18,7 @@ import { jwtAccessStrategy } from "./common/auth/jwt-access.strategy";
 import { jwtRefreshStrategy } from "./common/auth/jwt-refresh.strategy";
 import { JwtModule } from "@nestjs/jwt";
 import { FoodieBoardModule } from "./apis/foodie-board/foodie-board.module";
+import { FileUploadModule } from './apis/file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -66,6 +67,8 @@ import { FoodieBoardModule } from "./apis/foodie-board/foodie-board.module";
     TypeOrmModule.forFeature([BoardRepository]),
 
     FoodieBoardModule,
+
+    FileUploadModule,
   ],
   controllers: [AppController, BoardsController],
   providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy, BoardService],
