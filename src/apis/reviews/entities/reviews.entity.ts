@@ -49,9 +49,11 @@ export class Review {
   @ApiProperty({ description: "케미 지수" })
   @IsNumber()
   @Column({ type: "enum", enum: EnumRating, nullable: false })
+  // @ManyToOne(() => User, (user) => user.chemiRating)
+  // @JoinColumn()
   chemiRating: EnumRating;
 
-  @ManyToOne(() => User, { onDelete: "CASCADE" }) //유저가 탈퇴할 때 리뷰도 같이 삭제
+  @ManyToOne(() => User, (user) => user.review, { onDelete: "CASCADE" }) //유저가 탈퇴할 때 리뷰도 같이 삭제
   @JoinColumn({ name: "id" })
   user: User;
 

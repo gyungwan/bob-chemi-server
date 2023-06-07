@@ -5,6 +5,7 @@ import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity
 import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
 
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Review } from "src/apis/reviews/entities/reviews.entity";
 
 export enum Gender {
   Male = "Male",
@@ -72,15 +73,17 @@ export class User {
   @ApiProperty({ description: "유저 탈퇴" })
   deletedAt: Date;
 
-
   @OneToMany(() => MatchingChat, (matchingChat) => matchingChat.sender)
   sentMessages: MatchingChat[];
 
   @OneToMany(() => MatchingChat, (matchingChat) => matchingChat.receiver)
   receivedMessages: MatchingChat[];
 
+  // 다대일 관계 설정
+  @OneToMany(() => Review, (review) => review.user)
+  review: Review[];
+
   @OneToMany(() => FoodieBoard, (FoodieBoard) => FoodieBoard.user)
   @ApiProperty({ type: () => FoodieBoard })
   FoodieBoard: FoodieBoard[];
-
 }
