@@ -16,8 +16,10 @@ import { CreateFoodieBoardDto } from "./dto/create-foodie-board.dto";
 import { UpdateFoodieBoardDto } from "./dto/update-foodie-board.dto";
 import { Request } from "express";
 import { ExecutionContextHost } from "@nestjs/core/helpers/execution-context-host";
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller("foodieBoard")
+@ApiTags("맛잘알 API")
 export class FoodieBoardController {
   constructor(private readonly foodieBoardService: FoodieBoardService) {}
 
