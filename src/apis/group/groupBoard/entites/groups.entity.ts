@@ -11,12 +11,13 @@ import {
 } from "typeorm";
 import { GroupStatus } from "./groups.status.enum";
 import { Member } from "./members.entity";
+import { UserGroup } from "./userGroup.entity";
 
 @Entity()
 export class Group extends BaseEntity {
   @PrimaryGeneratedColumn()
   @ApiProperty({ description: "소모임 게시글 고유 ID" })
-  groupId: string;
+  groupId: number;
 
   @ApiProperty({ description: "소모임 게시글 제목" })
   @Column()
@@ -66,4 +67,7 @@ export class Group extends BaseEntity {
 
   @OneToMany(() => Member, (member) => member.group)
   members: Member[];
+
+  @OneToMany(() => UserGroup, (userGroup) => userGroup.group)
+  userGroups: UserGroup[];
 }

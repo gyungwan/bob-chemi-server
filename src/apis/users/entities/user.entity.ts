@@ -5,6 +5,7 @@ import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity
 import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
 
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { UserGroup } from "src/apis/group/groupBoard/entites/userGroup.entity";
 
 export enum Gender {
   Male = "Male",
@@ -62,7 +63,7 @@ export class User {
 
   @Column({ nullable: true })
   @ApiProperty({ description: "유저 생성일" })
-  creadeAt: Date;
+  createdAt: Date;
 
   @Column({ nullable: true })
   @ApiProperty({ description: "유저 수정일" })
@@ -71,7 +72,6 @@ export class User {
   @Column({ nullable: true })
   @ApiProperty({ description: "유저 탈퇴" })
   deletedAt: Date;
-
 
   @OneToMany(() => MatchingChat, (matchingChat) => matchingChat.sender)
   sentMessages: MatchingChat[];
@@ -83,4 +83,6 @@ export class User {
   @ApiProperty({ type: () => FoodieBoard })
   FoodieBoard: FoodieBoard[];
 
+  @OneToMany(() => UserGroup, (userGroup) => userGroup.user)
+  userGroups: UserGroup[];
 }

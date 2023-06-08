@@ -1,7 +1,9 @@
 import { Controller, Post, Param, Body, Get } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { ChatRoomsService } from "./groupChats.service";
 
 @Controller("groupChat")
+@ApiTags("소모임 채팅방 API")
 export class ChatRoomsController {
   constructor(private readonly chatRoomsService: ChatRoomsService) {}
 
