@@ -63,7 +63,7 @@ export class User {
 
   @Column({ nullable: true })
   @ApiProperty({ description: "유저 생성일" })
-  creadeAt: Date;
+  createdAt: Date;
 
   @Column({ nullable: true })
   @ApiProperty({ description: "유저 수정일" })
