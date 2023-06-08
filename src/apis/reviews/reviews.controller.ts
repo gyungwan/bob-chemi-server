@@ -19,7 +19,11 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
-import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
+import {
+  RestAuthAccessGuard,
+  RestAuthRefreshGuard,
+} from "src/common/auth/rest-auth-guards";
+import { UsersService } from "../users/users.service";
 import { CreateReviewDto } from "./dto/create-review.dto";
 import { Review } from "./entities/reviews.entity";
 import { ReviewsService } from "./reviews.service";
@@ -31,7 +35,10 @@ import { ReviewsService } from "./reviews.service";
 // 매칭되지 않았습니다. 필요
 @Controller("reviews")
 export class ReviewsController {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(
+    private readonly reviewsService: ReviewsService,
+    private readonly usersService: UsersService
+  ) {}
 
   //@Param()은 URL 경로에서 동적인 값을 가져오는 데 사용되고(get, patch, delete)
   //@Body()는 요청 본문에 포함된 데이터를 가져오는 데 사용(post,patch,put)
@@ -67,6 +74,15 @@ export class ReviewsController {
     const userId = request.user.id; // req는 미들웨어(passport, jwt 필요)
     return this.reviewsService.findOne({ userId });
   }
+
+  //----------------- 유저의 케미지수 조회 -----------------------//
+  // @Get(":id/chemiRating")
+  // @UseGuards(RestAuthAccessGuard)
+  // @ApiOperation({ summary: "유저의 케미지수 조회" })
+  // async fetchChemiRating(@Request() request: any, @Param("id") id: string) {
+  //   const userId = request.user.id;
+  //   return this.reviewsService.sumRating(userId);
+  // }
 
   //----------------- 생성 -----------------------//
   @Post()
