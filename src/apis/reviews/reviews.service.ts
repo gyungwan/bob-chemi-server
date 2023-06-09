@@ -11,9 +11,9 @@ import { identity } from "rxjs";
 export class ReviewsService {
   constructor(
     @InjectRepository(Review)
-    private readonly reviewRepository: Repository<Review> // @Inject(forwardRef(() => UsersService)) // private readonly usersService: UsersService
-  ) //private readonly usersService: UsersService
-  {}
+    private readonly reviewRepository: Repository<Review>, // @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService
+  ) {}
 
   findAll({ page, order }): Promise<Review[]> {
     return this.reviewRepository.find({
@@ -38,21 +38,40 @@ export class ReviewsService {
     return this.reviewRepository.save(review);
   }
 
-  // async sumRating({ userId }): Promise<number> {
-  //   const userChemiRating = await this.usersService.calculateChemiRating(
-  //     userId
-  //   );
-  //   const reviews = await this.reviewRepository.find({
-  //     where: { user: userId },
-  //   });
+  async sumRating({ userId }): Promise<number> {
+    const userChemiRating = await this.usersService.calculateChemiRating(
+      userId
+    );
+    const reviews = await this.reviewRepository.find({
+      where: { user: userId },
+    });
 
-  //   let sum = userChemiRating;
-  //   reviews.forEach((review) => {
-  //     sum += parseInt(review.chemiRating);
-  //   });
+    let sum = userChemiRating;
+    reviews.forEach((review) => {
+      //sum += parseInt(review.chemiRating.toString());
+      switch (review.chemiRating) {
+        case EnumRating.BEST:
+          sum += EnumRating.BEST;
+          break;
+        case EnumRating.GOOD:
+          sum += EnumRating.GOOD;
+          break;
 
-  //   return sum;
-  // }
+        case EnumRating.DISAPPOINTING:
+          sum += EnumRating.DISAPPOINTING;
+          break;
+
+        case EnumRating.POOR:
+          sum += EnumRating.POOR;
+          break;
+
+        default:
+          break;
+      }
+    });
+
+    return sum;
+  }
   //   update(
   //     reviewId: string,
   //     updateReviewInput: UpdateReviewInput

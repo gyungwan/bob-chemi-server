@@ -36,8 +36,7 @@ import { ReviewsService } from "./reviews.service";
 @Controller("reviews")
 export class ReviewsController {
   constructor(
-    private readonly reviewsService: ReviewsService,
-    private readonly usersService: UsersService
+    private readonly reviewsService: ReviewsService //private readonly usersService: UsersService
   ) {}
 
   //@Param()은 URL 경로에서 동적인 값을 가져오는 데 사용되고(get, patch, delete)
@@ -76,13 +75,13 @@ export class ReviewsController {
   }
 
   //----------------- 유저의 케미지수 조회 -----------------------//
-  // @Get(":id/chemiRating")
-  // @UseGuards(RestAuthAccessGuard)
-  // @ApiOperation({ summary: "유저의 케미지수 조회" })
-  // async fetchChemiRating(@Request() request: any, @Param("id") id: string) {
-  //   const userId = request.user.id;
-  //   return this.reviewsService.sumRating(userId);
-  // }
+  @Get(":id/chemiRating")
+  @UseGuards(RestAuthAccessGuard)
+  @ApiOperation({ summary: "유저의 케미지수 조회" })
+  async fetchChemiRating(@Request() request: any, @Param("id") id: string) {
+    const userId = request.user.id;
+    return this.reviewsService.sumRating(userId);
+  }
 
   //----------------- 생성 -----------------------//
   @Post()

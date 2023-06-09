@@ -23,7 +23,7 @@ export class MatchingChatGateway
   constructor(private readonly matchingChatService: MatchingChatService) {}
 
   @WebSocketServer() server: Server;
-  private logger: Logger = new Logger("EventGateway"); //로그를 기록하고 디버깅, 저장x
+  private logger: Logger = new Logger("MatchingChatGateway"); //로그를 기록하고 디버깅, 저장x
 
   //   @SubscribeMessage("matchingchat") // 클라이언트에서 보낸 메세지를 수신하는 핸들러
   //   handleEvent(@MessageBody() data: string): string {
@@ -36,24 +36,23 @@ export class MatchingChatGateway
   }
 
   @SubscribeMessage("ClientToServer") //matchingchat, 프엔이랑 맞춰줌
-  handleMessage(@MessageBody() data) {
+  handleMessage(client: Socket, @MessageBody() data: string) {
     this.server.emit("ServerToClient", data); //matchingchat
-
     this.matchingChatService.addChatLog(data); // 채팅 기록 저장
   } //클라이언트에서 ClientToServer라는 이름으로 메세지를 보내면 서버에선 메세지의 body에서 데이터를 읽어와 그대로 ServerToClient라는 이름으로 보낸다.
 
-  handleConnection(client: Socket, ...args: any[]) {
+  handleConnection(client: Socket) {
     // 유저가 접속하면 동작
     //this.logger.log("${client.id} 님이 입장하셨습니다.");
-    this.logger.log(
-      `${client.id}(${client.handshake.query["username"]}) is connected!`
-    );
+    const nickname = client.handshake.query["nickname"];
+    this.logger.log(`${client.id} (${nickname}) 님이 입장하셨습니다.`);
   }
 
   handleDisconnect(client: Socket) {
     //웹소켓 연결이 종료되었을 때 실행
     // 유저 접속이 끊어지면 실행
-    this.logger.log("${client.id} 님이 퇴장하셨습니다.");
+    const nickname = client.handshake.query["nickname"];
+    this.logger.log("${client.id} (${nickname}) 님이 퇴장하셨습니다.");
     //ChatGateway.logger.debug(`${client.id} is disconnected...`);
   }
 }
