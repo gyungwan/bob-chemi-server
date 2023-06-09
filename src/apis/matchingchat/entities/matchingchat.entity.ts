@@ -19,11 +19,11 @@ export class MatchingChat {
 
   @ManyToOne(() => User, (user) => user.sentMessages)
   @JoinColumn({ name: "senderId" }) //외부키 설정
-  sender: string;
+  sender: User;
 
   @ManyToOne(() => User, (user) => user.receivedMessages)
   @JoinColumn({ name: "receiverId" })
-  receiver: string;
+  receiver: User;
 
   @Column()
   message: string; // 개별 메세지
@@ -38,19 +38,18 @@ export class MatchingChat {
   @IsString()
   @Column({ nullable: false }) // 시간순으로 정렬하여 저장 및 조회 가능
   log: string; //여러 개의 메시지를 포함하는 전체 채팅의 기록
-
-  // @Min(0)
-  // @Max(5)
-  // @ApiProperty({ description: "케미 지수" })
-  // @IsNumber()
-  // @Column({ nullable: false })
-  // chemiRating: number;
-
-  // @ManyToOne(() => User, { onDelete: "CASCADE" })
-  // @JoinColumn({ name: "id" })
-  // user: User;
-
-  // @ApiProperty({ description: "작성일" })
-  // @CreateDateColumn()
-  // createdAt: Date;
 }
+// @Min(0)
+// @Max(5)
+// @ApiProperty({ description: "케미 지수" })
+// @IsNumber()
+// @Column({ nullable: false })
+// chemiRating: number;
+
+// @ManyToOne(() => User, { onDelete: "CASCADE" })
+// @JoinColumn({ name: "id" })
+// user: User;
+
+// @ApiProperty({ description: "작성일" })
+// @CreateDateColumn()
+// createdAt: Date;
