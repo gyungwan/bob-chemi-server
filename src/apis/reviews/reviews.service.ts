@@ -17,17 +17,17 @@ export class ReviewsService {
 
   findAll({ page, order }): Promise<Review[]> {
     return this.reviewRepository.find({
-      relations: ["user", "quickMatching"],
+      relations: ["user"], // "quickMatching
       skip: (page - 1) * 4,
       take: 4,
       order: { createdAt: order },
     });
   }
 
-  findOne({ userId }): Promise<Review[]> {
-    return this.reviewRepository.find({
+  async findOne({ userId }): Promise<Review[]> {
+    return await this.reviewRepository.find({
       where: { user: userId },
-      relations: ["user", "quickMatching"],
+      relations: ["user"], //"quickMatching"
     });
   }
 

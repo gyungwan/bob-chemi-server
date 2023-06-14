@@ -6,6 +6,7 @@ import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity"
 
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Review } from "src/apis/reviews/entities/reviews.entity";
+import { UserGroup } from "src/apis/group/groupBoard/entites/userGroup.entity";
 
 export enum Gender {
   Male = "Male",
@@ -86,4 +87,7 @@ export class User {
   @OneToMany(() => FoodieBoard, (FoodieBoard) => FoodieBoard.user)
   @ApiProperty({ type: () => FoodieBoard })
   FoodieBoard: FoodieBoard[];
+
+  @OneToMany(() => UserGroup, (userGroup) => userGroup.user)
+  userGroups: UserGroup[];
 }
