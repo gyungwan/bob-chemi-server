@@ -61,7 +61,7 @@ export class ReviewsController {
   }
   //----------------- 유저의 리뷰 조회 -----------------------//
 
-  @Get(":id")
+  @Get("/id")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
     summary: "유저의 리뷰 조회",
@@ -71,14 +71,17 @@ export class ReviewsController {
     @Param("id") id: string
   ): Promise<Review[]> {
     const userId = request.user.id; // req는 미들웨어(passport, jwt 필요)
-    return this.reviewsService.findOne({ userId });
+    return await this.reviewsService.findOne({ userId });
   }
 
   //----------------- 유저의 케미지수 조회 -----------------------//
   @Get(":id/chemiRating")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({ summary: "유저의 케미지수 조회" })
-  async fetchChemiRating(@Request() request: any, @Param("id") id: string) {
+  async fetchChemiRating(
+    @Request() request: any, //
+    @Param("id") id: string
+  ) {
     const userId = request.user.id;
     return this.reviewsService.sumRating(userId);
   }

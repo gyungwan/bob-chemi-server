@@ -39,6 +39,8 @@ export class FoodieBoard {
   @ApiProperty({ type: () => User })
   user: User;
 
-  @OneToMany(() => FoodieImage, (foodieImage) => foodieImage.foodieBoard)
+  @OneToMany(() => FoodieImage, (foodieImage) => foodieImage.foodieBoard, {
+    cascade: true,
+  })
   images: FoodieImage[];
 }

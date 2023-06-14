@@ -10,6 +10,8 @@ export class FoodieImage {
   @Column()
   url: string;
 
-  @ManyToOne(() => FoodieBoard, (foodieBoard) => foodieBoard.images)
+  @ManyToOne(() => FoodieBoard, (foodieBoard) => foodieBoard.images, {
+    onDelete: "CASCADE",
+  })
   foodieBoard: FoodieBoard;
 }
