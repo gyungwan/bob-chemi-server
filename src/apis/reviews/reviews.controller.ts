@@ -8,7 +8,6 @@ import {
   UseGuards,
   Query,
   Req,
-  Request,
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
@@ -27,6 +26,7 @@ import { UsersService } from "../users/users.service";
 import { CreateReviewDto } from "./dto/create-review.dto";
 import { Review } from "./entities/reviews.entity";
 import { ReviewsService } from "./reviews.service";
+import { Request } from "express";
 
 @ApiTags("REVIEW")
 @ApiResponse({ status: 200, description: "성공" })
@@ -36,7 +36,8 @@ import { ReviewsService } from "./reviews.service";
 @Controller("reviews")
 export class ReviewsController {
   constructor(
-    private readonly reviewsService: ReviewsService //private readonly usersService: UsersService
+    private readonly reviewsService: ReviewsService,
+    private readonly usersService: UsersService
   ) {}
 
   //@Param()은 URL 경로에서 동적인 값을 가져오는 데 사용되고(get, patch, delete)
@@ -61,38 +62,44 @@ export class ReviewsController {
   }
   //----------------- 유저의 리뷰 조회 -----------------------//
 
-  @Get("/id")
+  @Get("/reviews")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
     summary: "유저의 리뷰 조회",
   })
-  async fetchReview(
-    @Request() request: any,
-    @Param("id") id: string
-  ): Promise<Review[]> {
-    const userId = request.user.id; // req는 미들웨어(passport, jwt 필요)
+  async fetchReview(@Req() req: Request): Promise<Review[]> {
+    const userId = req.user; // req는 미들웨어(passport, jwt 필요)
+    console.log(userId);
     return await this.reviewsService.findOne({ userId });
   }
 
   //----------------- 유저의 케미지수 조회 -----------------------//
-  @Get(":id/chemiRating")
-  @UseGuards(RestAuthAccessGuard)
-  @ApiOperation({ summary: "유저의 케미지수 조회" })
-  async fetchChemiRating(
-    @Request() request: any, //
-    @Param("id") id: string
-  ) {
-    const userId = request.user.id;
-    return this.reviewsService.sumRating(userId);
-  }
+  // @Get(":id/chemiRating")
+  // @UseGuards(RestAuthAccessGuard)
+  // @ApiOperation({ summary: "유저의 케미지수 조회" })
+  // async fetchChemiRating(
+  //   @Req() req: Request, //
+  //   @Param("id") id: string
+  // ) {
+  //   const userId = req.user;
+
+  //   return this.reviewsService.sumRating({ userId });
+  // }
 
   //----------------- 생성 -----------------------//
   @Post()
   @UseGuards(RestAuthAccessGuard) // => 로그인이 && 매칭이 된 사람만 쓰기
   @ApiOperation({ summary: "리뷰 작성" })
-  createReview(@Body() createReviewDto: CreateReviewDto): Promise<Review> {
+  async createReview(
+    @Body() createReviewDto: CreateReviewDto, //
+    @Req() req: Request
+  ): Promise<Review> {
+    const userId = (req.user as any).id;
     //JSON 형식의 데이터를 전송하고 해당 데이터를 객체로 변환하여 사용
-    return this.reviewsService.create(createReviewDto);
+
+    const user = await this.usersService.findOneEmail(userId);
+
+    return this.reviewsService.create(createReviewDto, user.id);
   }
 
   //----------------- 삭제 -----------------------//
