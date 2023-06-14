@@ -6,12 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import * as bcrypt from "bcrypt";
+import { Request } from "express";
+import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
 
 @Controller("user")
 @ApiTags("유저 API")
@@ -46,6 +50,19 @@ export class UsersController {
   // async findOne(@Param("id") id: string) {
   //   return await this.usersService.findOne(id);
   // }
+
+  //———————— 유저의 케미지수 조회 ———————————//
+  @Get("/chemiRating")
+  @UseGuards(RestAuthAccessGuard)
+  @ApiOperation({ summary: "유저의 케미지수 조회" })
+  async fetchChemiRating(
+    @Req() req: Request //
+    // @Param("id") id: any
+  ) {
+    const userId = (req.user as any).id;
+    console.log(userId);
+    return this.usersService.findOneChemiRating(userId);
+  }
 
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {

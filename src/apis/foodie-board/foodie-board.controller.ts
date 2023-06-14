@@ -8,9 +8,7 @@ import {
   Delete,
   BadRequestException,
   Req,
-  ExecutionContext,
   UploadedFiles,
-  ValidationPipe,
   UseGuards,
 } from "@nestjs/common";
 import { FoodieBoardService } from "./foodie-board.service";

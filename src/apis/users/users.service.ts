@@ -55,8 +55,10 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
-  async calculateChemiRating({ id }): Promise<number> {
-    const user = await this.userRepository.findOne({ where: { id: id } });
+  async findOneChemiRating(userId: User): Promise<number> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId.id },
+    });
     if (!user) {
       throw new NotFoundException("사용자를 찾을 수 없습니다.");
     }

@@ -6,6 +6,7 @@ import { Repository } from "typeorm";
 import { CreateReviewDto } from "./dto/create-review.dto";
 import { UsersService } from "../users/users.service";
 import { identity } from "rxjs";
+import { User } from "../users/entities/user.entity";
 
 @Injectable()
 export class ReviewsService {
@@ -27,51 +28,53 @@ export class ReviewsService {
   async findOne({ userId }): Promise<Review[]> {
     return await this.reviewRepository.find({
       where: { user: userId },
-      relations: ["user"], //"quickMatching"
+      relations: ["User"], //"quickMatching"
     });
   }
 
-  create(createReviewDto: CreateReviewDto): Promise<Review> {
+  create(createReviewDto: CreateReviewDto, user): Promise<Review> {
+    //user:User
     const review = this.reviewRepository.create(createReviewDto);
     // 저장할 때 chemirating에 user의 기본 점수인 45점 + 케미점수 해주기
     // 같은 리뷰 받은거 count 해서 sum 하기
-    return this.reviewRepository.save(review);
+
+    return this.reviewRepository.save({ ...review, user: user.id }); //user
   }
 
-  async sumRating({ userId }): Promise<number> {
-    const userChemiRating = await this.usersService.calculateChemiRating(
-      userId
-    );
-    const reviews = await this.reviewRepository.find({
-      where: { user: userId },
-    });
+  // async sumRating({ userId }): Promise<number> {
+  //   const userChemiRating = await this.usersService.calculateChemiRating(
+  //     userId
+  //   );
+  //   const reviews = await this.reviewRepository.find({
+  //     where: { user: userId },
+  //   });
 
-    let sum = userChemiRating;
-    reviews.forEach((review) => {
-      //sum += parseInt(review.chemiRating.toString());
-      switch (review.chemiRating) {
-        case EnumRating.BEST:
-          sum += EnumRating.BEST;
-          break;
-        case EnumRating.GOOD:
-          sum += EnumRating.GOOD;
-          break;
+  //   let sum = userChemiRating;
+  //   reviews.forEach((review) => {
+  //     //sum += parseInt(review.chemiRating.toString());
+  //     switch (review.chemiRating) {
+  //       case EnumRating.BEST:
+  //         sum += EnumRating.BEST;
+  //         break;
+  //       case EnumRating.GOOD:
+  //         sum += EnumRating.GOOD;
+  //         break;
 
-        case EnumRating.DISAPPOINTING:
-          sum += EnumRating.DISAPPOINTING;
-          break;
+  //       case EnumRating.DISAPPOINTING:
+  //         sum += EnumRating.DISAPPOINTING;
+  //         break;
 
-        case EnumRating.POOR:
-          sum += EnumRating.POOR;
-          break;
+  //       case EnumRating.POOR:
+  //         sum += EnumRating.POOR;
+  //         break;
 
-        default:
-          break;
-      }
-    });
+  //       default:
+  //         break;
+  //     }
+  //   });
 
-    return sum;
-  }
+  //   return sum;
+  // }
   //   update(
   //     reviewId: string,
   //     updateReviewInput: UpdateReviewInput
