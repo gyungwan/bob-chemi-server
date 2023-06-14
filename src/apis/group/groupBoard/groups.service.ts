@@ -12,8 +12,6 @@ import { UpdateGroupDto } from "./dto/update.group.dto";
 import { Member } from "./entites/members.entity";
 import { MemberStatus } from "./entites/members.status.enum";
 import { UsersService } from "src/apis/users/users.service";
-import { group } from "console";
-import { NotFound } from "@aws-sdk/client-s3";
 
 @Injectable()
 export class GroupsService {
