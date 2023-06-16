@@ -10,6 +10,7 @@ import {
   Req,
   Put,
   Patch,
+  NotFoundException,
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
@@ -60,7 +61,9 @@ export class ReviewsController {
   }
   //----------------- 유저의 리뷰 조회 -----------------------//
 
+
   @Get(":id")
+
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
     summary: "유저의 리뷰 조회",
@@ -68,13 +71,19 @@ export class ReviewsController {
   async fetchReview(
     // @Request() request: any,
     @Param("id") id: string
+    //@Query("id") id: string
   ): Promise<Review[]> {
-    //const userId = request.user.id; // req는 미들웨어(passport, jwt 필요)
-    console.log("1111111111111111111111111111", id);
-
+    const user = await this.usersService.findOneEmail(id);
     //const userId = await this.usersService.findOne(id);
     console.log("1111111111111111111111111111");
     return this.reviewsService.findOne({ id });
+
+//     if (!user) {
+//       // Handle case when user is not found
+//       throw new NotFoundException("해당하는 유저를 찾을수 없습니다.");
+//     }
+//     return this.reviewsService.findOne({ userId: user.id });
+
   }
 
   //----------------- 유저의 케미지수 조회 -----------------------//
