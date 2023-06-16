@@ -12,6 +12,7 @@ import { CreateReviewDto } from "./dto/create-review.dto";
 import { UsersService } from "../users/users.service";
 import { identity } from "rxjs";
 import { User } from "../users/entities/user.entity";
+import { IReviewsServiceFindOne } from "./interfaces/review.interface";
 
 @Injectable()
 export class ReviewsService {
@@ -33,11 +34,13 @@ export class ReviewsService {
     });
   }
 
-  async findOne({ userId }): Promise<Review[]> {
+  async findOne({ id }: IReviewsServiceFindOne): Promise<Review[]> {
     return await this.reviewRepository.find({
-      where: { user: userId },
-      relations: ["user"], //"quickMatching"
+      where: { user: { id } },
+      relations: ["user"], // quickmatcing
     });
+    //where: { user: userId },
+    //relations: ["user"], //"quickMatching"
   }
   //-----유저 리뷰생성,케미지수 ------
   async create(createReviewDto: CreateReviewDto, user): Promise<Review> {
