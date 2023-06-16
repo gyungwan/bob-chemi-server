@@ -81,6 +81,7 @@ export class ReviewsController {
   // @Get(":id/chemiRating")
   // @UseGuards(RestAuthAccessGuard)
   // @ApiOperation({ summary: "유저의 케미지수 조회" })
+
   // async fetchChemiRating(@Req() req: Request, @Param("id") id: string) {
   //   const userId = (req.user as any).id;
   //   return this.usersService.findOneChemiRating(userId);
@@ -99,6 +100,7 @@ export class ReviewsController {
     const totalChemiRating = sum; // + user;
     console.log(totalChemiRating);
     await this.reviewsService.updateChemiRating(userId, totalChemiRating);
+
 
     return { chemiRating: totalChemiRating };
   }

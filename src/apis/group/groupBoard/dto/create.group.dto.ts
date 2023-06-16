@@ -27,7 +27,7 @@ export class CreateGroupDto {
   groupDate: Date;
 
   @Min(2)
-  @Min(10)
+  @Max(10)
   @ApiProperty({
     description: "소모임 인원 제한",
     example: "2~10",

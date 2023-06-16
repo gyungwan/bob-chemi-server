@@ -51,6 +51,7 @@ export class UsersController {
   //   return await this.usersService.findOne(id);
   // }
 
+
   //----------------- 유저의 케미지수 조회 -----------------------//
   @Get("/chemiRating")
   @UseGuards(RestAuthAccessGuard)
@@ -58,6 +59,7 @@ export class UsersController {
   async fetchChemiRating(@Req() req: Request) {
     const userId = (req.user as any).id;
     //console.log(userId);
+
     return this.usersService.findOneChemiRating(userId);
   }
 

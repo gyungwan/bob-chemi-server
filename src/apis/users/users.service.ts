@@ -59,7 +59,9 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
+
   async findOneChemiRating(userId): Promise<number> {
+
     const user = await this.userRepository.findOne({
       where: { id: userId.id },
     });

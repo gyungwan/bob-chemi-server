@@ -13,34 +13,39 @@ import {
 import { CreateGroupDto } from "./dto/create.group.dto";
 import { Group } from "./entites/groups.entity";
 import { GroupsService } from "./groups.service";
-import { GroupStatus } from "./entites/groups.status.enum";
-import { GroupStatusValidationPipe } from "./pipes/group.status.validation";
-import { ApiOperation } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UpdateGroupDto } from "./dto/update.group.dto";
 import { Member } from "./entites/members.entity";
 
 @Controller("groups")
+@ApiTags("소모임 API")
 export class GroupsController {
   constructor(private groupsService: GroupsService) {}
 
   //<<------------소모임 조회------------>>
   @Get("/")
-  @ApiOperation({ description: "모든 소모임 조회" })
+  @ApiOperation({
+    summary: "모든 소모임 조회",
+    description: "모든 소모임 조회",
+  })
   getAllGroupBoard(): Promise<Group[]> {
     return this.groupsService.getAllGroups();
   }
 
   //<<------------ID로 소모임 조회------------>>
   @Get("/:id")
-  @ApiOperation({ description: "id로 소모임 검색" })
-  getBoardById(@Param("id") groupId: string): Promise<Group> {
+  @ApiOperation({
+    summary: "ID로 소모임 검색 ",
+    description: "id로 소모임 검색",
+  })
+  getBoardById(@Param("groupId") groupId: number): Promise<Group> {
     return this.groupsService.getGroupById(groupId);
   }
 
   //<<------------소모임 생성------------>>
   @Post()
   @UsePipes(ValidationPipe)
-  @ApiOperation({ description: "소모임 생성" })
+  @ApiOperation({ summary: "소모임 생성", description: "소모임 생성" })
   createGroupBoard(
     @Body() createGroupDto: CreateGroupDto,
     @Param("id") id: string
@@ -49,76 +54,93 @@ export class GroupsController {
   }
 
   //<<------------소모임 삭제------------>>
-  @Delete()
-  @ApiOperation({ description: "소모임 삭제" })
+  @Delete("/:id")
+  @ApiOperation({ summary: "소모임 삭제", description: "소모임 삭제" })
   deleteBoard(@Param("id", ParseIntPipe) id): Promise<void> {
     return this.groupsService.deleteGroup(id);
   }
 
   //<<------------소모임 수정------------>>
   @Patch("/:id/group")
-  @ApiOperation({ description: "소모임 게시글 수정" })
+  @ApiOperation({
+    summary: "소모임 게시글 수정",
+    description: "해당 소모임 ID로 찾아와서, 수정된 내용 입력",
+  })
   updateGroup(
     @Param("id", ParseIntPipe) id: number,
     @Body() updateGroupDto: UpdateGroupDto
   ) {
-    return this.updateGroup(id, updateGroupDto);
+    return this.groupsService.updateGroup(id, updateGroupDto);
   }
 
   //<<------------소모임 구인 중 상태 변경------------>>
   @Patch("/:id/status")
-  @ApiOperation({ description: "소모임 모집중 <-> 모집완 변경" })
-  updateGroupStatus(
-    @Param("id", ParseIntPipe) id: number,
-    @Body("status", GroupStatusValidationPipe) status: GroupStatus
-  ) {
-    return this.updateGroupStatus(id, status);
+  @ApiOperation({
+    summary: "구인 상태 변경",
+    description:
+      "실행할 때 마다, 해당 ID의 소모임 구인 상태가 구인중<->구인완료 변경",
+  })
+  updateGroupStatus(@Param("groupId") id: number) {
+    return this.groupsService.updateGroupStatus(id);
   }
 
   //<<------------소모임 가입 신청------------>>
-  @Post(":id/:groupId/join")
-  @ApiOperation({ description: "소모임 가입 신청" })
+  @Post(":email/:groupId/join")
+  @ApiOperation({
+    summary: "소모임 가입 신청",
+    description:
+      "가입 신청 api 실행하면 member에 등록되어 가입 상태가 pending 처리 됨",
+  })
   async joinGroup(
-    @Param("id") id: string,
-    @Param("groupId") groupId: string
+    @Param("email") email: string,
+    @Param("groupId") groupId: number
   ): Promise<Member> {
-    return this.groupsService.joinGroup(id, groupId);
+    return this.groupsService.joinGroup(email, groupId);
   }
 
   //<<------------소모임 신청에 대한 수락------------>>
-  @Post(":id/:groupId/accept")
-  @ApiOperation({ description: "소모임 가입 수락" })
+  @Post(":memberId/:groupId/accept")
+  @ApiOperation({
+    summary: "소모임 가입 수락",
+    description: "Member의 가입 상태 pending을 confirmed로 변경",
+  })
   async acceptMember(
-    @Param("id") id: string,
-    @Param("groupId") groupId: string
+    @Param("memberId") memberId: string,
+    @Param("groupId") groupId: number
   ): Promise<Member> {
-    return this.groupsService.acceptMember(id, groupId);
+    return this.groupsService.acceptMember(memberId, groupId);
   }
 
   //<<------------소모임 신청에 대한 거절(삭제)------------>>
   @Delete(":memberId/:groupId/deny")
-  @ApiOperation({ description: "소모임 가입 거절" })
+  @ApiOperation({
+    summary: "소모입 가입 거절",
+    description: "member의 소모입 가입 신청을 삭제함",
+  })
   async denyMember(
     @Param("memberId") memberId: string,
-    @Param("groupId") groupId: string
+    @Param("groupId") groupId: number
   ): Promise<void> {
     return this.groupsService.denyMember(memberId, groupId);
   }
 
   //<<------------가입 대기중인 멤버 조회------------>>
   @Get(":groupId/pending")
-  @ApiOperation({ description: "소모임 가입 대기중인 멤버 조회" })
+  @ApiOperation({
+    summary: "가입 대기중인 멤버 조회",
+    description: "소모임 가입 대기중인 멤버 조회",
+  })
   async getPendingMembers(
-    @Param("groupId") groupId: string
+    @Param("groupId") groupId: number
   ): Promise<Member[]> {
     return this.groupsService.getPendingMembers(groupId);
   }
 
   //<<------------가입된 멤버 조회------------>>
   @Get(":groupId/confirmed")
-  @ApiOperation({ description: "소모임에 가입된 멤버 조회" })
+  @ApiOperation({ summary: "", description: "소모임에 가입된 멤버 조회" })
   async getConfirmedMembers(
-    @Param("groupId") groupId: string
+    @Param("groupId") groupId: number
   ): Promise<Member[]> {
     return this.groupsService.getConfirmedMembers(groupId);
   }

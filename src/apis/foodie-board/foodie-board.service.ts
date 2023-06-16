@@ -18,26 +18,23 @@ export class FoodieBoardService {
   ) {}
   async create(
     createFoodieBoardDto: CreateFoodieBoardDto,
+    userId,
     files: Express.MulterS3.File[]
   ) {
-    const foodieBoard = await this.foodieBoardRepository.create({
+    const images = await Promise.all(
+      files.map(async (file) => {
+        const url = await this.fileUploadService.uploadFiles(file);
+        return this.imageRepository.create({ url });
+      })
+    );
+
+    const foodieBoard = await this.foodieBoardRepository.save({
       ...createFoodieBoardDto,
-      user: { id: createFoodieBoardDto.userId },
+      user: { id: userId },
+      images,
     });
 
-    const savedFoodieBoard = await this.foodieBoardRepository.save(foodieBoard);
-
-    for (let file of files) {
-      const url = await this.fileUploadService.uploadFiles(file);
-
-      const image = this.imageRepository.create({
-        url,
-        foodieBoard: savedFoodieBoard,
-      });
-      await this.imageRepository.save(image);
-    }
-
-    return savedFoodieBoard;
+    return foodieBoard;
   }
 
   async findAll() {

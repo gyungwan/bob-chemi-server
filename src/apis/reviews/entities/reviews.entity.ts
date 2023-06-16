@@ -54,7 +54,7 @@ export class Review {
   chemiRating: EnumRating;
 
   @ManyToOne(() => User, (user) => user.review, { onDelete: "CASCADE" }) //유저가 탈퇴할 때 리뷰도 같이 삭제
-  @JoinColumn({ name: "id" })
+  // @JoinColumn({ name: "id" })
   user: User;
 
   @ApiProperty({ description: "작성일" })
