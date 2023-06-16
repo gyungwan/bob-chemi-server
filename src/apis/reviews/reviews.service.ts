@@ -25,7 +25,6 @@ export class ReviewsService {
 
   findAll({ page, order }): Promise<Review[]> {
     return this.reviewRepository.find({
-
       relations: ["user"], //"quickMatching"
 
       skip: (page - 1) * 4,
@@ -38,75 +37,47 @@ export class ReviewsService {
     return await this.reviewRepository.find({
       where: { user: userId },
       relations: ["user"], //"quickMatching"
-
     });
   }
+  //-----유저 리뷰생성,케미지수 ------
+  async create(createReviewDto: CreateReviewDto, user): Promise<Review> {
+    const userChemi = await this.sumRating(createReviewDto, user);
 
-  create(createReviewDto: CreateReviewDto, user): Promise<Review> {
-    const review = this.reviewRepository.create(createReviewDto);
+    const review = await this.reviewRepository.create(createReviewDto);
     // 저장할 때 chemirating에 user의 기본 점수인 45점 + 케미점수 해주기
     // 같은 리뷰 받은거 count 해서 sum 하기
-    return this.reviewRepository.save({ ...review, user });
+
+    user.chemiRating = userChemi;
+    console.log(user);
+    await this.userRepository.save(user);
+    return await this.reviewRepository.save({ ...review, user: user });
   }
 
-  async sumRating({ userId, reviews }): Promise<number> {
-    const userChemiRating = await this.usersService.findOneChemiRating(userId); //45
-    console.log(userChemiRating, "11111111111111111");
-    // const reviews = await this.reviewRepository.find({
-    //   where: { user: userId },
-    //   //relations: ["user"], // User와의 관계 설정
-    // });
-    //const user = await this.usersService.findOneEmail(userId); // 사용자 정보 가져오기
-    // const reviews = user.review; // 사용자의 리뷰 가져오기
-
-    console.log(userChemiRating, "22222222222222222", reviews);
-    let sum = userChemiRating;
-    // reviews.forEach((review) => {
-    //   //sum += parseInt(review.chemiRating.toString());
-    //   switch (review.chemiRating) {
-    //     case EnumRating.BEST: //2
-    //       sum += EnumRating.BEST;
-    //       break;
-    //     case EnumRating.GOOD: //1
-    //       sum += EnumRating.GOOD;
-    //       break;
-
-    //     case EnumRating.DISAPPOINTING: //-1
-    //       sum += EnumRating.DISAPPOINTING;
-    //       break;
-
-    //     case EnumRating.POOR: //-2
-    //       sum += EnumRating.POOR;
-    //       break;
-
-    //     default:
-    //       break;
-    //   }
-    // });
-
-    // return sum;
-    if (reviews) {
-      reviews.forEach((review) => {
-        switch (review.chemiRating) {
-          case EnumRating.BEST:
-            sum += EnumRating.BEST;
-            break;
-          case EnumRating.GOOD:
-            sum += EnumRating.GOOD;
-            break;
-          case EnumRating.DISAPPOINTING:
-            sum += EnumRating.DISAPPOINTING;
-            break;
-          case EnumRating.POOR:
-            sum += EnumRating.POOR;
-            break;
-          default:
-            break;
-        }
-      });
+  // ------- 유저 케미지수 연산  ------
+  async sumRating(createReviewDto: CreateReviewDto, user: User) {
+    const { chemiRating } = createReviewDto;
+    let updatedChemiRating = user.chemiRating;
+    console.log(user);
+    if (chemiRating) {
+      switch (chemiRating) {
+        case EnumRating.BEST:
+          updatedChemiRating += EnumRating.BEST;
+          break;
+        case EnumRating.GOOD:
+          updatedChemiRating += EnumRating.GOOD;
+          break;
+        case EnumRating.DISAPPOINTING:
+          updatedChemiRating += EnumRating.DISAPPOINTING;
+          break;
+        case EnumRating.POOR:
+          updatedChemiRating += EnumRating.POOR;
+          break;
+        default:
+          break;
+      }
     }
 
-    return sum;
+    return updatedChemiRating;
   }
   async updateChemiRating(id, newChemiRating: number) {
     const user = await this.usersService.findOneEmail(id);
@@ -117,7 +88,6 @@ export class ReviewsService {
     return this.userRepository.save(user); // user
   }
 
-   
   //   update(
   //     reviewId: string,
   //     updateReviewInput: UpdateReviewInput

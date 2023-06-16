@@ -88,22 +88,21 @@ export class ReviewsController {
   // }
 
   //----------------- 유저의 케미지수 계산 -----------------------//
-  @Patch("/chemiRating")
-  @UseGuards(RestAuthAccessGuard)
-  @ApiOperation({ summary: "케미지수 계산" })
-  async calculateChemiRating(@Req() req: Request) {
-    const userId = (req.user as any).id;
-    //console.log(userId); 가져와짐
-    const reviews = req.body.reviewId;
-    const sum = await this.reviewsService.sumRating({ userId, reviews });
-    //const user = await this.usersService.findOneChemiRating({ userId });
-    const totalChemiRating = sum; // + user;
-    console.log(totalChemiRating);
-    await this.reviewsService.updateChemiRating(userId, totalChemiRating);
+  // @Patch("/chemiRating")
+  // @UseGuards(RestAuthAccessGuard)
+  // @ApiOperation({ summary: "케미지수 계산" })
+  // async calculateChemiRating(@Req() req: Request) {
+  //   const userId = (req.user as any).id;
+  //   //console.log(userId); 가져와짐
+  //   const reviews = req.body.reviewId;
+  //   const sum = await this.reviewsService.sumRating({ userId, reviews });
+  //   //const user = await this.usersService.findOneChemiRating({ userId });
+  //   const totalChemiRating = sum; // + user;
+  //   console.log(totalChemiRating);
+  //   await this.reviewsService.updateChemiRating(userId, totalChemiRating);
 
-
-    return { chemiRating: totalChemiRating };
-  }
+  //   return { chemiRating: totalChemiRating };
+  // }
   //----------------- 생성 -----------------------//
   @Post()
   @UseGuards(RestAuthAccessGuard) // => 로그인이 && 매칭이 된 사람만 쓰기
@@ -115,7 +114,8 @@ export class ReviewsController {
     //JSON 형식의 데이터를 전송하고 해당 데이터를 객체로 변환하여 사용
     const userId = (req.user as any).id;
     const user = await this.usersService.findOneEmail(userId);
-    return this.reviewsService.create(createReviewDto, user.id);
+
+    return this.reviewsService.create(createReviewDto, user);
   }
 
   //----------------- 삭제 -----------------------//
