@@ -42,8 +42,8 @@ export class UsersService {
   //   return this.userRepository.findOne({ where: { id } });
   // }
 
-  async findOneEmail({ email }) {
-    return await this.userRepository.findOne({ where: { email } });
+  async findOneEmail(email): Promise<User> {
+    return await this.userRepository.findOne({ where: { id: email } });
   }
 
   async findOnePhone({ phone }: { phone: string }): Promise<string> {
@@ -59,9 +59,7 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
-
   async findOneChemiRating(userId): Promise<number> {
-
     const user = await this.userRepository.findOne({
       where: { id: userId.id },
     });
