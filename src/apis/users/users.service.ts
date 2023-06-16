@@ -38,6 +38,10 @@ export class UsersService {
     return `This action returns all users`;
   }
 
+  // findOne({ id }): Promise<User> {
+  //   return this.userRepository.findOne({ where: { id } });
+  // }
+
   async findOneEmail({ email }) {
     return await this.userRepository.findOne({ where: { email } });
   }
@@ -55,11 +59,23 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
-  async calculateChemiRating({ id }): Promise<number> {
-    const user = await this.userRepository.findOne({ where: { id: id } });
+  async findOneChemiRating(userId): Promise<number> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId.id },
+    });
     if (!user) {
       throw new NotFoundException("사용자를 찾을 수 없습니다.");
     }
     return user.chemiRating;
+  }
+
+  async updateChemiRating(id: string, newChemiRating: number) {
+    //: Promise<User>
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException("사용자를 찾을 수 없습니다.");
+    }
+    user.chemiRating = newChemiRating;
+    return this.userRepository.save(user); // user
   }
 }
