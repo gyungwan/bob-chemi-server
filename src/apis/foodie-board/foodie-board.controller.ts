@@ -35,11 +35,6 @@ export class FoodieBoardController {
     @Req() req: Request,
     @UploadedFiles() files: Express.MulterS3.File[]
   ) {
-    console.log(createFoodieBoardDto);
-
-    // const foodieDto = JSON.parse(createFoodieBoardDto);
-    console.log(createFoodieBoardDto);
-
     const { title, content } = createFoodieBoardDto;
     const userId = (req as any).user?.id;
 
@@ -54,41 +49,23 @@ export class FoodieBoardController {
     );
   }
 
-  // @Post()
-  // @ApiOperation({
-  //   summary: "맛잘알 생성",
-  //   description: "맛잘알 생성 API",
-  // })
-  // async create(
-  //   @Req() req: Request,
-  //   @UploadedFiles() files: Express.MulterS3.File[]
-  // ) {
-  //   const { title, content } = req.body; // Access form data directly from req.body
-  //   const userId = (req as any).user?.id;
-
-  //   console.log(title, content);
-
-  //   if (!title && !content) {
-  //     throw new BadRequestException(
-  //       "The subject and content are required fields."
-  //     );
-  //   }
-
-  //   const createFoodieBoardDto: CreateFoodieBoardDto = {
-  //     title,
-  //     content,
-  //     userId,
-  //   };
-
-  //   return await this.foodieBoardService.create(createFoodieBoardDto, files);
-  // }
   @Get()
   async findAll() {
     return await this.foodieBoardService.findAll();
   }
 
   @Get(":id")
-  async findOne(@Param("id") id: string) {
+  @UseGuards(RestAuthAccessGuard)
+  @ApiOperation({
+    summary: "맛잘알 단일 조회 ",
+    description: "맛잘알 단일 조회API",
+  })
+  async findOne(
+    @Req() req: Request, //
+    @Param("id") id: string
+  ) {
+    const userId = (req as any).user?.id;
+    console.log(userId);
     return await this.foodieBoardService.findOne(id);
   }
 

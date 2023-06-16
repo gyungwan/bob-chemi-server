@@ -7,7 +7,7 @@ import {
 import { EnumRating, Review } from "./entities/reviews.entity";
 
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Connection, getConnection, Repository } from "typeorm";
 import { CreateReviewDto } from "./dto/create-review.dto";
 import { UsersService } from "../users/users.service";
 import { identity } from "rxjs";
@@ -20,7 +20,8 @@ export class ReviewsService {
     private readonly reviewRepository: Repository<Review>, // @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    private connection: Connection
   ) {}
 
   findAll({ page, order }): Promise<Review[]> {
@@ -33,11 +34,13 @@ export class ReviewsService {
     });
   }
 
-  async findOne({ userId }): Promise<Review[]> {
-    return await this.reviewRepository.find({
-      where: { user: userId },
-      relations: ["user"], //"quickMatching"
-    });
+  async findOne({ userId }: { userId: string }): Promise<Review[]> {
+    return await this.connection
+      .getRepository(Review)
+      .createQueryBuilder("review")
+      .leftJoinAndSelect("review.user", "user")
+      .where("user.id = :userId", { userId })
+      .getMany();
   }
   //-----유저 리뷰생성,케미지수 ------
   async create(createReviewDto: CreateReviewDto, user): Promise<Review> {
