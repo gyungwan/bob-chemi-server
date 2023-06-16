@@ -6,8 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
   UseGuards,
+  Req,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -51,16 +51,15 @@ export class UsersController {
   //   return await this.usersService.findOne(id);
   // }
 
-  //———————— 유저의 케미지수 조회 ———————————//
+
+  //----------------- 유저의 케미지수 조회 -----------------------//
   @Get("/chemiRating")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({ summary: "유저의 케미지수 조회" })
-  async fetchChemiRating(
-    @Req() req: Request //
-    // @Param("id") id: any
-  ) {
+  async fetchChemiRating(@Req() req: Request) {
     const userId = (req.user as any).id;
-    console.log(userId);
+    //console.log(userId);
+
     return this.usersService.findOneChemiRating(userId);
   }
 

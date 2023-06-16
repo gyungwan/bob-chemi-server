@@ -17,6 +17,9 @@ import { EnumRating, EnumValue } from "../entities/reviews.entity";
 // }
 
 export class CreateReviewDto {
+  // @ApiProperty({})
+  // userId: string;
+
   @Min(-2)
   @Max(2)
   @IsNumber()
