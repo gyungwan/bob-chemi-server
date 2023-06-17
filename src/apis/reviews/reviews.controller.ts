@@ -45,7 +45,7 @@ export class ReviewsController {
 
   //----------------- 모든 리뷰 조회 -----------------------//
 
-  @Get()
+  @Get("/")
   @ApiOperation({
     summary: "모든 리뷰 조회",
   })
@@ -61,23 +61,26 @@ export class ReviewsController {
   }
   //----------------- 유저의 리뷰 조회 -----------------------//
 
+
   @Get("user")
+
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
     summary: "유저의 리뷰 조회",
   })
   async fetchReview(
     // @Request() request: any,
-    //@Param("id") id: string
-    @Query("id") id: string
+    @Param("id") id: string
+    //@Query("id") id: string
   ): Promise<Review[]> {
-    console.log("=======", id);
+
     const user = await this.usersService.findOneId(id);
 
     if (!user) {
       throw new NotFoundException("해당하는 유저를 찾을수 없습니다.");
     }
     return this.reviewsService.findOne({ userId: user.id });
+
   }
 
   //----------------- 유저의 케미지수 조회 -----------------------//
@@ -115,6 +118,7 @@ export class ReviewsController {
     @Req() req: Request
   ): Promise<Review> {
     //JSON 형식의 데이터를 전송하고 해당 데이터를 객체로 변환하여 사용
+    // 매칭된 사람의 아이디를 찾아와서 리뷰 작성
     const userId = (req.user as any).id;
     const user = await this.usersService.findOneEmail(userId);
 

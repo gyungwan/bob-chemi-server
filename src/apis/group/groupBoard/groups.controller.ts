@@ -42,6 +42,16 @@ export class GroupsController {
     return this.groupsService.getGroupById(groupId);
   }
 
+  //<<------------날짜로 소모임 조회------------>>
+  @Get("/date/:date")
+  @ApiOperation({
+    summary: "날짜로 소모임 검색",
+    description: "해당 날짜의 모든 소모임 조회",
+  })
+  getGroupByDate(@Param("date") groupDate: Date): Promise<Group[]> {
+    const date = new Date(groupDate);
+    return this.groupsService.getGroupByDate(date);
+  }
   //<<------------소모임 생성------------>>
   @Post()
   @UsePipes(ValidationPipe)
@@ -138,7 +148,10 @@ export class GroupsController {
 
   //<<------------가입된 멤버 조회------------>>
   @Get(":groupId/confirmed")
-  @ApiOperation({ summary: "", description: "소모임에 가입된 멤버 조회" })
+  @ApiOperation({
+    summary: "가입 허가된 멤버 조회",
+    description: "소모임에 가입된 멤버 조회",
+  })
   async getConfirmedMembers(
     @Param("groupId") groupId: number
   ): Promise<Member[]> {

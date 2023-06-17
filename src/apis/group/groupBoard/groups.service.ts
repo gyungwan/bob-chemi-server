@@ -39,6 +39,12 @@ export class GroupsService {
     return found;
   }
 
+  //<<------------날짜로 소모임 조회------------>>
+  async getGroupByDate(groupDate: Date): Promise<Group[]> {
+    const found = await this.groupRepository.find({ where: { groupDate } });
+    return found;
+  }
+
   //<<------------소모임 생성------------>>
   async createGroup(
     createGroupDto: CreateGroupDto,
