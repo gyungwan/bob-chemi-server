@@ -25,9 +25,7 @@ export class AuthService {
   ) {}
 
   async validateUser({ loginDto }) {
-    const user = await this.usersService.findOneEmail({
-      email: loginDto.email,
-    });
+    const user = await this.usersService.findOneEmail(loginDto.email);
     if (!user) {
       throw new UnprocessableEntityException(
         "가입한 계정이 없거나 비밀번호가 올바르지 않습니다"
