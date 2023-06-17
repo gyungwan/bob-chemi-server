@@ -52,7 +52,7 @@ export class GroupsService {
   ): Promise<Group> {
     const group = this.groupRepository.create(createGroupDto);
     const newGroup = await this.groupRepository.save(group);
-    const user = await this.userServices.findOneEmail({ email: id });
+    const user = await this.userServices.findOneEmail(id);
 
     console.log(group, user, "group과 user console.log");
 
@@ -109,7 +109,7 @@ export class GroupsService {
 
   //<<------------소모임 가입 신청------------>>
   async joinGroup(email: string, groupId: any): Promise<Member> {
-    const user = await this.userServices.findOneEmail({ email });
+    const user = await this.userServices.findOneEmail(email);
     const group = await this.groupRepository.findOne({ where: { groupId } });
 
     const isPending = await this.memberRepository.findOne({

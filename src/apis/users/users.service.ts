@@ -38,12 +38,12 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  // findOne({ id }): Promise<User> {
-  //   return this.userRepository.findOne({ where: { id } });
-  // }
+  async findOneId(id): Promise<User> {
+    return await this.userRepository.findOne({ where: { id: id } });
+  }
 
-  async findOneEmail(email): Promise<User> {
-    return await this.userRepository.findOne({ where: { id: email } });
+  async findOneEmail(email: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { email } });
   }
 
   async findOnePhone({ phone }: { phone: string }): Promise<string> {

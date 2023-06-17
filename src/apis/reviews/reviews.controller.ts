@@ -62,7 +62,7 @@ export class ReviewsController {
   //----------------- 유저의 리뷰 조회 -----------------------//
 
 
-  @Get(":id")
+  @Get("user")
 
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
@@ -73,16 +73,13 @@ export class ReviewsController {
     @Param("id") id: string
     //@Query("id") id: string
   ): Promise<Review[]> {
-    const user = await this.usersService.findOneEmail(id);
-    //const userId = await this.usersService.findOne(id);
-    console.log("1111111111111111111111111111");
-    return this.reviewsService.findOne({ id });
 
-//     if (!user) {
-//       // Handle case when user is not found
-//       throw new NotFoundException("해당하는 유저를 찾을수 없습니다.");
-//     }
-//     return this.reviewsService.findOne({ userId: user.id });
+    const user = await this.usersService.findOneId(id);
+
+    if (!user) {
+      throw new NotFoundException("해당하는 유저를 찾을수 없습니다.");
+    }
+    return this.reviewsService.findOne({ userId: user.id });
 
   }
 
