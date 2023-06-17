@@ -20,7 +20,7 @@ import { FoodieBoardModule } from "./apis/foodie-board/foodie-board.module";
 import { FileUploadModule } from "./apis/file-upload/file-upload.module";
 import { GroupsModule } from "./apis/group/groupBoard/groups.module";
 import { GroupChatsModule } from "./apis/group/groupChat/groupChats.module";
-
+import { QuickMatchingModule } from "./apis/quickmatchings/quickmatchings.module";
 
 @Module({
   imports: [
@@ -61,6 +61,7 @@ import { GroupChatsModule } from "./apis/group/groupChat/groupChats.module";
     GroupsModule,
     GroupChatsModule,
     FileUploadModule,
+    QuickMatchingModule,
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소
@@ -69,8 +70,6 @@ import { GroupChatsModule } from "./apis/group/groupChat/groupChats.module";
       // url: "redis://localhost:6379",
       isGlobal: true,
     }),
-   
-
   ],
   controllers: [AppController],
   providers: [AppService, jwtAccessStrategy, jwtRefreshStrategy],
