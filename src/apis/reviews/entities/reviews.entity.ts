@@ -36,7 +36,7 @@ export enum EnumValue {
 export class Review {
   @PrimaryGeneratedColumn("uuid")
   @IsString()
-  @ApiProperty({ description: "id" })
+  @ApiProperty({ description: " review id" })
   reviewId: string;
 
   @ApiProperty({ description: "리뷰" })
