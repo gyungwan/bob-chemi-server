@@ -67,14 +67,25 @@ export class UsersController {
   }
 
   //----------------- 유저의 케미지수 조회 -----------------------//
-  @Get("/chemiRating")
+  // @Get("/chemiRating")
+  // @UseGuards(RestAuthAccessGuard)
+  // @ApiOperation({ summary: "유저의 케미지수 조회" })
+  // async fetchChemiRating(@Req() req: Request) {
+  //   const userId = (req.user as any).id;
+  //   //console.log(userId);
+
+  //   return this.usersService.findOneChemiRating(userId);
+  // }
+
+  @Get(":id")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({ summary: "유저의 케미지수 조회" })
-  async fetchChemiRating(@Req() req: Request) {
-    const userId = (req.user as any).id;
-    //console.log(userId);
-
-    return this.usersService.findOneChemiRating(userId);
+  async fetchChemiRating(
+    @Param("id") id: string,
+    @Query("chemiRating") chemiRating: number
+  ) {
+    console.log(id, "==================");
+    return this.usersService.findOneChemiRating(id);
   }
   //------------ 유저 정보 수정 ----------- //
   @Patch(":id")
