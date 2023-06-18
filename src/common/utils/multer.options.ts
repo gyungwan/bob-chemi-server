@@ -5,21 +5,21 @@ import multerS3 from "multer-s3";
 import path from "path";
 
 export const multerOptionsFactory = (
-  ConfigService: ConfigService
+  configService: ConfigService
 ): MulterOptions => {
   // s3 인스턴스 생성
   const s3 = new S3Client({
-    region: ConfigService.get("AWS_BUCKET_REGION"),
+    region: configService.get("AWS_BUCKET_REGION"),
     credentials: {
-      accessKeyId: ConfigService.get("AWS_ACCESS_KEY_ID"),
-      secretAccessKey: ConfigService.get("AWS_SECRET_ACCESS_KEY"),
+      accessKeyId: configService.get("AWS_ACCESS_KEY_ID"),
+      secretAccessKey: configService.get("AWS_SECRET_ACCESS_KEY"),
     },
   });
 
   return {
     storage: multerS3({
       s3,
-      bucket: ConfigService.get("AWS_BUCKET_NAME"),
+      bucket: configService.get("AWS_BUCKET_NAME"),
       key(_req, file, done) {
         const folderPath = "image/foodieBoard"; //버킷에 원하는 폴더안에 저장
         const ext = path.extname(file.originalname); // 파일의 확장자 추출

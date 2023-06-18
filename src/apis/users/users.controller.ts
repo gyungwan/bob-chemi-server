@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  NotFoundException,
   Query,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
@@ -17,12 +18,14 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import * as bcrypt from "bcrypt";
 import { Request } from "express";
 import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
+import { User } from "./entities/user.entity";
+import { UserProfileDto } from "./dto/userProfileDto";
 
 @Controller("user")
 @ApiTags("유저 API")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
+  //------------ 유저 회원가입 -----------
   @Post()
   @ApiOperation({
     summary: "유저 회원가입",
@@ -46,11 +49,22 @@ export class UsersController {
   async findAll() {
     return await this.usersService.findAll();
   }
-
-  // @Get(":id")
-  // async findOne(@Param("id") id: string) {
-  //   return await this.usersService.findOne(id);
-  // }
+  //----------------- 유저의 특정데이터 조회 -----------------------//
+  @Get("/profile")
+  @ApiOperation({
+    summary: "유저 특정데이터 조회 프로필",
+    description: "유저 특정데이터 조회 프로필 API",
+  })
+  async getUserProfile(
+    @Query("id") id: string
+    //
+  ): Promise<UserProfileDto> {
+    const userProfile = await this.usersService.userProfile(id);
+    if (!userProfile) {
+      throw new NotFoundException("The user could not be found.");
+    }
+    return userProfile;
+  }
 
   //----------------- 유저의 케미지수 조회 -----------------------//
   // @Get("/chemiRating")
@@ -73,14 +87,24 @@ export class UsersController {
     console.log(id, "==================");
     return this.usersService.findOneChemiRating(id);
   }
-
+  //------------ 유저 정보 수정 ----------- //
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiOperation({
+    summary: "유저 수정",
+    description: "유저 수정 API",
+  })
+  async updateUser(
+    @Param("id") id: string,
+    @Body() updateUserDto: UpdateUserDto
+  ): Promise<User> {
+    const updatedUser = await this.usersService.updateUser(id, updateUserDto);
+    if (!updatedUser) {
+      throw new NotFoundException("해당하는 유저를 찾을 수 없습니다.");
+    }
+    return updatedUser;
   }
-
   @Delete(":id")
   remove(@Param("id") id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }

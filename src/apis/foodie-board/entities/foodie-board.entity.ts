@@ -2,10 +2,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { User } from "src/apis/users/entities/user.entity";
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { FoodieImage } from "./foodieBoard-image.entity";
 
@@ -23,11 +25,11 @@ export class FoodieBoard {
   @ApiProperty({ description: "맛집 게시물 내용" })
   content: string;
 
-  @Column({ nullable: true })
+  @CreateDateColumn()
   @ApiProperty({ description: "맛집 게시물 생성일" })
   creadeAt: Date;
 
-  @Column({ nullable: true })
+  @UpdateDateColumn()
   @ApiProperty({ description: "맛집 게시물 수정일" })
   updatedAt: Date;
 
