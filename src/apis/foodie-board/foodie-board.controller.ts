@@ -10,6 +10,7 @@ import {
   Req,
   UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { FoodieBoardService } from "./foodie-board.service";
 import { CreateFoodieBoardDto } from "./dto/create-foodie-board.dto";
@@ -18,6 +19,8 @@ import { Request } from "express";
 import { ExecutionContextHost } from "@nestjs/core/helpers/execution-context-host";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { User } from "../users/entities/user.entity";
 
 @Controller("foodieBoard")
 @ApiTags("맛잘알 API")
@@ -26,6 +29,7 @@ export class FoodieBoardController {
 
   @Post()
   @UseGuards(RestAuthAccessGuard)
+  @UseInterceptors(FilesInterceptor)
   @ApiOperation({
     summary: "맛잘알 생성",
     description: "맛잘알 생성 API",
@@ -33,15 +37,10 @@ export class FoodieBoardController {
   async create(
     @Body() createFoodieBoardDto: CreateFoodieBoardDto,
     @Req() req: Request,
-    @UploadedFiles() files: Express.MulterS3.File[]
+    @UploadedFiles() files: Express.MulterS3.File[] = []
   ) {
-    console.log(createFoodieBoardDto);
-
-    // const foodieDto = JSON.parse(createFoodieBoardDto);
-    console.log(createFoodieBoardDto);
-
     const { title, content } = createFoodieBoardDto;
-    const userId = (req as any).user?.id;
+    const userId = (req.user as User).id;
 
     if (!title && !content) {
       throw new BadRequestException("제목과 내용은 필수 입력 항목입니다.");
@@ -54,50 +53,47 @@ export class FoodieBoardController {
     );
   }
 
-  // @Post()
-  // @ApiOperation({
-  //   summary: "맛잘알 생성",
-  //   description: "맛잘알 생성 API",
-  // })
-  // async create(
-  //   @Req() req: Request,
-  //   @UploadedFiles() files: Express.MulterS3.File[]
-  // ) {
-  //   const { title, content } = req.body; // Access form data directly from req.body
-  //   const userId = (req as any).user?.id;
-
-  //   console.log(title, content);
-
-  //   if (!title && !content) {
-  //     throw new BadRequestException(
-  //       "The subject and content are required fields."
-  //     );
-  //   }
-
-  //   const createFoodieBoardDto: CreateFoodieBoardDto = {
-  //     title,
-  //     content,
-  //     userId,
-  //   };
-
-  //   return await this.foodieBoardService.create(createFoodieBoardDto, files);
-  // }
   @Get()
+  @ApiOperation({
+    summary: "맛잘알 전체 조회 ",
+    description: "맛잘알 전체 조회API",
+  })
   async findAll() {
     return await this.foodieBoardService.findAll();
   }
 
   @Get(":id")
-  async findOne(@Param("id") id: string) {
+  @UseGuards(RestAuthAccessGuard)
+  @ApiOperation({
+    summary: "맛잘알 단일 조회 ",
+    description: "맛잘알 단일 조회API",
+  })
+  async findOne(
+    @Req() req: Request, //
+    @Param("id") id: string
+  ) {
+    const userId = (req.user as User).id;
+    console.log(userId);
     return await this.foodieBoardService.findOne(id);
   }
 
   @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateFoodieBoardDto: UpdateFoodieBoardDto
+  @UseGuards(RestAuthAccessGuard)
+  @UseInterceptors(FilesInterceptor)
+  async update(
+    @Param("id") imgId: string,
+    @Body() updateFoodieBoardDto: UpdateFoodieBoardDto,
+    @Req() req: Request,
+    @UploadedFiles() files: Express.MulterS3.File[] = []
   ) {
-    return this.foodieBoardService.update(id, updateFoodieBoardDto);
+    const userId = (req as any).user?.id;
+
+    return await this.foodieBoardService.update(
+      imgId,
+      updateFoodieBoardDto,
+      userId,
+      files
+    );
   }
 
   @Delete(":id")

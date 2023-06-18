@@ -8,6 +8,7 @@ import {
   UseGuards,
   Query,
   Req,
+  NotFoundException,
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
@@ -62,17 +63,23 @@ export class ReviewsController {
   }
   //----------------- 유저의 리뷰 조회 -----------------------//
 
-  @Get("/reviews")
+  @Get("user")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
     summary: "유저의 리뷰 조회",
   })
-  async fetchReview(@Req() req: Request): Promise<Review[]> {
-    const userId = req.user; // req는 미들웨어(passport, jwt 필요)
-    console.log(userId);
-    return await this.reviewsService.findOne({ userId });
-  }
+  async fetchReview(
+    // @Request() request: any,
+    @Param("id") id: string
+    //@Query("id") id: string
+  ): Promise<Review[]> {
+    const user = await this.usersService.findOneId(id);
 
+    if (!user) {
+      throw new NotFoundException("해당하는 유저를 찾을수 없습니다.");
+    }
+    return this.reviewsService.findOne({ userId: user.id });
+  }
   //----------------- 유저의 케미지수 조회 -----------------------//
   // @Get(":id/chemiRating")
   // @UseGuards(RestAuthAccessGuard)
