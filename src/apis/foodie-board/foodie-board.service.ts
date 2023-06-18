@@ -75,12 +75,14 @@ export class FoodieBoardService {
       );
 
       // 기존 이미지들 삭제
-      await Promise.all(
-        existingFoodieBoard.images.map(async (image) => {
-          await this.fileUploadService.deleteFile(image.url);
-          await this.imageRepository.remove(image);
-        })
-      );
+      if (existingFoodieBoard.images) {
+        await Promise.all(
+          existingFoodieBoard.images.map(async (image) => {
+            await this.fileUploadService.deleteFile(image.url);
+            await this.imageRepository.remove(image);
+          })
+        );
+      }
 
       // 새로운 이미지들 추가
       existingFoodieBoard.images = newImages;
