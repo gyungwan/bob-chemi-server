@@ -19,10 +19,9 @@ export class ReviewsService {
     @InjectRepository(Review)
     private readonly reviewRepository: Repository<Review>, // @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
-    private connection: Connection
+    private connection: Connection,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>
-
   ) {}
 
   findAll({ page, order }): Promise<Review[]> {
@@ -35,7 +34,6 @@ export class ReviewsService {
     });
   }
 
-
   async findOne({ userId }: { userId: string }): Promise<Review[]> {
     return await this.connection
       .getRepository(Review)
@@ -44,26 +42,24 @@ export class ReviewsService {
       .where("user.id = :userId", { userId })
       .getMany();
 
-//   async findOne({ id }: IReviewsServiceFindOne): Promise<Review[]> {
-//     return await this.reviewRepository.find({
-//       where: { user: { id } },
-//       relations: ["user"], // quickmatcing
-//     });
+    //   async findOne({ id }: IReviewsServiceFindOne): Promise<Review[]> {
+    //     return await this.reviewRepository.find({
+    //       where: { user: { id } },
+    //       relations: ["user"], // quickmatcing
+    //     });
     //where: { user: userId },
     //relations: ["user"], //"quickMatching"
-
   }
   //-----유저 리뷰생성,케미지수 ------
   async create(createReviewDto: CreateReviewDto, user): Promise<Review> {
     const userChemi = await this.sumRating(createReviewDto, user);
 
-
-  // async findOne({ userId }): Promise<Review[]> {
-  //   return await this.reviewRepository.find({
-  //     where: { user: userId },
-  //     relations: ["User"], //"quickMatching"
-  //   });
-  // }
+    // async findOne({ userId }): Promise<Review[]> {
+    //   return await this.reviewRepository.find({
+    //     where: { user: userId },
+    //     relations: ["User"], //"quickMatching"
+    //   });
+    // }
 
     const review = await this.reviewRepository.create(createReviewDto);
 
