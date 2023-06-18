@@ -29,7 +29,7 @@ async function bootstrap() {
     .setTitle("Bob - chemi Documentation") //제목
     .setDescription("앱 개발시 사용되는 서버 API에 대한 연동 문서입니다.") // 설명
     .setVersion("1.0") //버전
-    .addTag("REVIEW") //API 그룹을 나타내는데 사용
+    //.addTag("REVIEW") //API 그룹을 나타내는데 사용
     .build();
   const document = SwaggerModule.createDocument(app, config);
 
