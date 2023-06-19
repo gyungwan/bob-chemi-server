@@ -34,19 +34,28 @@ export class ReviewsService {
     });
   }
 
-  async findOne({ userId }: { userId: string }): Promise<Review[]> {
-    return await this.connection
-      .getRepository(Review)
-      .createQueryBuilder("review")
-      .leftJoinAndSelect("review.user", "user")
-      .where("user.id = :userId", { userId })
-      .getMany();
+  // async findOne({ userId }: { userId: string }): Promise<Review[]> {
+  //   return await this.connection
+  //     .getRepository(Review)
+  //     .createQueryBuilder("review")
+  //     .leftJoinAndSelect("review.user", "user")
+  //     .where("user.id = :userId", { userId })
+  //     .getMany();
 
-    //   async findOne({ id }: IReviewsServiceFindOne): Promise<Review[]> {
-    //     return await this.reviewRepository.find({
-    //       where: { user: { id } },
-    //       relations: ["user"], // quickmatcing
-    //     });
+  //   //   async findOne({ id }: IReviewsServiceFindOne): Promise<Review[]> {
+  //   //     return await this.reviewRepository.find({
+  //   //       where: { user: { id } },
+  //   //       relations: ["user"], // quickmatcing
+  //   //     });
+  //   //where: { user: userId },
+  //   //relations: ["user"], //"quickMatching"
+  // }
+
+  async findOne({ id }): Promise<Review[]> {
+    return await this.reviewRepository.find({
+      where: { user: { id } },
+      relations: ["user"], // quickmatcing
+    });
     //where: { user: userId },
     //relations: ["user"], //"quickMatching"
   }
