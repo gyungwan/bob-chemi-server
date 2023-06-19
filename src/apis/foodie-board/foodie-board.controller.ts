@@ -53,16 +53,7 @@ export class FoodieBoardController {
     );
   }
 
-  @Get()
-  @ApiOperation({
-    summary: "맛잘알 전체 조회 ",
-    description: "맛잘알 전체 조회API",
-  })
-  async findAll() {
-    return await this.foodieBoardService.findAll();
-  }
-
-  @Get(":id")
+  @Get("board/:id")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
     summary: "맛잘알 단일 조회 ",
@@ -77,11 +68,24 @@ export class FoodieBoardController {
     return await this.foodieBoardService.findOne(id);
   }
 
+  @Get()
+  @ApiOperation({
+    summary: "맛잘알 전체 조회 ",
+    description: "맛잘알 전체 조회API",
+  })
+  async findAll() {
+    return await this.foodieBoardService.findAll();
+  }
+
   @Patch(":id")
   @UseGuards(RestAuthAccessGuard)
+  @ApiOperation({
+    summary: "맛잘알 수정 ",
+    description: "맛잘알 수정 API",
+  })
   @UseInterceptors(FilesInterceptor)
   async update(
-    @Param("id") imgId: string,
+    @Param("id") boardId: string,
     @Body() updateFoodieBoardDto: UpdateFoodieBoardDto,
     @Req() req: Request,
     @UploadedFiles() files: Express.MulterS3.File[] = []
@@ -89,7 +93,7 @@ export class FoodieBoardController {
     const userId = (req as any).user?.id;
 
     return await this.foodieBoardService.update(
-      imgId,
+      boardId,
       updateFoodieBoardDto,
       userId,
       files
@@ -97,7 +101,13 @@ export class FoodieBoardController {
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.foodieBoardService.remove(+id);
+  @UseGuards(RestAuthAccessGuard)
+  @ApiOperation({
+    summary: "맛잘알 삭제 ",
+    description: "맛잘알 삭제 API",
+  })
+  async remove(@Param("id") boardId: string, @Req() req: Request) {
+    const userId = (req.user as User).id;
+    return await this.foodieBoardService.remove(boardId, userId);
   }
 }

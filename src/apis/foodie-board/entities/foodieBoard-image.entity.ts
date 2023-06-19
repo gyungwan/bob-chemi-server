@@ -4,7 +4,7 @@ import { FoodieBoard } from "./foodie-board.entity";
 
 @Entity()
 export class FoodieImage {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: number;
 
   @Column()
