@@ -26,7 +26,7 @@ export class FileUploadService {
   }
 
   async deleteFile(fileUrl: string) {
-    const bucket = "your-bucket-name";
+    const bucket = this.configService.get<string>("AWS_BUCKET_NAME");
     const key = `${this.folderPath}/${fileUrl.substring(
       fileUrl.lastIndexOf("/") + 1
     )}`;

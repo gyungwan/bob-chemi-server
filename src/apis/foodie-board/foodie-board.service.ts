@@ -47,6 +47,7 @@ export class FoodieBoardService {
   async findOne(id: string) {
     return await this.foodieBoardRepository.findOneBy({ id });
   }
+
   async update(
     id: string, //
     updateFoodieBoardDto: UpdateFoodieBoardDto,
@@ -55,7 +56,7 @@ export class FoodieBoardService {
   ) {
     const existingFoodieBoard = await this.foodieBoardRepository.findOne({
       where: { id },
-      relations: ["user"],
+      relations: ["user", "images"],
     });
 
     if (!existingFoodieBoard) {
@@ -78,8 +79,9 @@ export class FoodieBoardService {
       if (existingFoodieBoard.images) {
         await Promise.all(
           existingFoodieBoard.images.map(async (image) => {
+            console.log("=============", image);
             await this.fileUploadService.deleteFile(image.url);
-            await this.imageRepository.remove(image);
+            await this.imageRepository.delete(image.id);
           })
         );
       }
@@ -98,7 +100,32 @@ export class FoodieBoardService {
     return await this.foodieBoardRepository.save(existingFoodieBoard);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} foodieBoard`;
+  async remove(id: string, userId: string) {
+    const existingFoodieBoard = await this.foodieBoardRepository.findOne({
+      where: { id },
+      relations: ["user", "images"],
+    });
+
+    if (!existingFoodieBoard) {
+      throw new BadRequestException("해당 게시글이 존재하지 않습니다.");
+    }
+
+    if (existingFoodieBoard.user.id !== userId) {
+      throw new BadRequestException("게시글을 삭제할 권한이 없습니다.");
+    }
+
+    // 기존 이미지들 삭제
+    if (existingFoodieBoard.images) {
+      await Promise.all(
+        existingFoodieBoard.images.map(async (image) => {
+          await this.fileUploadService.deleteFile(image.url);
+          await this.imageRepository.delete(image.id);
+        })
+      );
+    }
+
+    // Post 삭제
+    await this.foodieBoardRepository.delete(id);
+    return { message: `Post with id ${id} has been removed` };
   }
 }
