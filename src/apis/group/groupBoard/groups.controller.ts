@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UploadedFile,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -82,9 +83,11 @@ export class GroupsController {
   @ApiOperation({ summary: "소모임 생성", description: "소모임 생성" })
   createGroupBoard(
     @Body() createGroupDto: CreateGroupDto,
-    @Param("userId") userId: string
+   @Param("userId") userId: string
+    @UploadedFile() file: Express.MulterS3.File
   ): Promise<Group> {
-    return this.groupsService.createGroup(createGroupDto, userId);
+    return this.groupsService.createGroup(createGroupDto, userId, file);
+
   }
 
   //<<------------소모임 삭제------------>>

@@ -80,7 +80,9 @@ export class GroupsService {
   //<<------------소모임 생성------------>>
   async createGroup(
     createGroupDto: CreateGroupDto,
-    email: string
+   email: string
+    file: Express.MulterS3.File
+
   ): Promise<Group> {
     const group = this.groupRepository.create(createGroupDto);
     const newGroup = await this.groupRepository.save(group);

@@ -18,6 +18,16 @@ export class FileUploadService {
     this.folderPath = "image/foodieBoard";
   }
 
+  //<<------------단일 파일 업로드------------>>
+  uploadFile(file: Express.MulterS3.File) {
+    if (!file) {
+      throw new BadRequestException("파일이 존재하지 않습니다.");
+    }
+
+    return { filePath: file.location };
+  }
+
+  //<<------------여러 파일 업로드------------>>
   async uploadFiles(file: Express.MulterS3.File) {
     if (!file) {
       throw new BadRequestException("파일들이 존재하지 않습니다.");
@@ -25,6 +35,7 @@ export class FileUploadService {
     return file.location;
   }
 
+  //<<------------파일 삭제------------>>
   async deleteFile(fileUrl: string) {
     const bucket = this.configService.get<string>("AWS_BUCKET_NAME");
     const key = `${this.folderPath}/${fileUrl.substring(
