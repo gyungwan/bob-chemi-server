@@ -1,8 +1,22 @@
 import { Injectable } from "@nestjs/common";
+import { Repository } from "typeorm";
+import { Chat } from "./entities/chats.entity";
 
 @Injectable()
-export class ChatRoomsService {
+export class GroupChatService {
   private chatRooms: Map<string, string[]> = new Map<string, string[]>();
+  private chatRepository: Repository<Chat>;
+
+  //<<------------메세지 발송------------>>
+  async sendChat(chatId: string, message: string): Promise<Chat> {
+    const chat = await this.chatRepository.save({ chatId, message });
+    return chat;
+  }
+
+  //<<------------채팅 조회------------>>
+  async getChat(): Promise<Chat[]> {
+    return this.chatRepository.find();
+  }
 
   //<<------------단체 채팅방 조회------------>>
   getChatRoom(chatRoomId: string) {

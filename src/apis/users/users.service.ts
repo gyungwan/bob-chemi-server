@@ -43,9 +43,7 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { id: id } });
   }
 
-
   async findOneEmail(email: string): Promise<User> {
-
     return await this.userRepository.findOne({ where: { email } });
   }
 
@@ -98,8 +96,6 @@ export class UsersService {
   }
 
   async findOneChemiRating(id): Promise<number> {
-
-
     const user = await this.userRepository.findOne({
       where: { id },
     });
