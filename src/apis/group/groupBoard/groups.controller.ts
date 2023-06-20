@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UploadedFile,
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
@@ -58,9 +59,10 @@ export class GroupsController {
   @ApiOperation({ summary: "소모임 생성", description: "소모임 생성" })
   createGroupBoard(
     @Body() createGroupDto: CreateGroupDto,
-    @Param("id") id: string
+    @Param("id") id: string,
+    @UploadedFile() file: Express.MulterS3.File
   ): Promise<Group> {
-    return this.groupsService.createGroup(createGroupDto, id);
+    return this.groupsService.createGroup(createGroupDto, id, file);
   }
 
   //<<------------소모임 삭제------------>>

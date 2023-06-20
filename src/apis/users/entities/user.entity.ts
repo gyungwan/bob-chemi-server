@@ -8,6 +8,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Review } from "src/apis/reviews/entities/reviews.entity";
 import { UserGroup } from "src/apis/group/groupBoard/entites/userGroup.entity";
 import { QuickMatching } from "src/apis/quickmatchings/entities/quickmatchings.entity";
+import { RestaurantMark } from "src/apis/restaurantMark/entities/restaurantMark.entity";
 
 export enum Gender {
   Male = "Male",
@@ -94,4 +95,7 @@ export class User {
 
   @OneToMany(() => QuickMatching, (quickMatching) => quickMatching.user)
   quickMatchings: QuickMatching[];
+
+  @OneToMany(() => RestaurantMark, (restaurantMark) => restaurantMark.user)
+  restaurantMarks: RestaurantMark[];
 }

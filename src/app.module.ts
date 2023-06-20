@@ -21,6 +21,7 @@ import { FileUploadModule } from "./apis/file-upload/file-upload.module";
 import { GroupsModule } from "./apis/group/groupBoard/groups.module";
 import { GroupChatsModule } from "./apis/group/groupChat/groupChats.module";
 import { QuickMatchingModule } from "./apis/quickmatchings/quickmatchings.module";
+import { RestaurantMarkModule } from "./apis/restaurantMark/restaurantMark.module";
 
 @Module({
   imports: [
@@ -56,12 +57,14 @@ import { QuickMatchingModule } from "./apis/quickmatchings/quickmatchings.module
     UsersModule,
     AuthModule,
     ReviewsModule,
+    RestaurantMarkModule,
     MatchingChatModule,
     FoodieBoardModule,
     GroupsModule,
     GroupChatsModule,
     FileUploadModule,
     QuickMatchingModule,
+
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소

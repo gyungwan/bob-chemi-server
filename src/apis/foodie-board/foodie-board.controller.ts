@@ -27,6 +27,7 @@ import { User } from "../users/entities/user.entity";
 export class FoodieBoardController {
   constructor(private readonly foodieBoardService: FoodieBoardService) {}
 
+  //<<------------맛잘알 게시글 생성------------>>
   @Post()
   @UseGuards(RestAuthAccessGuard)
   @UseInterceptors(FilesInterceptor)
@@ -53,6 +54,8 @@ export class FoodieBoardController {
     );
   }
 
+  //----------이거 유저별로 조회로 바꾸기!!!!
+  //<<------------맛잘알 게시글 단일 조회------------>>
   @Get("board/:id")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
@@ -67,7 +70,7 @@ export class FoodieBoardController {
     console.log(userId);
     return await this.foodieBoardService.findOne(id);
   }
-
+  //<<------------맛잘알 게시글 전체 조회------------>>
   @Get()
   @ApiOperation({
     summary: "맛잘알 전체 조회 ",
@@ -77,6 +80,7 @@ export class FoodieBoardController {
     return await this.foodieBoardService.findAll();
   }
 
+  //<<------------맛잘알 게시글 수정------------>>
   @Patch(":id")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
@@ -100,6 +104,7 @@ export class FoodieBoardController {
     );
   }
 
+  //<<------------맛잘알 게시글 삭제------------>>
   @Delete(":id")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
