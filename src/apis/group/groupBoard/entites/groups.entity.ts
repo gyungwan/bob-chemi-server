@@ -1,17 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { User } from "src/apis/users/entities/user.entity";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { GroupStatus } from "./groups.status.enum";
 import { Member } from "./members.entity";
-import { UserGroup } from "./userGroup.entity";
 
 @Entity()
 export class Group extends BaseEntity {
@@ -68,6 +69,6 @@ export class Group extends BaseEntity {
   @OneToMany(() => Member, (member) => member.group)
   members: Member[];
 
-  @OneToMany(() => UserGroup, (userGroup) => userGroup.group)
-  userGroups: UserGroup[];
+  @ManyToMany(() => User, (user) => user.groups)
+  users: User[];
 }

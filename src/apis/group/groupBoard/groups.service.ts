@@ -45,24 +45,50 @@ export class GroupsService {
     return found;
   }
 
+  //<<------------내가 만든 소모임 조회------------>>
+  async getMyGroup(userId: string): Promise<Group[]> {
+    const user = await this.userServices.findOneId(userId);
+
+    const groups = await this.groupRepository
+      .createQueryBuilder("group")
+      .innerJoin("group.users", "user", "user.id = :userId", {
+        userId: user.id,
+      })
+      .getMany();
+
+    console.log(groups);
+
+    return groups;
+  }
+
+  // <<------------내가 가입한 소모임 조회------------>>
+  async getMyConfirmedGroup(userId: string): Promise<Group[]> {
+    const user = await this.userServices.findOneId(userId);
+    const member = await this.memberRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+        status: MemberStatus.CONFIRMED,
+      },
+      relations: ["group"],
+    });
+    const joinedGroups = member.map((m) => m.group);
+    return joinedGroups;
+  }
+
   //<<------------소모임 생성------------>>
   async createGroup(
     createGroupDto: CreateGroupDto,
-    id: string
+    email: string
   ): Promise<Group> {
     const group = this.groupRepository.create(createGroupDto);
     const newGroup = await this.groupRepository.save(group);
-    const user = await this.userServices.findOneEmail(id);
-
-    console.log(group, user, "group과 user console.log");
-
+    const user = await this.userServices.findOneEmail(email);
     const owner = new Member(); // 게시글 작성자 자동 멤버 가입
     owner.group = newGroup;
     owner.user = user;
     owner.status = MemberStatus.CONFIRMED;
-
-    console.log(this.memberRepository, "memberRepository 조회");
-    console.log(this.groupRepository, "groupRepository 조회");
 
     try {
       await this.memberRepository.save(owner);
@@ -126,6 +152,14 @@ export class GroupsService {
       },
     });
 
+    const confirmedMember = await this.memberRepository.count({
+      where: {
+        group: { groupId: group.groupId },
+        status: MemberStatus.CONFIRMED,
+      },
+    });
+
+    if (group.groupPeopleLimit <= confirmedMember) {throw new ConflictException("인원이 마감되었습니다.");} //prettier-ignore
     if (isPending) {throw new ConflictException("이미 가입신청 되었습니다.");} //prettier-ignore
     if (isConfirmed) {throw new ConflictException("이미 가입된 그룹입니다.");} //prettier-ignore
 
@@ -162,7 +196,7 @@ export class GroupsService {
 
   //<<------------소모임 신청에 대한 거절(삭제)------------>>
   async denyMember(memberId: any, groupId: number): Promise<void> {
-    const request = await this.memberRepository.findOne(memberId); //prettier-ignore
+    const request = await this.memberRepository.findOne(memberId);
     const group = await this.groupRepository.findOne({ where: { groupId } });
 
     if(!request) {throw new NotFoundException('찾을 수 없는 신청자 입니다.')} //prettier-ignore

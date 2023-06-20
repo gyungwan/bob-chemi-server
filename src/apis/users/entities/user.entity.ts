@@ -1,13 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger";
-
 import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity";
-
 import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
-
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Review } from "src/apis/reviews/entities/reviews.entity";
-import { UserGroup } from "src/apis/group/groupBoard/entites/userGroup.entity";
 import { QuickMatching } from "src/apis/quickmatchings/entities/quickmatchings.entity";
+import { Group } from "src/apis/group/groupBoard/entites/groups.entity";
 
 export enum Gender {
   Male = "Male",
@@ -89,9 +93,10 @@ export class User {
   @ApiProperty({ type: () => FoodieBoard })
   FoodieBoard: FoodieBoard[];
 
-  @OneToMany(() => UserGroup, (userGroup) => userGroup.user)
-  userGroups: UserGroup[];
-
   @OneToMany(() => QuickMatching, (quickMatching) => quickMatching.user)
   quickMatchings: QuickMatching[];
+
+  @ManyToMany(() => Group)
+  @JoinTable()
+  groups: Group[];
 }
