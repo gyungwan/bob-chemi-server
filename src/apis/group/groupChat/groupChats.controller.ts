@@ -1,22 +1,23 @@
 import { Controller, Post, Param, Body, Get } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { ChatRoomsService } from "./groupChats.service";
+import { GroupChatService } from "./groupChats.service";
 
 @Controller("groupChat")
 @ApiTags("소모임 채팅방 API")
-export class ChatRoomsController {
-  constructor(private readonly chatRoomsService: ChatRoomsService) {}
+export class GroupChatController {
+  constructor(private readonly groupChatService: GroupChatService) {}
+  //<<------------d------------>>
 
   //<<------------단체 채팅방 조회------------>>
   @Get(":roomId")
   getChatRoom(@Param("roomId") chatRoomId: string) {
-    return this.chatRoomsService.getChatRoom(chatRoomId);
+    return this.groupChatService.getChatRoom(chatRoomId);
   }
 
   //<<------------채팅방 개설----------->>
   @Post(":chatRoomId/create")
   createChatRoom(@Param("chatRoomId") chatRoomId: string) {
-    this.chatRoomsService.createChatRoom(chatRoomId);
+    this.groupChatService.createChatRoom(chatRoomId);
   }
 
   //<<------------채팅방 참여------------>>
@@ -25,7 +26,7 @@ export class ChatRoomsController {
     @Param("chatRoomId") chatRoomId: string,
     @Body("user") user: string
   ) {
-    this.chatRoomsService.joinChatRoom(chatRoomId, user);
+    this.groupChatService.joinChatRoom(chatRoomId, user);
   }
 
   //<<------------채팅방 나가기------------>>
@@ -34,7 +35,7 @@ export class ChatRoomsController {
     @Param("chatRoomId") chatRoomId: string,
     @Body("user") user: string
   ) {
-    this.chatRoomsService.leaveChatRoom(chatRoomId, user);
+    this.groupChatService.leaveChatRoom(chatRoomId, user);
   }
 
   //<<------------채팅 보내기------------>>
@@ -44,6 +45,6 @@ export class ChatRoomsController {
     @Body("user") user: string,
     @Body("message") message: string
   ) {
-    this.chatRoomsService.sendMessage(chatRoomId, user, message);
+    this.groupChatService.sendMessage(chatRoomId, user, message);
   }
 }

@@ -61,8 +61,26 @@ export class ReviewsController {
   }
   //----------------- 유저의 리뷰 조회 -----------------------//
 
+  // @Get("user")
+  // @UseGuards(RestAuthAccessGuard)
+  // @ApiOperation({
+  //   summary: "유저의 리뷰 조회",
+  // })
+  // async fetchReview(
+  //   // @Request() request: any,
+  //   @Param("id") id: string
+  //   //@Query("id") id: string
+  // ): Promise<Review[]> {
 
-  @Get("user")
+  //   const user = await this.usersService.findOneId(id);
+
+  //   if (!user) {
+  //     throw new NotFoundException("해당하는 유저를 찾을수 없습니다.");
+  //   }
+  //   return this.reviewsService.findOne({ userId: user.id });
+  // }
+
+  @Get(":id")
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
     summary: "유저의 리뷰 조회",
@@ -72,15 +90,13 @@ export class ReviewsController {
     @Param("id") id: string
     //@Query("id") id: string
   ): Promise<Review[]> {
-
-    const user = await this.usersService.findOneId(id);
-
-
-    if (!user) {
-      throw new NotFoundException("해당하는 유저를 찾을수 없습니다.");
-    }
-    return this.reviewsService.findOne({ userId: user.id });
+    //     if (!user) {
+    //       // Handle case when user is not found
+    //       throw new NotFoundException("해당하는 유저를 찾을수 없습니다.");
+    //     }
+    return this.reviewsService.findOne({ id });
   }
+
   //----------------- 유저의 케미지수 조회 -----------------------//
   // @Get(":id/chemiRating")
   // @UseGuards(RestAuthAccessGuard)

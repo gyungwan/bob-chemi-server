@@ -5,7 +5,6 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import multer from "multer";
 import { AppModule } from "./app.module";
 import { multerOptionsFactory } from "./common/utils/multer.options";
-//import { WsAdapter } from "@nestjs/platform-ws";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

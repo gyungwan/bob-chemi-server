@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
@@ -17,6 +18,7 @@ import { GroupsService } from "./groups.service";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UpdateGroupDto } from "./dto/update.group.dto";
 import { Member } from "./entites/members.entity";
+import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
 
 @Controller("groups")
 @ApiTags("소모임 API")
@@ -53,16 +55,39 @@ export class GroupsController {
     const date = new Date(groupDate);
     return this.groupsService.getGroupByDate(date);
   }
+
+  //<<------------내가 만든 소모임 조회------------>>
+  @Get("/created/:userId")
+  @ApiOperation({
+    summary: "내가 만든 소모임 조회",
+    description: "사용자의 이메일을 통해, 사용자가 만든 모든 소모임 조회",
+  })
+  getGroupsCreatedByUser(@Param("userId") userId: string): Promise<Group[]> {
+    return this.groupsService.getMyGroup(userId);
+  }
+
+  // <<------------내가 가입한 소모임 조회------------>>
+  @Get("/joined/:userId")
+  @ApiOperation({
+    summary: "내가 가입한 소모임 조회",
+    description: "사용자의 이메일을 통해, 사용자가 가입한 모든 소모임 조회",
+  })
+  getGroupsJoinedByUser(@Param("userId") userId: string): Promise<Group[]> {
+    return this.groupsService.getMyConfirmedGroup(userId);
+  }
+
   //<<------------소모임 생성------------>>
-  @Post()
+  @Post("/:userId")
   @UsePipes(ValidationPipe)
+  // @UseGuards(AuthGuard("access"))
   @ApiOperation({ summary: "소모임 생성", description: "소모임 생성" })
   createGroupBoard(
     @Body() createGroupDto: CreateGroupDto,
-    @Param("id") id: string,
+   @Param("userId") userId: string
     @UploadedFile() file: Express.MulterS3.File
   ): Promise<Group> {
-    return this.groupsService.createGroup(createGroupDto, id, file);
+    return this.groupsService.createGroup(createGroupDto, userId, file);
+
   }
 
   //<<------------소모임 삭제------------>>
