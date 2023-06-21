@@ -26,7 +26,7 @@ export class ReviewsService {
 
   findAll({ page, order }): Promise<Review[]> {
     return this.reviewRepository.find({
-      relations: ["user"], //"quickMatching"
+      relations: ["user", "quickMatching"], //"quickMatching"
 
       skip: (page - 1) * 4,
       take: 4,
@@ -54,7 +54,7 @@ export class ReviewsService {
   async findOne({ id }): Promise<Review[]> {
     return await this.reviewRepository.find({
       where: { user: { id } },
-      relations: ["user"], // quickmatcing
+      relations: ["user", "quickmatching"], // quickmatcing
     });
     //where: { user: userId },
     //relations: ["user"], //"quickMatching"

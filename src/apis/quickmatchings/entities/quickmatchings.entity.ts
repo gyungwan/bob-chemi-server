@@ -7,7 +7,9 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -33,7 +35,7 @@ export enum AgeGroup {
   FORTIES = "40대",
   FIFTIES = "50대",
 }
-
+// 1대1 매칭은 일대일관계
 @Entity()
 export class QuickMatching {
   @PrimaryGeneratedColumn("uuid")
@@ -60,8 +62,13 @@ export class QuickMatching {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.quickMatchings)
+  @OneToOne(() => User, (user) => user.quickMatching)
+  @JoinColumn({ name: "userId" })
   user: User;
+
+  @OneToOne(() => User, (matchedUser) => matchedUser.quickMatching)
+  @JoinColumn({ name: "matchedUserId" })
+  matchedUser: User;
 
   @ApiProperty({ description: "매칭 취소일" })
   @DeleteDateColumn()

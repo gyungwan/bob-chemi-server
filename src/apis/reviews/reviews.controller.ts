@@ -131,7 +131,6 @@ export class ReviewsController {
     @Body() createReviewDto: CreateReviewDto,
     @Req() req: Request
   ): Promise<Review> {
-    //JSON 형식의 데이터를 전송하고 해당 데이터를 객체로 변환하여 사용
     // 매칭된 사람의 아이디를 찾아와서 리뷰 작성
     const userId = (req.user as any).id;
     const user = await this.usersService.findOneEmail(userId);

@@ -1,12 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity";
 import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
+
+
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
   OneToMany,
+  OneToOne,
+  JoinTable,
+
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Review } from "src/apis/reviews/entities/reviews.entity";
@@ -95,8 +98,12 @@ export class User {
   @ApiProperty({ type: () => FoodieBoard })
   FoodieBoard: FoodieBoard[];
 
-  @OneToMany(() => QuickMatching, (quickMatching) => quickMatching.user)
-  quickMatchings: QuickMatching[];
+
+  @OneToMany(() => UserGroup, (userGroup) => userGroup.user)
+  userGroups: UserGroup[];
+
+  @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.user)
+  quickMatching: QuickMatching;
 
 
   @OneToMany(() => RestaurantMark, (restaurantMark) => restaurantMark.user)
@@ -105,5 +112,6 @@ export class User {
   @ManyToMany(() => Group)
   @JoinTable()
   groups: Group[];
+
 
 }
