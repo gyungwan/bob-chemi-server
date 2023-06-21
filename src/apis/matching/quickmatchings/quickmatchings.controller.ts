@@ -32,10 +32,11 @@ export class QuickMatchingController {
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({ summary: "매칭 요청" })
   async requestQuickMatching(
-    @Body() { gender, ageGroup }: CreateQuickMatchingDto,
+    @Body() createQuickingDto: CreateQuickMatchingDto,
     @Req() req: Request
   ): Promise<QuickMatching> {
-    console.log("==============================");
+    const { gender, ageGroup } = createQuickingDto;
+    console.log("==============================", gender, ageGroup);
     const userId = (req.user as any).id;
     const user = await this.usersService.findOneId(userId); // 내정보
 
@@ -44,7 +45,10 @@ export class QuickMatchingController {
     const myAgeGroup = this.getAgeGroup(myAge);
 
     console.log(user, myAge, myAgeGroup); // 상대방의 정보 출력
-    return this.quickMatchingService.create(userId, { gender, ageGroup });
+    return this.quickMatchingService.create(userId, {
+      gender: createQuickingDto.gender,
+      ageGroup: createQuickingDto.ageGroup,
+    });
   }
 
   getAgeGroup(age: number): string {
