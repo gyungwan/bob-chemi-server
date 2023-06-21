@@ -10,7 +10,11 @@ import { Repository } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/users.service";
 import { CreateQuickMatchingDto } from "./dto/create-quickmatching.dto";
-import { QuickMatching } from "./entities/quickmatchings.entity";
+import {
+  AgeGroup,
+  Gender,
+  QuickMatching,
+} from "./entities/quickmatchings.entity";
 
 @Injectable()
 export class QuickMatchingService {
@@ -24,9 +28,8 @@ export class QuickMatchingService {
   ) {}
 
   async create(
-    { gender, ageGroup }: CreateQuickMatchingDto,
-    userId
-    //{ gender, ageGroup }: CreateQuickMatchingDto
+    userId: string,
+    { gender, ageGroup }: { gender: Gender; ageGroup: AgeGroup }
   ): Promise<QuickMatching> {
     const user = await this.usersService.findOneId(userId);
     const quickMatching = await this.quickMatchingRepository.create({
