@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity";
 import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
-
 import {
   Column,
   Entity,
@@ -105,7 +104,7 @@ export class User {
   @OneToMany(() => RestaurantMark, (restaurantMark) => restaurantMark.user)
   restaurantMarks: RestaurantMark[];
 
-  @ManyToMany(() => Group)
+  @ManyToMany(() => Group, (group) => group.users)
   @JoinTable()
   groups: Group[];
 }

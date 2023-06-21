@@ -6,7 +6,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -70,6 +73,7 @@ export class Group extends BaseEntity {
   members: Member[];
 
   @ManyToMany(() => User, (user) => user.groups)
+  @JoinTable()
   users: User[];
 
   @ApiProperty({ description: "소모임 이미지 한장" })

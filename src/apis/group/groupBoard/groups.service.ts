@@ -13,6 +13,8 @@ import { Member } from "./entites/members.entity";
 import { MemberStatus } from "./entites/members.status.enum";
 import { UsersService } from "src/apis/users/users.service";
 import { FileUploadService } from "src/apis/file-upload/file-upload.service";
+import { User } from "src/apis/users/entities/user.entity";
+
 
 @Injectable()
 export class GroupsService {
@@ -20,6 +22,9 @@ export class GroupsService {
     @InjectRepository(Group)
     private groupRepository: Repository<Group>,
     private userServices: UsersService,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 
     @InjectRepository(Member) // MemberRepository 주입
     private memberRepository: Repository<Member>,
@@ -84,6 +89,7 @@ export class GroupsService {
     createGroupDto: CreateGroupDto,
     email: string
     //file: Express.MulterS3.File
+
   ): Promise<Group> {
     //파일 s3에 저장후 url 받아오기
     // const image = file ? [await this.fileUploadService.uploadFile(file)] : [];
@@ -94,17 +100,17 @@ export class GroupsService {
     });
 
     const newGroup = await this.groupRepository.save(group);
-    const user = await this.userServices.findOneEmail(email);
+    const user = await this.userServices.findOneId(userId);
     const owner = new Member(); // 게시글 작성자 자동 멤버 가입
+
     owner.group = newGroup;
     owner.user = user;
     owner.status = MemberStatus.CONFIRMED;
 
-    try {
-      await this.memberRepository.save(owner);
-    } catch (error) {
-      console.log(error, "Save 에러 발생 시,");
-    }
+    if (!user.groups) {user.groups = []} //prettier-ignore
+    user.groups.push(newGroup);
+    await this.memberRepository.save(owner);
+    await this.userRepository.save(user);
 
     return newGroup;
   }
@@ -183,7 +189,10 @@ export class GroupsService {
 
   //<<------------소모임 신청에 대한 수락------------>>
   async acceptMember(memberId: string, groupId: any): Promise<Member> {
-    const group = await this.groupRepository.findOne({ where: { groupId } });
+    const group = await this.groupRepository.findOne({
+      where: { groupId },
+      relations: ["members"],
+    });
     if(!group) {throw new NotFoundException('찾을 수 없는 소모임 입니다.')} //prettier-ignore
 
     const checkRequest = await this.memberRepository.findOne({
@@ -198,6 +207,13 @@ export class GroupsService {
     }
     if (checkRequest.status === MemberStatus.CONFIRMED) {
       throw new NotFoundException("이미 수락한 신청자 입니다.");
+    }
+
+    const groupMembersCount = group.members.length + 1;
+
+    if (groupMembersCount >= group.groupPeopleLimit) {
+      group.status = GroupStatus.PRIVATE;
+      await group.save();
     }
 
     checkRequest.status = MemberStatus.CONFIRMED;
