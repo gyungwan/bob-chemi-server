@@ -20,7 +20,7 @@ export class CreateQuickMatchingDto {
     description: "성별",
     example: "Male = Male Female = Female",
     enum: Gender,
-    required: true,
+    //required: true,
   })
   gender: Gender;
 
@@ -28,7 +28,7 @@ export class CreateQuickMatchingDto {
     description: "유저 연령대",
     example: "TEENAGER = TEENAGER ,TWENTIES = TWENTIES",
     enum: AgeGroup,
-    required: true,
+    //required: true,
   })
   ageGroup: AgeGroup;
 }

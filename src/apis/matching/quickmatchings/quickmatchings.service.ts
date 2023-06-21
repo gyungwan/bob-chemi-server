@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   forwardRef,
   Inject,
   Injectable,
@@ -31,38 +32,32 @@ export class QuickMatchingService {
     userId: string,
     { gender, ageGroup }: { gender: Gender; ageGroup: AgeGroup }
   ): Promise<QuickMatching> {
-    const user = await this.usersService.findOneId(userId);
-    const quickMatching = await this.quickMatchingRepository.create({
-      gender,
-      ageGroup,
+    const existingMatching = await this.quickMatchingRepository.findOne({
+      where: { user: { id: userId } },
     });
-    console.log(quickMatching, "================================");
+    if (existingMatching) {
+      // 이미 생성된 QuickMatching이 있을 경우 예외 처리 또는 중복 생성 방지 로직을 수행해야 합니다.
+      throw new ConflictException("QuickMatching already exists");
+    }
 
-    await this.userRepository.save(user);
-    return await this.quickMatchingRepository.save({
-      user,
-      gender,
-      ageGroup,
-    });
+    const user = await this.usersService.findOneId(userId); // My Info
+
+    // const myGender = user.gender;
+    // const myAge = user.age;
+    // const myAgeGroup = this.getAgeGroup(myAge);
+
+    // QuickMatching 객체 생성 및 저장
+    const quickMatching = new QuickMatching();
+    quickMatching.gender = gender;
+    quickMatching.ageGroup = ageGroup;
+    quickMatching.user = user;
+
+    return this.quickMatchingRepository.save(quickMatching);
   }
   // async findMatchedUser(gender, ageGroup): Promise<User | undefined> {
   //   //const matchedUser = await.usersService.findOneId()
   // }
-  getAgeGroup(age: number): string {
-    if (age >= 10 && age <= 19) {
-      return "10대";
-    } else if (age >= 20 && age <= 29) {
-      return "20대";
-    } else if (age >= 30 && age <= 39) {
-      return "30대";
-    } else if (age >= 40 && age <= 49) {
-      return "40대";
-    } else if (age >= 50 && age <= 59) {
-      return "50대";
-    } else {
-      return "기타";
-    }
-  }
+
   async findOne(id): Promise<QuickMatching> {
     const quickMatching = await this.quickMatchingRepository.findOne({
       where: { id },
