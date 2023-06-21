@@ -4,7 +4,13 @@ import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity
 
 import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
 
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Review } from "src/apis/reviews/entities/reviews.entity";
 import { UserGroup } from "src/apis/group/groupBoard/entites/userGroup.entity";
 import { QuickMatching } from "src/apis/quickmatchings/entities/quickmatchings.entity";
@@ -92,6 +98,6 @@ export class User {
   @OneToMany(() => UserGroup, (userGroup) => userGroup.user)
   userGroups: UserGroup[];
 
-  @OneToMany(() => QuickMatching, (quickMatching) => quickMatching.user)
-  quickMatchings: QuickMatching[];
+  @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.user)
+  quickMatching: QuickMatching;
 }
