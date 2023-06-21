@@ -75,4 +75,8 @@ export class Group extends BaseEntity {
   @ManyToMany(() => User, (user) => user.groups)
   @JoinTable()
   users: User[];
+
+  @ApiProperty({ description: "소모임 이미지 한장" })
+  @Column()
+  image: string;
 }

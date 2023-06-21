@@ -12,7 +12,9 @@ import { UpdateGroupDto } from "./dto/update.group.dto";
 import { Member } from "./entites/members.entity";
 import { MemberStatus } from "./entites/members.status.enum";
 import { UsersService } from "src/apis/users/users.service";
+import { FileUploadService } from "src/apis/file-upload/file-upload.service";
 import { User } from "src/apis/users/entities/user.entity";
+
 
 @Injectable()
 export class GroupsService {
@@ -25,7 +27,8 @@ export class GroupsService {
     private userRepository: Repository<User>,
 
     @InjectRepository(Member) // MemberRepository 주입
-    private memberRepository: Repository<Member>
+    private memberRepository: Repository<Member>,
+    private readonly fileUploadService: FileUploadService
   ) {}
 
   //<<------------소모임 조회------------>>
@@ -85,10 +88,16 @@ export class GroupsService {
   async createGroup(
     createGroupDto: CreateGroupDto,
     userId: string,
-
-    file: Express.MulterS3.File
+   //file: Express.MulterS3.File
   ): Promise<Group> {
-    const group = this.groupRepository.create(createGroupDto);
+    //파일 s3에 저장후 url 받아오기
+    // const image = file ? [await this.fileUploadService.uploadFile(file)] : [];
+
+    const group = this.groupRepository.create({
+      ...createGroupDto,
+      //image: image[0].filePath || "",
+    });
+
     const newGroup = await this.groupRepository.save(group);
     const user = await this.userServices.findOneId(userId);
     const owner = new Member(); // 게시글 작성자 자동 멤버 가입

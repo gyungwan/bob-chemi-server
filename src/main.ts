@@ -2,9 +2,9 @@ import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import multer from "multer";
+//import multer from "multer";
 import { AppModule } from "./app.module";
-import { multerOptionsFactory } from "./common/utils/multer.options";
+//import { multerOptionsFactory } from "./common/utils/multer.options";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,8 +13,8 @@ async function bootstrap() {
   // app.setBaseViewsDir(join(__dirname, '..', 'views'))
   // app.setViewEngine('ejs')
   const configService = app.get(ConfigService);
-  const multerOptions = multerOptionsFactory(configService);
-  app.use(multer(multerOptions).array("files"));
+  //const multerOptions = multerOptionsFactory(configService);
+  //app.use(multer(multerOptions).array("files"));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: false, // dto에 정의되지 않은 속성 자동 필터링

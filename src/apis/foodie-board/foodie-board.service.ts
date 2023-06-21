@@ -32,12 +32,16 @@ export class FoodieBoardService {
     if (!user) {
       throw new Error("사용자가 존재하지 않습니다");
     }
-    const images =
+    const urls =
       files && files.length > 0
+        ? await this.fileUploadService.uploadFiles(files)
+        : [];
+
+    const images =
+      urls && urls.length > 0
         ? await Promise.all(
-            files.map(async (file) => {
-              const url = await this.fileUploadService.uploadFiles(file);
-              return this.imageRepository.create({ url });
+            urls.map(async (url) => {
+              return this.imageRepository.create({ url: [url] });
             })
           )
         : [];
@@ -58,7 +62,11 @@ export class FoodieBoardService {
   ///수정 하기 유저아이디 받아와서
   //<<------------맛잘알 게시글 유저 조회------------>>
   async findOne(id: string) {
-    return await this.foodieBoardRepository.findOneBy({ id });
+    console.log(id, " 111111111111111111111111");
+    return await this.foodieBoardRepository.find({
+      where: { user: { id: id } },
+      relations: ["images"],
+    });
   }
 
   //<<------------맛잘알 게시글 수정------------>>
@@ -84,7 +92,7 @@ export class FoodieBoardService {
     if (files.length > 0) {
       const newImages = await Promise.all(
         files.map(async (file) => {
-          const url = await this.fileUploadService.uploadFiles(file);
+          const url = await this.fileUploadService.uploadFiles(files);
           return this.imageRepository.create({ url });
         })
       );
@@ -94,7 +102,7 @@ export class FoodieBoardService {
         await Promise.all(
           existingFoodieBoard.images.map(async (image) => {
             console.log("=============", image);
-            await this.fileUploadService.deleteFile(image.url);
+            await this.fileUploadService.deleteFiles(image.url);
             await this.imageRepository.delete(image.id);
           })
         );
@@ -133,7 +141,7 @@ export class FoodieBoardService {
     if (existingFoodieBoard.images) {
       await Promise.all(
         existingFoodieBoard.images.map(async (image) => {
-          await this.fileUploadService.deleteFile(image.url);
+          await this.fileUploadService.deleteFiles(image.url);
           await this.imageRepository.delete(image.id);
         })
       );

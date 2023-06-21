@@ -95,6 +95,9 @@ export class User {
   @ApiProperty({ type: () => FoodieBoard })
   FoodieBoard: FoodieBoard[];
 
+  // @OneToMany(() => UserGroup, (userGroup) => userGroup.user)
+  // userGroups: UserGroup[];
+
   @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.user)
   quickMatching: QuickMatching;
 

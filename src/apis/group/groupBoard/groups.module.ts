@@ -9,19 +9,18 @@ import { UsersService } from "src/apis/users/users.service";
 import { Member } from "./entites/members.entity";
 import { MulterModule } from "@nestjs/platform-express";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { multerOptionsFactory } from "src/common/utils/multer.options";
+import { FileUploadModule } from "src/apis/file-upload/file-upload.module";
+import { FileUploadService } from "src/apis/file-upload/file-upload.service";
+//import { multerOptionsFactory } from "src/common/utils/multer.options";
 @Module({
   imports: [
     TypeOrmModule.forFeature([Group, Member, User]),
-    MulterModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: multerOptionsFactory,
-      inject: [ConfigService],
-    }),
+    ConfigModule,
+    FileUploadModule,
   ],
 
   exports: [GroupsService],
   controllers: [GroupsController],
-  providers: [GroupsService, Repository, UsersService],
+  providers: [GroupsService, Repository, UsersService, FileUploadService],
 })
 export class GroupsModule {}

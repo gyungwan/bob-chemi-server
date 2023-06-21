@@ -17,7 +17,6 @@ import { FileUploadService } from "./file-upload.service";
 import multerS3 from "multer-s3";
 import path from "path";
 import { S3Client } from "@aws-sdk/client-s3";
-import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
 
 @Controller("fileUpload")
 export class FileUploadController {
@@ -43,7 +42,7 @@ export class FileUploadController {
         }),
         bucket: process.env.AWS_BUCKET_NAME,
         key(_req, file, done) {
-          const folderPath = "image/"; // 원하는 경로를 여기에 지정하세요
+          const folderPath = "image/group"; // 원하는 경로를 여기에 지정하세요
           const ext = path.extname(file.originalname); // 파일 확장자 추출
           const basename = path.basename(file.originalname, ext); // 파일 이름 추출
           // 파일 이름 중복을 방지하기 위해, 현재 시간을 추가하여 파일 이름을 고유하게 만듭니다
@@ -68,6 +67,7 @@ export class FileUploadController {
   uploadFile(@UploadedFile() file: Express.MulterS3.File) {
     return this.fileUploadService.uploadFile(file);
   }
+  //<<-------------------------->>
 
   @Post("multipleUpload")
   @ApiOperation({
@@ -89,7 +89,7 @@ export class FileUploadController {
         }),
         bucket: process.env.AWS_BUCKET_NAME,
         key(_req, file, done) {
-          const folderPath = "images/"; // specify the desired path here
+          const folderPath = "imagesfoodieBoard/"; // specify the desired path here
           const ext = path.extname(file.originalname); // extract file extension
           const basename = path.basename(file.originalname, ext); // extract file name
           // Make the filename unique by appending the current time to prevent filename duplication

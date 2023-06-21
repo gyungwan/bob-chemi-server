@@ -28,31 +28,37 @@ export class FileUploadService {
   }
 
   //<<------------여러 파일 업로드------------>>
-  async uploadFiles(file: Express.MulterS3.File) {
-    if (!file) {
+  async uploadFiles(files: Express.MulterS3.File[]) {
+    if (!files || files.length === 0) {
       throw new BadRequestException("파일들이 존재하지 않습니다.");
     }
-    return file.location;
+    const urls = files.map((file) => file.location);
+    return urls;
   }
 
-  //<<------------파일 삭제------------>>
-  async deleteFile(fileUrl: string) {
+  //<<------------파일들 삭제------------>>
+  async deleteFiles(fileUrls: string[]) {
     const bucket = this.configService.get<string>("AWS_BUCKET_NAME");
-    const key = `${this.folderPath}/${fileUrl.substring(
-      fileUrl.lastIndexOf("/") + 1
-    )}`;
 
-    const params = {
-      Bucket: bucket,
-      Key: key,
-    };
+    // 여러 파일들을 동시에 삭제하기 위해 Promise.all을 사용합니다.
+    await Promise.all(
+      fileUrls.map(async (fileUrl) => {
+        const key = `${this.folderPath}/${fileUrl.substring(
+          fileUrl.lastIndexOf("/") + 1
+        )}`;
 
-    try {
-      await this.s3.send(new DeleteObjectCommand(params));
-    } catch (error) {
-      // Handle any errors that occur during file deletion
-      console.error("Failed to delete file from S3:", error);
-      throw new BadRequestException("Failed to delete the file");
-    }
+        const params = {
+          Bucket: bucket,
+          Key: key,
+        };
+
+        try {
+          await this.s3.send(new DeleteObjectCommand(params));
+        } catch (error) {
+          console.error("Failed to delete file from S3:", error);
+          throw new BadRequestException("Failed to delete the file");
+        }
+      })
+    );
   }
 }
