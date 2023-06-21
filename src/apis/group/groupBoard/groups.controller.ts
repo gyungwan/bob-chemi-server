@@ -9,9 +9,13 @@ import {
   Post,
   UploadedFile,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
+import multerS3 from "multer-s3";
+import { S3Client } from "@aws-sdk/client-s3";
+import path from "path";
 import { CreateGroupDto } from "./dto/create.group.dto";
 import { Group } from "./entites/groups.entity";
 import { GroupsService } from "./groups.service";
@@ -19,6 +23,7 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UpdateGroupDto } from "./dto/update.group.dto";
 import { Member } from "./entites/members.entity";
 import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("groups")
 @ApiTags("소모임 API")
@@ -80,13 +85,35 @@ export class GroupsController {
   @Post("/:userId")
   @UsePipes(ValidationPipe)
   // @UseGuards(AuthGuard("access"))
+  // @UseInterceptors(
+  //   FileInterceptor("file", {
+  //     storage: multerS3({
+  //       s3: new S3Client({
+  //         region: process.env.AWS_BUCKET_REGION,
+  //         credentials: {
+  //           accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  //           secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  //         },
+  //       }),
+  //       bucket: process.env.AWS_BUCKET_NAME,
+  //       key(_req, file, done) {
+  //         const folderPath = "image/group"; // specify the desired path here
+  //         const ext = path.extname(file.originalname); // extract file extension
+  //         const basename = path.basename(file.originalname, ext); // extract file name
+  //         // Make the filename unique by appending the current time to prevent filename duplication
+  //         done(null, `${folderPath}/${basename}_${Date.now()}${ext}`);
+  //       },
+  //     }),
+  //     // limits: { fileSize: 10 * 1024 * 1024 },
+  //   })
+  // )
   @ApiOperation({ summary: "소모임 생성", description: "소모임 생성" })
   createGroupBoard(
     @Body() createGroupDto: CreateGroupDto,
-    @Param("userId") userId: string,
-    @UploadedFile() file: Express.MulterS3.File
+    @Param("userId") userId: string
+    //@UploadedFile() file: Express.MulterS3.File
   ): Promise<Group> {
-    return this.groupsService.createGroup(createGroupDto, userId, file);
+    return this.groupsService.createGroup(createGroupDto, userId);
   }
 
   //<<------------소모임 삭제------------>>

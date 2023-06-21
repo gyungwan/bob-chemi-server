@@ -7,8 +7,8 @@ export class FoodieImage {
   @PrimaryGeneratedColumn("uuid")
   id: number;
 
-  @Column()
-  url: string;
+  @Column("text", { array: true })
+  url: string[];
 
   @ManyToOne(() => FoodieBoard, (foodieBoard) => foodieBoard.images, {
     onDelete: "CASCADE",
