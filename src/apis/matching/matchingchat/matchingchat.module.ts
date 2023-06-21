@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "../users/entities/user.entity";
+import { User } from "../../users/entities/user.entity";
 import { MatchingChat } from "./entities/matchingchat.entity";
 import { MatchingChatGateway } from "./matchingchat.gateway";
 import { MatchingChatService } from "./matchingchat.service";

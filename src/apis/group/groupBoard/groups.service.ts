@@ -85,6 +85,7 @@ export class GroupsService {
   async createGroup(
     createGroupDto: CreateGroupDto,
     userId: string,
+
     file: Express.MulterS3.File
   ): Promise<Group> {
     const group = this.groupRepository.create(createGroupDto);
