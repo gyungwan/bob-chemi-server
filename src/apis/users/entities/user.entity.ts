@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { MatchingChat } from "src/apis/matchingchat/entities/matchingchat.entity";
+import { MatchingChat } from "src/apis/matching/matchingchat/entities/matchingchat.entity";
 import { FoodieBoard } from "src/apis/foodie-board/entities/foodie-board.entity";
 import {
   Column,
@@ -11,7 +11,7 @@ import {
   ManyToMany,
 } from "typeorm";
 import { Review } from "src/apis/reviews/entities/reviews.entity";
-import { QuickMatching } from "src/apis/quickmatchings/entities/quickmatchings.entity";
+import { QuickMatching } from "src/apis/matching/quickmatchings/entities/quickmatchings.entity";
 import { RestaurantMark } from "src/apis/restaurantMark/entities/restaurantMark.entity";
 import { Group } from "src/apis/group/groupBoard/entites/groups.entity";
 

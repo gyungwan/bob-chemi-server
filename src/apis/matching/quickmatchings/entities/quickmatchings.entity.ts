@@ -12,6 +12,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { MatchingRoom } from "../../matchingroom/entities/matchingroom.entity";
 
 //성별, 나이대
 
@@ -20,20 +21,12 @@ export enum Gender {
   Female = "Female",
 }
 
-// export const AgeGroup = [
-//   { name: "10대", minAge: 10, maxAge: 19 },
-//   { name: "20대", minAge: 20, maxAge: 29 },
-//   { name: "30대", minAge: 30, maxAge: 39 },
-//   { name: "40대", minAge: 40, maxAge: 49 },
-//   { name: "50대", minAge: 50, maxAge: 59 },
-// ];
-
 export enum AgeGroup {
-  TEENAGER = "10대",
-  TWENTIES = "20대",
-  THIRTIES = "30대",
-  FORTIES = "40대",
-  FIFTIES = "50대",
+  TEENAGER = "TEENAGER",
+  TWENTIES = "TWENTIES",
+  THIRTIES = "THIRTIES",
+  FORTIES = "FORTIES",
+  FIFTIES = "FIFTIES",
 }
 // 1대1 매칭은 일대일관계
 @Entity()
@@ -45,12 +38,12 @@ export class QuickMatching {
   @Column({
     type: "enum",
     enum: Gender,
-    nullable: false,
+    nullable: true,
   })
   @ApiProperty({ description: "유저 성별" })
   gender: Gender;
 
-  @Column({ type: "enum", enum: AgeGroup, nullable: false })
+  @Column({ type: "enum", enum: AgeGroup, nullable: true })
   @ApiProperty({ description: "유저 연령대" })
   ageGroup: AgeGroup;
 
@@ -66,9 +59,14 @@ export class QuickMatching {
   @JoinColumn({ name: "userId" })
   user: User;
 
-  @OneToOne(() => User, (matchedUser) => matchedUser.quickMatching)
-  @JoinColumn({ name: "matchedUserId" })
-  matchedUser: User;
+  @OneToOne(() => User, (targetUser) => targetUser.quickMatching)
+  @JoinColumn({ name: "targetUserId" })
+  //matchedUser: User;
+  targetUser: User;
+
+  @OneToOne(() => MatchingRoom, (matchingRoom) => matchingRoom.quickMatching)
+  @JoinColumn()
+  matchingRoom: MatchingRoom;
 
   @ApiProperty({ description: "매칭 취소일" })
   @DeleteDateColumn()

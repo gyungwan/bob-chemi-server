@@ -87,9 +87,8 @@ export class GroupsService {
   //<<------------소모임 생성------------>>
   async createGroup(
     createGroupDto: CreateGroupDto,
-    email: string
-    //file: Express.MulterS3.File
-
+    userId: string,
+   //file: Express.MulterS3.File
   ): Promise<Group> {
     //파일 s3에 저장후 url 받아오기
     // const image = file ? [await this.fileUploadService.uploadFile(file)] : [];
