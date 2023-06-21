@@ -6,7 +6,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -70,5 +73,6 @@ export class Group extends BaseEntity {
   members: Member[];
 
   @ManyToMany(() => User, (user) => user.groups)
+  @JoinTable()
   users: User[];
 }
