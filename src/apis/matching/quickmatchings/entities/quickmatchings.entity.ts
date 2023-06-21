@@ -20,7 +20,7 @@ export enum Gender {
   Male = "Male",
   Female = "Female",
 }
-
+//export type GenderString = "Male" | "Female";
 export enum AgeGroup {
   TEENAGER = "TEENAGER",
   TWENTIES = "TWENTIES",

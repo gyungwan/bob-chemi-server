@@ -1,5 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { MatchingChat } from "../../matchingchat/entities/matchingchat.entity";
 import { QuickMatching } from "../../quickmatchings/entities/quickmatchings.entity";
 
@@ -11,6 +17,10 @@ export class MatchingRoom {
   @Column({ type: "boolean", default: false })
   @ApiProperty({ description: "매칭 여부" })
   isMatched: boolean;
+
+  @ApiProperty({ description: "매칭 요청일" })
+  @CreateDateColumn()
+  createdAt: Date;
 
   @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.matchingRoom)
   quickMatching: QuickMatching;
