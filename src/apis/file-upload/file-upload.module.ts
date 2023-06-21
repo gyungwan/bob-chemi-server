@@ -8,13 +8,13 @@ import { multerOptionsFactory } from "src/common/utils/multer.options";
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MulterModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: multerOptionsFactory,
-      inject: [ConfigService],
-    }),
+    // MulterModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: multerOptionsFactory,
+    //   inject: [ConfigService],
+    // }),
   ],
   controllers: [FileUploadController],
-  providers: [FileUploadService],
+  providers: [FileUploadService, ConfigService],
 })
 export class FileUploadModule {}

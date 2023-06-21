@@ -21,6 +21,7 @@ export const multerOptionsFactory = (
       s3,
       bucket: configService.get("AWS_BUCKET_NAME"),
       key(_req, file, done) {
+        // const folderPath = req.body.folderName || "default"; // 폴더 경로가 제공되지 않은 경우 default 폴더에 저장
         const folderPath = "image/foodieBoard"; //버킷에 원하는 폴더안에 저장
         const ext = path.extname(file.originalname); // 파일의 확장자 추출
         const basename = path.basename(file.originalname, ext); // 파일 이름
@@ -31,3 +32,28 @@ export const multerOptionsFactory = (
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   };
 };
+// export const multerOptionsFactoryForGroup = (
+//   configService: ConfigService
+// ): MulterOptions => {
+//   const s3 = new S3Client({
+//     region: configService.get("AWS_BUCKET_REGION"),
+//     credentials: {
+//       accessKeyId: configService.get("AWS_ACCESS_KEY_ID"),
+//       secretAccessKey: configService.get("AWS_SECRET_ACCESS_KEY"),
+//     },
+//   });
+
+//   return {
+//     storage: multerS3({
+//       s3,
+//       bucket: configService.get("AWS_BUCKET_NAME"),
+//       key(_req, file, done) {
+//         const folderPath = "image/smallGroup";
+//         const ext = path.extname(file.originalname);
+//         const basename = path.basename(file.originalname, ext);
+//         done(null, `${folderPath}/${basename}_${Date.now()}${ext}`);
+//       },
+//     }),
+//     limits: { fileSize: 10 * 1024 * 1024 },
+//   };
+// };
