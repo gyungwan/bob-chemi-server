@@ -8,8 +8,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { MatchingRoom } from "../../matchingroom/entities/matchingroom.entity";
 @Entity()
 export class MatchingChat {
   @PrimaryGeneratedColumn("uuid")
@@ -38,6 +40,9 @@ export class MatchingChat {
   @IsString()
   @Column({ nullable: false }) // 시간순으로 정렬하여 저장 및 조회 가능
   log: string; //여러 개의 메시지를 포함하는 전체 채팅의 기록
+
+  @OneToOne(() => MatchingRoom, (matchingRoom) => matchingRoom.matchingChat)
+  matchingRoom: MatchingRoom;
 }
 // @Min(0)
 // @Max(5)

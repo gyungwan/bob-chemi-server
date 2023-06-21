@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsEnum, IsNotEmpty } from "class-validator";
 import { AgeGroup, Gender } from "../entities/quickmatchings.entity";
 
 // export enum Gender {
@@ -15,8 +16,6 @@ import { AgeGroup, Gender } from "../entities/quickmatchings.entity";
 //   ];
 // 유저가 입력하는 것
 export class CreateQuickMatchingDto {
-  //나이 변환은 상대방의 나이를 변환에서 넣을 때 , 성별
-
   @ApiProperty({
     description: "성별",
     example: "Male = Male Female = Female",
@@ -27,7 +26,7 @@ export class CreateQuickMatchingDto {
 
   @ApiProperty({
     description: "유저 연령대",
-    example: "TEENAGER = 10대,TWENTIES = 20대",
+    example: "TEENAGER = TEENAGER ,TWENTIES = TWENTIES",
     enum: AgeGroup,
     required: true,
   })
