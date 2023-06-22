@@ -123,9 +123,24 @@ export class GroupsService {
   //<<------------소모임 수정------------>>
   async updateGroup(
     groupId: number,
-    updateGroupDto: UpdateGroupDto
+    updateGroupDto: UpdateGroupDto,
+    file: Express.MulterS3.File
   ): Promise<Group> {
-    const group = await this.getGroupById(groupId);
+    //이부분에서 유저 아이디를 다 받아와서 아래코드로 바꿔줌
+    // const group = await this.getGroupById(groupId);
+    const group = await this.groupRepository.findOne({ where: { groupId } });
+
+    // 새로운 파일이 제공되고 그룹에 기존 파일이 있는 경우, 기존 파일 삭제
+    if (file && group.image) {
+      const oldFilePath = group.image;
+      // 파일 URL에서 폴더 경로 추출
+      await this.fileUploadService.deleteFile(oldFilePath);
+    }
+
+    // 새로운 파일이 제공되면 파일 URL 업데이트
+    if (file) {
+      group.image = file.location;
+    }
 
     Object.assign(group, updateGroupDto);
     const updatedGroup = await this.groupRepository.save(group);

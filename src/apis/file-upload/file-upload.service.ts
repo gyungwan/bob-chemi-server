@@ -6,7 +6,7 @@ import { ConfigService } from "@nestjs/config";
 export class FileUploadService {
   private readonly s3: S3Client;
   private readonly folderPath: string;
-
+  private readonly folderPath1: string;
   constructor(private readonly configService: ConfigService) {
     this.s3 = new S3Client({
       region: configService.get<string>("AWS_BUCKET_REGION"),
@@ -16,6 +16,7 @@ export class FileUploadService {
       },
     });
     this.folderPath = "image/foodieBoard";
+    this.folderPath1 = "image/group";
   }
 
   //<<------------단일 파일 업로드------------>>
@@ -60,5 +61,24 @@ export class FileUploadService {
         }
       })
     );
+  }
+  //<<------------파일 삭제------------>>
+  async deleteFile(fileUrl: string) {
+    const bucket = this.configService.get<string>("AWS_BUCKET_NAME");
+    // console.log(folderPath, "----00110------------------------------");
+    const key = `${this.folderPath1}/${fileUrl.substring(
+      fileUrl.lastIndexOf("/") + 1
+    )}`;
+    const params = {
+      Bucket: bucket,
+      Key: key,
+    };
+
+    try {
+      await this.s3.send(new DeleteObjectCommand(params));
+    } catch (error) {
+      console.error("Failed to delete file from S3:", error);
+      throw new BadRequestException("Failed to delete the file");
+    }
   }
 }

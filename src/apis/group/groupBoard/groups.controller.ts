@@ -24,11 +24,15 @@ import { UpdateGroupDto } from "./dto/update.group.dto";
 import { Member } from "./entites/members.entity";
 import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { FileUploadService } from "src/apis/file-upload/file-upload.service";
 
 @Controller("groups")
 @ApiTags("소모임 API")
 export class GroupsController {
-  constructor(private groupsService: GroupsService) {}
+  constructor(
+    private groupsService: GroupsService,
+    private readonly fileUploadService: FileUploadService
+  ) {}
 
   //<<------------소모임 조회------------>>
   @Get("/")
@@ -119,7 +123,12 @@ export class GroupsController {
   //<<------------소모임 삭제------------>>
   @Delete("/:id")
   @ApiOperation({ summary: "소모임 삭제", description: "소모임 삭제" })
-  deleteBoard(@Param("id", ParseIntPipe) id): Promise<void> {
+  async deleteBoard(@Param("id", ParseIntPipe) id): Promise<void> {
+    const group = await this.groupsService.getGroupById(id);
+
+    //S3에 저장된 이미지 파일 삭제
+    await this.fileUploadService.deleteFile(group.image); // Assuming "image/group" is your desired folder
+
     return this.groupsService.deleteGroup(id);
   }
 
@@ -129,11 +138,34 @@ export class GroupsController {
     summary: "소모임 게시글 수정",
     description: "해당 소모임 ID로 찾아와서, 수정된 내용 입력",
   })
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: multerS3({
+        s3: new S3Client({
+          region: process.env.AWS_BUCKET_REGION,
+          credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+          },
+        }),
+        bucket: process.env.AWS_BUCKET_NAME,
+        key(_req, file, done) {
+          const folderPath = "image/group"; // specify the desired path here
+          const ext = path.extname(file.originalname); // extract file extension
+          const basename = path.basename(file.originalname, ext); // extract file name
+          // Make the filename unique by appending the current time to prevent filename duplication
+          done(null, `${folderPath}/${basename}_${Date.now()}${ext}`);
+        },
+      }),
+      // limits: { fileSize: 10 * 1024 * 1024 },
+    })
+  )
   updateGroup(
     @Param("id", ParseIntPipe) id: number,
-    @Body() updateGroupDto: UpdateGroupDto
+    @Body() updateGroupDto: UpdateGroupDto,
+    @UploadedFile() file: Express.MulterS3.File
   ) {
-    return this.groupsService.updateGroup(id, updateGroupDto);
+    return this.groupsService.updateGroup(id, updateGroupDto, file);
   }
 
   //<<------------소모임 구인 중 상태 변경------------>>
