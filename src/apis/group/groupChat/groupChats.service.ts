@@ -1,57 +1,55 @@
 import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { ChatRoom } from "./entities/chat.rooms.entity";
 import { Chat } from "./entities/chats.entity";
 
 @Injectable()
 export class GroupChatService {
-  private chatRooms: Map<string, string[]> = new Map<string, string[]>();
-  private chatRepository: Repository<Chat>;
+  @InjectRepository(ChatRoom)
+  private chatRoomRepository: Repository<ChatRoom>;
 
-  //<<------------메세지 발송------------>>
-  async sendChat(chatId: string, message: string): Promise<Chat> {
-    const chat = await this.chatRepository.save({ chatId, message });
-    return chat;
+  private readonly chatRooms: Map<string, ChatRoom> = new Map();
+
+  //<<------------방 생성------------>>
+  async createRoom(roomName: string): Promise<ChatRoom> {
+    const chatRoom = new ChatRoom();
+    chatRoom.roomName = roomName;
+    chatRoom.chats = [];
+
+    await this.chatRooms.set(chatRoom.chatRoomId, chatRoom);
+    await this.chatRoomRepository.save(chatRoom);
+
+    return chatRoom;
   }
 
-  //<<------------채팅 조회------------>>
-  async getChat(): Promise<Chat[]> {
-    return this.chatRepository.find();
+  //<<------------방 조회------------>>
+  getRooms(): ChatRoom[] {
+    return Array.from(this.chatRooms.values());
   }
 
-  //<<------------단체 채팅방 조회------------>>
-  getChatRoom(chatRoomId: string) {
-    return this.chatRooms.get(chatRoomId);
+  //<<------------채팅방 검색------------>>
+  findRoom(roomName: string): ChatRoom | undefined {
+    return this.chatRooms.get(roomName);
   }
 
-  //<<------------채팅방 개설----------->>
-  createChatRoom(chatRoomId: string) {
-    this.chatRooms.set(chatRoomId, []);
-  }
-
-  //<<------------채팅방 참여------------>>
-  joinChatRoom(chatRoomId: string, user: string) {
-    const room = this.chatRooms.get(chatRoomId);
-    if (room) {
-      room.push(user);
-    }
-  }
-
-  //<<------------채팅방 나가기------------>>
-  leaveChatRoom(chatRoomId: string, user: string) {
-    const room = this.chatRooms.get(chatRoomId);
-    if (room) {
-      const index = room.indexOf(user);
-      if (index !== -1) {
-        room.splice(index, 1);
-      }
-    }
+  //<<------------채팅방 삭제------------>
+  deleteRoom(roomName: string): boolean {
+    return this.chatRooms.delete(roomName);
   }
 
   //<<------------채팅 보내기------------>>
-  sendMessage(chatRoomId: string, user: string, message: string) {
-    const room = this.chatRooms.get(chatRoomId);
-    if (room) {
-      room.push(`${user}: ${message}`);
+  addChat(roomName: string, message: string): Chat {
+    const chatRoom = this.findRoom(roomName);
+    if (!chatRoom) {
+      return null;
     }
+    const chat: Chat = {
+      chatId: Date.now().toString(),
+      message,
+      chatRoom,
+    };
+    chatRoom.chats.push(chat);
+    return chat;
   }
 }

@@ -15,7 +15,6 @@ import { UsersService } from "src/apis/users/users.service";
 import { FileUploadService } from "src/apis/file-upload/file-upload.service";
 import { User } from "src/apis/users/entities/user.entity";
 
-
 @Injectable()
 export class GroupsService {
   constructor(
@@ -88,14 +87,13 @@ export class GroupsService {
   async createGroup(
     createGroupDto: CreateGroupDto,
     userId: string,
-   //file: Express.MulterS3.File
+    file: Express.MulterS3.File
   ): Promise<Group> {
-    //파일 s3에 저장후 url 받아오기
-    // const image = file ? [await this.fileUploadService.uploadFile(file)] : [];
+    const image = file ? [await this.fileUploadService.uploadFile(file)] : [];
 
     const group = this.groupRepository.create({
       ...createGroupDto,
-      //image: image[0].filePath || "",
+      image: image[0].filePath || "",
     });
 
     const newGroup = await this.groupRepository.save(group);
@@ -174,7 +172,7 @@ export class GroupsService {
       },
     });
 
-    if (group.groupPeopleLimit <= confirmedMember) {throw new ConflictException("인원이 마감되었습니다.");} //prettier-ignore
+    if (Number(group.groupPeopleLimit) <= confirmedMember) {throw new ConflictException("인원이 마감되었습니다.");} //prettier-ignore
     if (isPending) {throw new ConflictException("이미 가입신청 되었습니다.");} //prettier-ignore
     if (isConfirmed) {throw new ConflictException("이미 가입된 그룹입니다.");} //prettier-ignore
 
@@ -210,7 +208,7 @@ export class GroupsService {
 
     const groupMembersCount = group.members.length + 1;
 
-    if (groupMembersCount >= group.groupPeopleLimit) {
+    if (groupMembersCount >= Number(group.groupPeopleLimit)) {
       group.status = GroupStatus.PRIVATE;
       await group.save();
     }

@@ -2,14 +2,15 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ChatRoom } from "./entities/chat.rooms.entity";
 import { Chat } from "./entities/chats.entity";
-import { groupChatAdapter } from "./groupChats.adapter";
-import { GroupChatController } from "./groupChats.controller";
+import { GroupChatsGateway } from "./groupChats.gateway";
 import { GroupChatService } from "./groupChats.service";
+import { Repository } from "typeorm";
+import { GroupChatsController } from "./groupChats.controller";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Chat, ChatRoom])],
+  controllers: [GroupChatsController],
+  providers: [GroupChatService, GroupChatsGateway, Repository],
   exports: [GroupChatService],
-  controllers: [GroupChatController],
-  providers: [GroupChatService, groupChatAdapter],
 })
 export class GroupChatsModule {}
