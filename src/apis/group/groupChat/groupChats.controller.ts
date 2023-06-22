@@ -1,50 +1,37 @@
-import { Controller, Post, Param, Body, Get } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { ChatRoom } from "./entities/chat.rooms.entity";
 import { GroupChatService } from "./groupChats.service";
 
 @Controller("groupChat")
-@ApiTags("소모임 채팅방 API")
-export class GroupChatController {
+export class GroupChatsController {
   constructor(private readonly groupChatService: GroupChatService) {}
-  //<<------------d------------>>
 
-  //<<------------단체 채팅방 조회------------>>
-  @Get(":roomId")
-  getChatRoom(@Param("roomId") chatRoomId: string) {
-    return this.groupChatService.getChatRoom(chatRoomId);
+  //<<------------방 생성------------>>
+  @Post("room")
+  createRoom(@Body() roomName: string): any {
+    const room = this.groupChatService.createRoom(roomName);
+    return { success: !!room, payload: room };
   }
 
-  //<<------------채팅방 개설----------->>
-  @Post(":chatRoomId/create")
-  createChatRoom(@Param("chatRoomId") chatRoomId: string) {
-    this.groupChatService.createChatRoom(chatRoomId);
+  //<<------------방 조회------------>>
+  @Get("room")
+  getRooms(): ChatRoom[] {
+    return this.groupChatService.getRooms();
   }
 
-  //<<------------채팅방 참여------------>>
-  @Post(":chatRoomId/join")
-  joinChatRoom(
-    @Param("chatRoomId") chatRoomId: string,
-    @Body("user") user: string
-  ) {
-    this.groupChatService.joinChatRoom(chatRoomId, user);
+  //<<------------방 검색------------>>
+  @Get("room/:roomName")
+  getRoom(@Param("roomName") roomName: string): ChatRoom {
+    return this.groupChatService.findRoom(roomName);
   }
 
-  //<<------------채팅방 나가기------------>>
-  @Post(":chatRoomId/leave")
-  leaveChatRoom(
-    @Param("chatRoomId") chatRoomId: string,
-    @Body("user") user: string
-  ) {
-    this.groupChatService.leaveChatRoom(chatRoomId, user);
-  }
-
-  //<<------------채팅 보내기------------>>
-  @Post(":chatRoomId/send")
-  sendMessage(
-    @Param("chatRoomId") chatRoomId: string,
-    @Body("user") user: string,
-    @Body("message") message: string
-  ) {
-    this.groupChatService.sendMessage(chatRoomId, user, message);
+  //<<------------채팅 발송------------>>
+  @Post("room/:roomName/chats")
+  addChat(
+    @Param("roomName") roomName: string,
+    @Body() { message }: { message: string }
+  ): any {
+    const chat = this.groupChatService.addChat(roomName, message);
+    return { success: !!chat, payload: chat };
   }
 }

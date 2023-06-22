@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, Max, Min } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 
 export class CreateGroupDto {
   @ApiProperty({
@@ -26,35 +26,29 @@ export class CreateGroupDto {
   @IsNotEmpty()
   groupDate: Date;
 
-  @Min(2)
-  @Max(10)
   @ApiProperty({
     description: "소모임 인원 제한",
-    example: "2~10",
+    example: "타입은 string이지만 인원 제한 로직때문에 숫자만 사용해야함",
     required: false,
   })
   @IsNotEmpty()
-  groupPeopleLimit: number;
+  groupPeopleLimit: string;
 
-  @Min(0)
-  @Max(23)
   @ApiProperty({
     description: "소모임 모이는 Hour",
-    example: "0~23",
+    example: "string",
     required: true,
   })
   @IsNotEmpty()
-  groupHour: number;
+  groupHour: string;
 
-  @Min(0)
-  @Max(59)
   @ApiProperty({
     description: "소모임 모이는 Min",
-    example: "0~59",
+    example: "string",
     required: true,
   })
   @IsNotEmpty()
-  groupMin: number;
+  groupMin: string;
 
   @ApiProperty({
     description: "소모임 모임 장소",
