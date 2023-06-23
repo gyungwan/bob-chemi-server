@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 import { User } from "src/apis/users/entities/user.entity";
 import {
   BaseEntity,
@@ -79,4 +80,10 @@ export class Group extends BaseEntity {
   @ApiProperty({ description: "소모임 이미지 한장" })
   @Column()
   image: string;
+
+  @ApiProperty({ description: "소모임 만든 유저" })
+  @ManyToOne(() => User)
+  @JoinColumn()
+  @Exclude()
+  owner: User;
 }

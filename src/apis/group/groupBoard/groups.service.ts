@@ -53,18 +53,13 @@ export class GroupsService {
 
   //<<------------내가 만든 소모임 조회------------>>
   async getMyGroup(userId: string): Promise<Group[]> {
-    const user = await this.userServices.findOneId(userId);
-
-    const groups = await this.groupRepository
+    const myGroup = await this.groupRepository
       .createQueryBuilder("group")
-      .innerJoin("group.users", "user", "user.id = :userId", {
-        userId: user.id,
-      })
+      .leftJoin("group.owner", "owner")
+      .where("owner.id = :userId", { userId })
       .getMany();
 
-    console.log(groups);
-
-    return groups;
+    return myGroup;
   }
 
   // <<------------내가 가입한 소모임 조회------------>>
@@ -72,9 +67,7 @@ export class GroupsService {
     const user = await this.userServices.findOneId(userId);
     const member = await this.memberRepository.find({
       where: {
-        user: {
-          id: user.id,
-        },
+        user: { id: user.id }, //
         status: MemberStatus.CONFIRMED,
       },
       relations: ["group"],
@@ -89,25 +82,22 @@ export class GroupsService {
     userId: string,
     file: Express.MulterS3.File
   ): Promise<Group> {
+    const user = await this.userServices.findOneId(userId);
     const image = file ? [await this.fileUploadService.uploadFile(file)] : [];
 
-    const group = this.groupRepository.create({
+    const newGroup = await this.groupRepository.save({
       ...createGroupDto,
-      image: image[0].filePath || "",
+      image: image[0]?.filePath || "",
+      owner: user,
     });
 
-    const newGroup = await this.groupRepository.save(group);
-    const user = await this.userServices.findOneId(userId);
-    const owner = new Member(); // 게시글 작성자 자동 멤버 가입
+    const firstMember = this.memberRepository.create({
+      group: newGroup,
+      user,
+      status: MemberStatus.CONFIRMED,
+    });
 
-    owner.group = newGroup;
-    owner.user = user;
-    owner.status = MemberStatus.CONFIRMED;
-
-    if (!user.groups) {user.groups = []} //prettier-ignore
-    user.groups.push(newGroup);
-    await this.memberRepository.save(owner);
-    await this.userRepository.save(user);
+    await this.memberRepository.save(firstMember);
 
     return newGroup;
   }
