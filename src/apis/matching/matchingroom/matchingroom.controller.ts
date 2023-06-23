@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -11,6 +12,7 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Request } from "express";
 import { UsersService } from "src/apis/users/users.service";
 import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
+import { QuickMatching } from "../quickmatchings/entities/quickmatchings.entity";
 import { CreateCheckInfoDto } from "./dto/create-checkInfo.dto";
 import { MatchingRoom } from "./entities/matchingroom.entity";
 import { MatchingRoomService } from "./matchingroom.service";
@@ -30,63 +32,66 @@ export class MatchingRoomController {
   async checkInfoForMatching(
     @Body() createCheckInfoDto: CreateCheckInfoDto,
     @Req() req: Request
-  ): Promise<MatchingRoom> {
+  ): Promise<QuickMatching[]> {
     // 퀵매칭 id 로 퀵매칭 가져오기 (dto)
     const userId = (req.user as any).id;
     const user = await this.usersService.findOneId(userId);
-    const myGender = user.gender;
-    const myAge = user.age;
-    const myAgeGroup = this.getAgeGroup(myAge);
+    // const myGender = user.gender;
+    // const myAge = user.age;
+    // const myAgeGroup = this.getAgeGroup(myAge);
     const { targetGender, targetAgeGroup, quickMatchingId } =
       createCheckInfoDto;
-    const matchingRoom = await this.matchingRoomService.checkMatching({
-      userId,
-      myGender,
-      myAgeGroup,
-      targetGender,
-      targetAgeGroup,
-      quickMatchingId,
-    });
-    console.log("==========================================");
-    console.log(
-      user,
-      myGender,
-      myAgeGroup,
-      targetGender,
-      targetAgeGroup,
-      quickMatchingId,
-      matchingRoom
-    );
+    // const matchingRoom = await this.matchingRoomService.checkMatching({
+    //   userId,
+    //   targetGender,
+    //   targetAgeGroup,
+    //   quickMatchingId,
+    // });
+
+    const matchingRoom = await this.matchingRoomService.findTargetUser();
+
     return matchingRoom;
   }
-  getAgeGroup(age: number): string {
-    if (age >= 10 && age <= 19) {
-      return "TEENAGER";
-    } else if (age >= 20 && age <= 29) {
-      return "TWENTIES";
-    } else if (age >= 30 && age <= 39) {
-      return "THIRTIES";
-    } else if (age >= 40 && age <= 49) {
-      return "FORTIES";
-    } else if (age >= 50 && age <= 59) {
-      return "FIFTIES";
-    } else {
-      return "기타";
-    }
-  }
+  // getAgeGroup(age: number): string {
+  //   if (age >= 10 && age <= 19) {
+  //     return "TEENAGER";
+  //   } else if (age >= 20 && age <= 29) {
+  //     return "TWENTIES";
+  //   } else if (age >= 30 && age <= 39) {
+  //     return "THIRTIES";
+  //   } else if (age >= 40 && age <= 49) {
+  //     return "FORTIES";
+  //   } else if (age >= 50 && age <= 59) {
+  //     return "FIFTIES";
+  //   } else {
+  //     return "기타";
+  //   }
+  // }
   //----------------- 매칭된 상대방 유저 정보 조회 -----------------------//
   // 매칭된 유저의 정보 확인할 수 있도록
-  @Get(":id")
+  // 수정하기
+  @Get(":id") // 퀵매칭아이디
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({ summary: "매칭된 상대방 유저 정보 조회 " })
-  async fetchQuickMatching(@Param("id") id: string) {
-    return this.matchingRoomService.findTargetUser(id);
+  async fetchQuickMatching(@Param("id") quickMatchingId: string) {
+    //return this.matchingRoomService.findOne(id);
+    return this.matchingRoomService.findTargetUser();
   }
 
+  //----------------- 매칭 수락 -----------------------//
+  // 수락을 하면 isMatched == true, db에 저장 , 매칭챗 생성
+
   //----------------- 유저가 매칭 거절 -----------------------//
+  // @Post(":id/reject")
+  // @UseGuards(RestAuthAccessGuard)
+  // @ApiOperation({ summary: "매칭된 상대 거절 " })
+  // async rejectMatching(@Param("id") id: string) {
+  //   await this.matchingRoomService.reject(id);
+  // }
 
   //if(isMatched == false){}
   // else if(isMatched == true){}
+
   //----------------- 매칭룸에서 제거(시간 제한)-----------------------//
   // 대기 시간 설정 메서드
   // setWaitingTime(waitingHours: number) {

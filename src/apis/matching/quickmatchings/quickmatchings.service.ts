@@ -13,6 +13,7 @@ import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/users.service";
 import { MatchingChat } from "../matchingchat/entities/matchingchat.entity";
 import { MatchingRoom } from "../matchingroom/entities/matchingroom.entity";
+import { MatchingRoomService } from "../matchingroom/matchingroom.service";
 import { CreateQuickMatchingDto } from "./dto/create-quickmatching.dto";
 import {
   AgeGroup,
@@ -29,6 +30,8 @@ export class QuickMatchingService {
     private usersService: UsersService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => MatchingRoomService))
+    private matchingRoomService: MatchingRoomService,
     @InjectRepository(MatchingRoom)
     private readonly matchingRoomRepository: Repository<MatchingRoom>
   ) {}
@@ -39,7 +42,7 @@ export class QuickMatchingService {
       targetGender,
       targetAgeGroup,
     }: { targetGender: Gender; targetAgeGroup: AgeGroup }
-  ): Promise<QuickMatching> {
+  ): Promise<QuickMatching[]> {
     const existingMatching = await this.quickMatchingRepository.findOne({
       where: { user: { id: userId } },
     });
@@ -80,12 +83,24 @@ export class QuickMatchingService {
     // const savedQuickMatching = await this.quickMatchingRepository.save(
     //   quickMatching
     // );
-    return this.quickMatchingRepository.save(quickMatching);
+
+    await this.quickMatchingRepository.save(quickMatching);
+    const targetUser = await this.matchingRoomService.findTargetUser();
+    //return this.quickMatchingRepository.save(quickMatching);
+    return targetUser;
   }
 
   async findRequestMatching(id): Promise<QuickMatching> {
     const quickMatching = await this.quickMatchingRepository.findOne({
       where: { id },
+      relations: ["user"], // matchingChat 유저의 정보까지 모두 반환
+    });
+    return quickMatching;
+  }
+
+  async findAllRequestMatching(): Promise<QuickMatching[]> {
+    const quickMatching = await this.quickMatchingRepository.find({
+      //where: { id },
       relations: ["user"], // matchingChat 유저의 정보까지 모두 반환
     });
     return quickMatching;
@@ -97,6 +112,6 @@ export class QuickMatchingService {
     if (!quickMatching) {
       throw new NotFoundException("매칭을 찾을 수 없습니다.");
     }
-    await this.quickMatchingRepository.softDelete(id); //remove
+    await this.quickMatchingRepository.remove(id); //remove
   }
 }

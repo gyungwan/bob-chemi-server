@@ -37,25 +37,13 @@ export class MatchingRoom {
   @ApiProperty({ description: "매칭룸에서 제거일" })
   removalDate: Date;
 
-  @Column({ type: "enum", enum: Gender, nullable: true })
+  @Column({ nullable: true }) // 값 바꿔주기
   @ApiProperty({ description: "원하는 상대방의 성별" })
-  requestGender: Gender;
+  requestGender: string;
 
-  @Column({ type: "enum", enum: AgeGroup, nullable: true })
+  @Column({ nullable: true }) // 값 바꿔주기
   @ApiProperty({ description: "원하는 상대방의 나이대" })
-  requestAgeGroup: AgeGroup;
-
-  // @Column({ nullable: true })
-  // @ApiProperty({ description: "매칭 대기 시작 시간" })
-  // waitingStart: Date;
-
-  // @Column({ nullable: true })
-  // @ApiProperty({ description: "매칭 대기 종료 시간" })
-  // waitingEnd: Date;
-
-  // @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.m)
-  // @JoinColumn({ name: "gender" })
-  // gender: QuickMatching; // 여기서 유저 정보 가져오기
+  requestAgeGroup: string;
 
   @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.matchingRoom)
   @JoinColumn({ name: "quickMatchingId" })
@@ -65,10 +53,26 @@ export class MatchingRoom {
   @JoinColumn({ name: "matchingChatId" })
   matchingChat: MatchingChat;
 
+  @OneToOne(() => User, (user) => user.matchingRoom)
+  @JoinColumn({ name: "userId" })
+  user: User;
+
   @OneToOne(() => User, (targetUser) => targetUser.matchingRoom)
   @JoinColumn({ name: "targetUserId" })
   targetUser: User;
 }
+
+// @Column({ nullable: true })
+// @ApiProperty({ description: "매칭 대기 시작 시간" })
+// waitingStart: Date;
+
+// @Column({ nullable: true })
+// @ApiProperty({ description: "매칭 대기 종료 시간" })
+// waitingEnd: Date;
+
+// @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.m)
+// @JoinColumn({ name: "gender" })
+// gender: QuickMatching; // 여기서 유저 정보 가져오기
 // 대기 시간 설정 메서드
 // setWaitingTime(waitingHours: number) {
 //   this.waitingStart = new Date();  // 대기 시작 시간을 현재 시간으로 설정

@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   AgeGroup,
   Gender,
+  QuickMatching,
 } from "../../quickmatchings/entities/quickmatchings.entity";
 
 export class CreateCheckInfoDto {
@@ -23,5 +24,5 @@ export class CreateCheckInfoDto {
     description: "퀵매칭 id",
     required: true,
   })
-  quickMatchingId: string;
+  quickMatchingId: QuickMatching;
 }
