@@ -27,18 +27,17 @@ export class MatchingChat {
   @JoinColumn({ name: "receiverId" })
   receiver: User;
 
-  @Column()
+  @Column({ nullable: true })
   message: string; // 개별 메세지
 
   @Column()
   timestamp: Date; //메세지가 전송된 시간
 
-  @Column({ nullable: false }) // 1:1 채팅이기 때문에 필수
+  @Column({ nullable: true }) // 1:1 채팅이기 때문에 필수
   roomId: string; //채팅이 속한 방 또는 대화의 식별자
 
   @ApiProperty({ description: "채팅 저장" })
-  @IsString()
-  @Column({ nullable: false }) // 시간순으로 정렬하여 저장 및 조회 가능
+  @Column({ nullable: true }) // 시간순으로 정렬하여 저장 및 조회 가능
   log: string; //여러 개의 메시지를 포함하는 전체 채팅의 기록
 
   @OneToOne(() => MatchingRoom, (matchingRoom) => matchingRoom.matchingChat)

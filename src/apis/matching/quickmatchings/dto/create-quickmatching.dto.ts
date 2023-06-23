@@ -22,7 +22,7 @@ export class CreateQuickMatchingDto {
     enum: Gender,
     //required: true,
   })
-  gender: Gender;
+  targetGender: Gender;
 
   @ApiProperty({
     description: "유저 연령대",
@@ -30,5 +30,5 @@ export class CreateQuickMatchingDto {
     enum: AgeGroup,
     //required: true,
   })
-  ageGroup: AgeGroup;
+  targetAgeGroup: AgeGroup;
 }
