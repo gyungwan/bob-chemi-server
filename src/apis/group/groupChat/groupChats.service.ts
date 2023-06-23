@@ -1,5 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { User } from "src/apis/users/entities/user.entity";
+import { UsersService } from "src/apis/users/users.service";
 import { Repository } from "typeorm";
 import { ChatRoom } from "./entities/chat.rooms.entity";
 import { Chat } from "./entities/chats.entity";
@@ -10,6 +12,10 @@ export class GroupChatService {
   private chatRoomRepository: Repository<ChatRoom>;
 
   private readonly chatRooms: Map<string, ChatRoom> = new Map();
+
+  @InjectRepository(User)
+  private userService: UsersService;
+  private userRepository: Repository<User>;
 
   //<<------------방 생성------------>>
   async createRoom(roomName: string): Promise<ChatRoom> {
@@ -33,21 +39,31 @@ export class GroupChatService {
     return this.chatRooms.get(roomName);
   }
 
-  //<<------------채팅방 삭제------------>
+  //<<------------채팅방 참여------------>>
+  //<<------------채팅방 나가기------------>>
+
+  //<<------------채팅방 삭제------------>>
   deleteRoom(roomName: string): boolean {
     return this.chatRooms.delete(roomName);
   }
 
   //<<------------채팅 보내기------------>>
-  addChat(roomName: string, message: string): Chat {
-    const chatRoom = this.findRoom(roomName);
-    if (!chatRoom) {
-      return null;
-    }
+  async addChat(
+    chatRoomId: string,
+    message: string,
+    userId: string
+  ): Promise<Chat> {
+    const chatRoom = this.findRoom(chatRoomId);
+    if (!chatRoom) {throw new ConflictException("존재하지 않는 채팅방 입니다.");} //prettier-ignore
+
+    const user = await this.userService.findOneId(userId);
+    if (!user) {throw new ConflictException("존재하지 않는 유저입니다.");} //prettier-ignore
+
     const chat: Chat = {
       chatId: Date.now().toString(),
       message,
       chatRoom,
+      user,
     };
     chatRoom.chats.push(chat);
     return chat;

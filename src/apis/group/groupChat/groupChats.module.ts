@@ -6,9 +6,10 @@ import { GroupChatsGateway } from "./groupChats.gateway";
 import { GroupChatService } from "./groupChats.service";
 import { Repository } from "typeorm";
 import { GroupChatsController } from "./groupChats.controller";
+import { User } from "src/apis/users/entities/user.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Chat, ChatRoom])],
+  imports: [TypeOrmModule.forFeature([Chat, ChatRoom, User])],
   controllers: [GroupChatsController],
   providers: [GroupChatService, GroupChatsGateway, Repository],
   exports: [GroupChatService],

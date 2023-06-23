@@ -11,16 +11,24 @@ import { MulterModule } from "@nestjs/platform-express";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { FileUploadModule } from "src/apis/file-upload/file-upload.module";
 import { FileUploadService } from "src/apis/file-upload/file-upload.service";
+import { ChatRoom } from "../groupChat/entities/chat.rooms.entity";
+import { GroupChatService } from "../groupChat/groupChats.service";
 //import { multerOptionsFactory } from "src/common/utils/multer.options";
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Group, Member, User]),
+    TypeOrmModule.forFeature([Group, Member, User, ChatRoom]),
     ConfigModule,
     FileUploadModule,
   ],
 
   exports: [GroupsService],
   controllers: [GroupsController],
-  providers: [GroupsService, Repository, UsersService, FileUploadService],
+  providers: [
+    GroupsService,
+    Repository,
+    UsersService,
+    FileUploadService,
+    GroupChatService,
+  ],
 })
 export class GroupsModule {}
