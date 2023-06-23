@@ -1,5 +1,4 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Exclude } from "class-transformer";
 import { User } from "src/apis/users/entities/user.entity";
 import {
   BaseEntity,
@@ -37,11 +36,11 @@ export class Group extends BaseEntity {
   groupDate: Date;
 
   @ApiProperty({ description: "소모임 모이는 Hour" })
-  @Column()
+  @Column({ nullable: true })
   groupHour: string;
 
   @ApiProperty({ description: "소모임 모이는 Min" })
-  @Column()
+  @Column({ nullable: true })
   groupMin: string;
 
   @ApiProperty({ description: "소모임 모임 장소" })
@@ -49,7 +48,7 @@ export class Group extends BaseEntity {
   groupLocation: string;
 
   @ApiProperty({ description: "소모임 인원 제한" })
-  @Column()
+  @Column({ nullable: true })
   groupPeopleLimit: string;
 
   @ApiProperty({
