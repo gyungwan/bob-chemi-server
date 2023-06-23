@@ -40,16 +40,16 @@ export class QuickMatching {
     enum: Gender,
     nullable: true,
   })
-  @ApiProperty({ description: "유저 성별" })
-  gender: Gender;
+  @ApiProperty({ description: "원하는 상대의 성별" })
+  targetGender: Gender;
 
   @Column({ type: "enum", enum: AgeGroup, nullable: true })
-  @ApiProperty({ description: "유저 연령대" })
-  ageGroup: AgeGroup;
+  @ApiProperty({ description: "원하는 상대의 연령대" })
+  targetAgeGroup: AgeGroup;
 
-  @Column({ type: "boolean", default: false })
-  @ApiProperty({ description: "매칭 여부" })
-  isMatched: boolean;
+  // @Column({ type: "boolean", default: false })
+  // @ApiProperty({ description: "매칭 여부" })
+  // isMatched: boolean;
 
   @ApiProperty({ description: "매칭 성사일" })
   @CreateDateColumn()
@@ -59,10 +59,10 @@ export class QuickMatching {
   @JoinColumn({ name: "userId" })
   user: User;
 
-  @OneToOne(() => User, (targetUser) => targetUser.quickMatching)
-  @JoinColumn({ name: "targetUserId" })
-  //matchedUser: User;
-  targetUser: User;
+  // @OneToOne(() => User, (targetUser) => targetUser.quickMatching)
+  // @JoinColumn({ name: "targetUserId" })
+  // //matchedUser: User;
+  // targetUser: User;
 
   @OneToOne(() => MatchingRoom, (matchingRoom) => matchingRoom.quickMatching)
   @JoinColumn()

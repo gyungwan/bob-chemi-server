@@ -7,9 +7,12 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { classToPlain } from "class-transformer";
 import { Repository } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/users.service";
+import { MatchingChat } from "../matchingchat/entities/matchingchat.entity";
+import { MatchingRoom } from "../matchingroom/entities/matchingroom.entity";
 import { CreateQuickMatchingDto } from "./dto/create-quickmatching.dto";
 import {
   AgeGroup,
@@ -25,12 +28,17 @@ export class QuickMatchingService {
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(MatchingRoom)
+    private readonly matchingRoomRepository: Repository<MatchingRoom>
   ) {}
 
   async create(
     userId: string,
-    { gender, ageGroup }: { gender: Gender; ageGroup: AgeGroup }
+    {
+      targetGender,
+      targetAgeGroup,
+    }: { targetGender: Gender; targetAgeGroup: AgeGroup }
   ): Promise<QuickMatching> {
     const existingMatching = await this.quickMatchingRepository.findOne({
       where: { user: { id: userId } },
@@ -41,27 +49,44 @@ export class QuickMatchingService {
     }
 
     const user = await this.usersService.findOneId(userId); // My Info
-
-    // const myGender = user.gender;
-    // const myAge = user.age;
-    // const myAgeGroup = this.getAgeGroup(myAge);
-
     // QuickMatching 객체 생성 및 저장
     const quickMatching = new QuickMatching();
-    quickMatching.gender = gender;
-    quickMatching.ageGroup = ageGroup;
+    quickMatching.targetGender = targetGender;
+    quickMatching.targetAgeGroup = targetAgeGroup;
     quickMatching.user = user;
 
+    // MatchingRoom 생성 및 연결
+    // const matchingRoom = new MatchingRoom();
+    // matchingRoom.quickMatching = quickMatching;
+    // //matchingRoom.matchingChat = null; // 매칭되면 채팅 생성 예정
+
+    // const savedMatchingRoom = await this.matchingRoomRepository.save(
+    //   matchingRoom
+    // );
+    // MatchingChat 생성 및 연결
+    // const matchingChat = new MatchingChat();
+    // matchingChat.matchingRoom = savedMatchingRoom;
+    // matchingChat.message = "Hello, this is a message";
+    // matchingChat.timestamp = new Date(); // 현재 시간으로 설정
+
+    // const savedMatchingChat = await this.matchingChatRepository.save(
+    //   matchingChat
+    // );
+
+    // matchingRoom.matchingChat = savedMatchingChat;
+
+    //quickMatching.matchingRoom = savedMatchingRoom; // 매칭룸 저장
+
+    // const savedQuickMatching = await this.quickMatchingRepository.save(
+    //   quickMatching
+    // );
     return this.quickMatchingRepository.save(quickMatching);
   }
-  // async findMatchedUser(gender, ageGroup): Promise<User | undefined> {
-  //   //const matchedUser = await.usersService.findOneId()
-  // }
 
-  async findOne(id): Promise<QuickMatching> {
+  async findRequestMatching(id): Promise<QuickMatching> {
     const quickMatching = await this.quickMatchingRepository.findOne({
       where: { id },
-      relations: ["user"], // matchingChat
+      relations: ["user"], // matchingChat 유저의 정보까지 모두 반환
     });
     return quickMatching;
   }
@@ -72,6 +97,6 @@ export class QuickMatchingService {
     if (!quickMatching) {
       throw new NotFoundException("매칭을 찾을 수 없습니다.");
     }
-    await this.quickMatchingRepository.softDelete(id);
+    await this.quickMatchingRepository.softDelete(id); //remove
   }
 }
