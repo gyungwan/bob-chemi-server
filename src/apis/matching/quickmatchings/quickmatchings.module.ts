@@ -4,6 +4,7 @@ import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/users.service";
 import { MatchingChat } from "../matchingchat/entities/matchingchat.entity";
 import { MatchingRoom } from "../matchingroom/entities/matchingroom.entity";
+import { MatchingRoomService } from "../matchingroom/matchingroom.service";
 import { QuickMatching } from "./entities/quickmatchings.entity";
 import { QuickMatchingController } from "./quickmatchings.controller";
 import { QuickMatchingService } from "./quickmatchings.service";
@@ -13,6 +14,6 @@ import { QuickMatchingService } from "./quickmatchings.service";
 
   exports: [QuickMatchingService],
   controllers: [QuickMatchingController],
-  providers: [QuickMatchingService, UsersService],
+  providers: [QuickMatchingService, UsersService, MatchingRoomService],
 })
 export class QuickMatchingModule {}

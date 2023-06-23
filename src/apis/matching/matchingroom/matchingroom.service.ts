@@ -4,9 +4,9 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  ParseEnumPipe,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { identity } from "rxjs";
 import { User } from "src/apis/users/entities/user.entity";
 import { UsersService } from "src/apis/users/users.service";
 import { Repository } from "typeorm";
@@ -33,19 +33,15 @@ export class MatchingRoomService {
 
   async checkMatching({
     userId,
-    myGender,
-    myAgeGroup,
     targetGender,
     targetAgeGroup,
     quickMatchingId,
   }: {
     userId: string;
-    myGender: Gender;
-    myAgeGroup: string;
     targetGender: Gender;
     targetAgeGroup: AgeGroup;
-    quickMatchingId: string;
-  }): Promise<MatchingRoom> {
+    quickMatchingId: QuickMatching;
+  }): Promise<MatchingRoom[]> {
     // const existingUser = await this.matchingRoomRepository.findOne({
     //   where: { user: { id: userId } },
     // });
@@ -53,66 +49,128 @@ export class MatchingRoomService {
     //   throw new ConflictException("유저가 이미 매칭 요청을 하였습니다.");
     // }
 
-    const user = await this.usersService.findOneId(userId);
+    const user = await this.usersService.findOneId(userId); // 내정보
     // const quickMatching = await this.quickMatchingService.create(userId, {
     //   gender,
     //   ageGroup,
     // });
 
-    const matchingRoom = new MatchingRoom();
-    //matchingRoom.quickMatching = quickMatching;
-    //matchingRoom.user = user;
-    //matchingRoom.targetUser = targetUser;
-
-    const savedMatchingRoom = await this.matchingRoomRepository.save(
-      matchingRoom
-    );
-
-    // Check if there is a matching user in the matching room
-    const targetUser = await this.findTargetUser(savedMatchingRoom);
-    if (targetUser) {
-      // 조건 비교
+    // 매칭이 되는걸 matchingRoom 이라고 하고 그걸 save
+    // const matchingRoom = new MatchingRoom();
+    // matchingRoom.quickMatching = quickMatchingId;
+    // //matchingRoom.user = user;
+    // //matchingRoom.targetUser = targetUser;
+    // matchingRoom.requestAgeGroup = targetAgeGroup;
+    // matchingRoom.requestGender = targetGender;
+    // matchingRoom.user = user;
+    //const savedMatchingRoom = await this.matchingRoomRepository.save(
+    //   matchingRoom
+    // );
+    const targetUser = await this.findTargetUser();
+    if (!targetUser) {
+      throw new NotFoundException("조건에 해당하는 유저를 찾을 수 없습니다.");
     }
-    return savedMatchingRoom;
+
+    // const matchingRooms: Partial<MatchingRoom>[] = [];
+
+    // for (const target of targetUser) {
+    //   const matchingRoom: Partial<MatchingRoom> = {
+    //     quickMatching: quickMatchingId,
+    //     requestAgeGroup: targetAgeGroup,
+    //     requestGender: targetGender,
+    //     user: user,
+    //     targetUser: target.user,
+    //   };
+
+    //   matchingRooms.push(matchingRoom);
+    // }
+    const savedMatchingRooms: MatchingRoom[] = [];
+    for (const target of targetUser) {
+      const matchingRoom = new MatchingRoom();
+      matchingRoom.quickMatching = quickMatchingId;
+      matchingRoom.requestAgeGroup = targetAgeGroup;
+      matchingRoom.requestGender = targetGender;
+      matchingRoom.user = user;
+      matchingRoom.targetUser = target.user;
+      matchingRoom.isMatched = true; // 매칭이 성공한 경우 항상 true로 저장
+
+      const savedMatchingRoom = await this.matchingRoomRepository.save(
+        matchingRoom
+      );
+      savedMatchingRooms.push(savedMatchingRoom);
+    }
+
+    console.log(savedMatchingRooms, "11111111111111111111111");
+    //db 저장하는 save에 문제있음
+    // const savedMatchingRoom = await this.matchingRoomRepository.save(
+    //   matchingRooms
+    // );
+
+    //const targetUser = await this.findTargetUser();
+    // const perfectMatching = await this.matchingRoomRepository.save(targetUser);
+    // console.log(
+    //   savedMatchingRoom,
+    //   "=========================================="
+    // );
+    return savedMatchingRooms;
   }
 
-  async findTargetUser(quickMatchingId): Promise<QuickMatching> {
-    // 퀵매칭 요청을 찾아옴
-    const quickMatching = await this.quickMatchingService.findRequestMatching(
-      quickMatchingId
-    ); // 퀵매칭, 유저 정보 같이
-    console.log(quickMatching, "============================");
+  async findTargetUser(): Promise<QuickMatching[]> {
+    // 1. 모든 퀵매칭 요청을 찾아옴
+    const quickMatching =
+      await this.quickMatchingService.findAllRequestMatching();
 
-    if (!quickMatching) {
-      throw new NotFoundException("매칭을 찾을 수 없습니다");
-    }
+    // if (!quickMatching) {
+    //   throw new NotFoundException("존재하는 매칭이 없습니다.");
+    // } 나의 매칭 또한 들어가기 때문에 에러 안뜸
 
-    const targetUser = quickMatching.user; // 나를 제외시켜야함
-    const targetAge = quickMatching.targetAgeGroup;
-    const targetGender = quickMatching.targetGender;
-    //const targetAgeGroup = this.getAgeGroup(targetAge);
+    //2. 조건 매칭
+    // 나를 제외시켜야함
     // if (!targetUser) {//시간 제한으로 퀵매칭 유저가 없어도 기다려야함
-
     //   throw new NotFoundException("대상 사용 찾을 수 없습니다");
     // }
-    // const { targetGender, targetAgeGroup } = quickMatching; // 유저가 원하는 상대방의 조건인거잖아
-    console.log(
-      targetUser, // 결국 내 정보
-      //gender,// 왜 타겟 젠더가 나오지?
-      targetGender, // 왜 내 성별?
-      //ageGroup, // 왜 타겟 나이?
-      targetAge,
-      //targetAgeGroup, // 왜 내 나이?
-      "3333333333333333333"
+    const sortedMatching = quickMatching.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
-    // if (gender == targetGender && ageGroup == targetAgeGroup) {
-    //   // 나의 아이디가 포함된건 제외해야 하잖아
-    return quickMatching;
-    // } else {
-    //   throw new NotFoundException("조건에 일치하는 유저가 존재하지 않습니다");
-    // }
+    const succeedMatching: QuickMatching[] = [];
+    for (let i = 0; i < quickMatching.length; i++) {
+      const applicant = quickMatching[i];
 
-    // 나온 퀵매칭 중에서 createdAt 제일 빠른애 순서로 정려 -> 제일 상위권인 애가 리턴되도록 하기
+      const userAge = applicant.user.age;
+      const userAgeGroup = this.getAgeGroup(userAge);
+      // 자신의 정보와 일치하지 않는 다른 유저들을 선택
+      const otherUsers = quickMatching.filter(
+        (match) => match.user.id !== applicant.user.id // 자신의 정보를 제외
+      );
+      for (let j = 0; j < otherUsers.length; j++) {
+        const otherUser = otherUsers[j].user;
+        const otherUserTargetAgeGroup = otherUsers[j].targetAgeGroup;
+        const otherUserTargetGender = otherUsers[j].targetGender;
+        const otherUserAge = otherUser.age;
+        const otherUserAgeGroup = this.getAgeGroup(otherUserAge);
+
+        if (
+          applicant.user.gender === otherUserTargetGender && // female ==
+          userAgeGroup === otherUserTargetAgeGroup &&
+          applicant.targetGender === otherUser.gender && // male == male
+          applicant.targetAgeGroup === otherUserAgeGroup // 40 == 40
+        ) {
+          const matchedOtherUser: QuickMatching = {
+            ...applicant,
+            user: otherUser,
+          };
+          succeedMatching.push(matchedOtherUser);
+          console.log(succeedMatching, "6666666666666666666666666");
+          break;
+        }
+      }
+      if (succeedMatching.length > 0) {
+        break; // 1대1 매칭
+      }
+    }
+
+    return succeedMatching;
   }
 
   getAgeGroup(age: number): string {
@@ -135,6 +193,7 @@ export class MatchingRoomService {
       where: { id },
       relations: ["user"], // matchingChat
     });
+    console.log(quickMatching, "111111111");
     return quickMatching;
   }
   async performMatching(
@@ -151,4 +210,13 @@ export class MatchingRoomService {
 
     // Additional logic for creating matching chat or other actions after successful matching
   }
+
+  // async reject(id) {
+  //   //const perfectMatching = await this.findTargetUser()
+  //   const quickMatching = await this.quickMatchingService.findRequestMatching(
+  //     id
+  //   );
+
+  //   await this.quickMatchingRepository.remove(quickMatching);
+  // }
 }
