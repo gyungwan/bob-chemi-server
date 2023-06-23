@@ -77,7 +77,7 @@ export class Group extends BaseEntity {
   users: User[];
 
   @ApiProperty({ description: "소모임 이미지 한장" })
-  @Column()
+  @Column({ nullable: true })
   image: string;
 
   @ApiProperty({ description: "소모임 만든 유저" })

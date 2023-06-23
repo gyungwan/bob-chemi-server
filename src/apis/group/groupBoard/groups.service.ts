@@ -39,10 +39,8 @@ export class GroupsService {
   }
 
   //<<------------ID로 소모임 조회------------>>
-  async getGroupById(groupId: any): Promise<Group> {
-    const found = await this.groupRepository.findOne({ where: groupId });
-    if (!found) {throw new NotFoundException(`${groupId} 는 올바르지 않은 ID 입니다.`)} //prettier-ignore
-    return found;
+  async getGroupById(groupId: number): Promise<Group> {
+    return this.groupRepository.findOne({ where: { groupId } });
   }
 
   //<<------------날짜로 소모임 조회------------>>
@@ -106,7 +104,7 @@ export class GroupsService {
   //<<------------소모임 게시글 삭제------------>>
   async deleteGroup(groupId: number): Promise<void> {
     const result = await this.groupRepository.softDelete(groupId);
-    if (result.affected === 0) {throw new NotFoundException(`${groupId}로 작성된 게시글이 없습니다.`)} //prettier-ignore
+    if (!result) {throw new NotFoundException(`${groupId}로 작성된 게시글이 없습니다.`)} //prettier-ignore
   }
 
   //<<------------소모임 수정------------>>
