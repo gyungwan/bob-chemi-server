@@ -82,8 +82,7 @@ export class Group extends BaseEntity {
   image: string;
 
   @ApiProperty({ description: "소모임 만든 유저" })
-  @ManyToOne(() => User)
-  @JoinColumn()
-  @Exclude()
+  @ManyToOne(() => User, { eager: true })
+  @JoinColumn({ name: "ownerId" })
   owner: User;
 }

@@ -15,6 +15,8 @@ import { QuickMatching } from "src/apis/matching/quickmatchings/entities/quickma
 import { RestaurantMark } from "src/apis/restaurantMark/entities/restaurantMark.entity";
 import { Group } from "src/apis/group/groupBoard/entites/groups.entity";
 import { MatchingRoom } from "src/apis/matching/matchingroom/entities/matchingroom.entity";
+import { Chat } from "src/apis/group/groupChat/entities/chats.entity";
+import { ChatRoom } from "src/apis/group/groupChat/entities/chat.rooms.entity";
 
 export enum Gender {
   Male = "Male",
@@ -96,9 +98,6 @@ export class User {
   @ApiProperty({ type: () => FoodieBoard })
   FoodieBoard: FoodieBoard[];
 
-  // @OneToMany(() => UserGroup, (userGroup) => userGroup.user)
-  // userGroups: UserGroup[];
-
   @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.user)
   quickMatching: QuickMatching;
 
@@ -111,4 +110,18 @@ export class User {
   @ManyToMany(() => Group, (group) => group.users)
   @JoinTable()
   groups: Group[];
+
+  @OneToMany(() => Chat, (chat) => chat.user)
+  @ApiProperty({
+    type: () => Chat,
+    isArray: true,
+  })
+  chats: Chat[];
+
+  @OneToMany(() => ChatRoom, (chatRoom) => chatRoom.user)
+  @ApiProperty({
+    type: () => ChatRoom,
+    isArray: true,
+  })
+  chatRooms: ChatRoom[];
 }

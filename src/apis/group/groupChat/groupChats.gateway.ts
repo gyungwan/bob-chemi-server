@@ -13,7 +13,8 @@ import { Namespace, Socket } from "socket.io";
 import { GroupChatService } from "./groupChats.service";
 
 interface MessagePayload {
-  roomName: string;
+  chatRoomId: string;
+  userId: string;
   message: string;
 }
 
@@ -38,10 +39,10 @@ export class GroupChatsGateway
       );
       if (!deletedRoom) return;
 
-      this.nsp.emit("delete-room", deletedRoom);
-      createdRooms = createdRooms.filter(
-        (createdRoom) => createdRoom !== deletedRoom
-      ); // 유저가 생성한 room 목록 중에 삭제되는 room 있으면 제거
+      // this.nsp.emit("delete-room", deletedRoom);
+      // createdRooms = createdRooms.filter(
+      //   (createdRoom) => createdRoom !== deletedRoom
+      // ); // 유저가 생성한 room 목록 중에 삭제되는 room 있으면 제거
     });
 
     this.logger.log("웹소켓 서버 초기화 ✅");
@@ -61,12 +62,13 @@ export class GroupChatsGateway
   @SubscribeMessage("message")
   handleMessage(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() { roomName, message }: MessagePayload
+    @MessageBody() { chatRoomId, userId, message }: MessagePayload
   ) {
-    const chat = this.groupChatService.addChat(roomName, message);
+    const chat = this.groupChatService.addChat(chatRoomId, message, userId);
+
     if (chat) {
       socket.broadcast
-        .to(roomName)
+        .to(chatRoomId)
         .emit("message", { username: socket.id, message });
     }
     return { username: socket.id, message };

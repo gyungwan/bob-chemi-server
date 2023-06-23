@@ -13,6 +13,8 @@ import { Member } from "./entites/members.entity";
 import { MemberStatus } from "./entites/members.status.enum";
 import { UsersService } from "src/apis/users/users.service";
 import { FileUploadService } from "src/apis/file-upload/file-upload.service";
+import { ChatRoom } from "../groupChat/entities/chat.rooms.entity";
+import { GroupChatService } from "../groupChat/groupChats.service";
 import { User } from "src/apis/users/entities/user.entity";
 
 @Injectable()
@@ -20,14 +22,15 @@ export class GroupsService {
   constructor(
     @InjectRepository(Group)
     private groupRepository: Repository<Group>,
-    private userServices: UsersService,
+    private usersServices: UsersService,
 
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-
-    @InjectRepository(Member) // MemberRepository 주입
+    @InjectRepository(Member)
     private memberRepository: Repository<Member>,
-    private readonly fileUploadService: FileUploadService
+    private readonly fileUploadService: FileUploadService,
+
+    @InjectRepository(ChatRoom)
+    private chatRoomRepository: Repository<ChatRoom>, // ChatRoom Repository 주입
+    private readonly groupChatService: GroupChatService
   ) {}
 
   //<<------------소모임 조회------------>>
@@ -38,10 +41,7 @@ export class GroupsService {
   //<<------------ID로 소모임 조회------------>>
   async getGroupById(groupId: any): Promise<Group> {
     const found = await this.groupRepository.findOne({ where: groupId });
-
-    if (!found) {
-      throw new NotFoundException(`${groupId} 는 올바르지 않은 ID 입니다.`);
-    }
+    if (!found) {throw new NotFoundException(`${groupId} 는 올바르지 않은 ID 입니다.`)} //prettier-ignore
     return found;
   }
 
@@ -64,7 +64,7 @@ export class GroupsService {
 
   // <<------------내가 가입한 소모임 조회------------>>
   async getMyConfirmedGroup(userId: string): Promise<Group[]> {
-    const user = await this.userServices.findOneId(userId);
+    const user = await this.usersServices.findOneId(userId);
     const member = await this.memberRepository.find({
       where: {
         user: { id: user.id }, //
@@ -82,7 +82,7 @@ export class GroupsService {
     userId: string,
     file: Express.MulterS3.File
   ): Promise<Group> {
-    const user = await this.userServices.findOneId(userId);
+    const user = await this.usersServices.findOneId(userId);
     const image = file ? [await this.fileUploadService.uploadFile(file)] : [];
 
     const newGroup = await this.groupRepository.save({
@@ -98,6 +98,7 @@ export class GroupsService {
     });
 
     await this.memberRepository.save(firstMember);
+    await this.groupChatService.createRoom(newGroup.title);
 
     return newGroup;
   }
@@ -105,9 +106,7 @@ export class GroupsService {
   //<<------------소모임 게시글 삭제------------>>
   async deleteGroup(groupId: number): Promise<void> {
     const result = await this.groupRepository.softDelete(groupId);
-    if (result.affected === 0) {
-      throw new NotFoundException(`${groupId}로 작성된 게시글이 없습니다.`);
-    }
+    if (result.affected === 0) {throw new NotFoundException(`${groupId}로 작성된 게시글이 없습니다.`)} //prettier-ignore
   }
 
   //<<------------소모임 수정------------>>
@@ -153,7 +152,7 @@ export class GroupsService {
 
   //<<------------소모임 가입 신청------------>>
   async joinGroup(email: string, groupId: any): Promise<Member> {
-    const user = await this.userServices.findOneEmail(email);
+    const user = await this.usersServices.findOneEmail(email);
     const group = await this.groupRepository.findOne({ where: { groupId } });
 
     const isPending = await this.memberRepository.findOne({
