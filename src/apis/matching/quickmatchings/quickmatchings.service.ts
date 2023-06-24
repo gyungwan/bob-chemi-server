@@ -8,6 +8,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { classToPlain } from "class-transformer";
+import { identity } from "rxjs";
 import { Repository } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/users.service";
@@ -56,8 +57,10 @@ export class QuickMatchingService {
     const quickMatching = new QuickMatching();
     quickMatching.targetGender = targetGender;
     quickMatching.targetAgeGroup = targetAgeGroup;
+    //quickMatching.id = userId; // 나의 유저아이디
     quickMatching.user = user;
 
+    console.log(quickMatching, "이건 크레이트에서 뉴 퀵매칭 ");
     // MatchingRoom 생성 및 연결
     // const matchingRoom = new MatchingRoom();
     // matchingRoom.quickMatching = quickMatching;
@@ -101,6 +104,7 @@ export class QuickMatchingService {
   async findAllRequestMatching(): Promise<QuickMatching[]> {
     const quickMatching = await this.quickMatchingRepository.find({
       //where: { id },
+      where: { isMatched: false },
       relations: ["user"], // matchingChat 유저의 정보까지 모두 반환
     });
     return quickMatching;

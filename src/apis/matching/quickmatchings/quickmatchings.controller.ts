@@ -66,6 +66,15 @@ export class QuickMatchingController {
       return "기타";
     }
   }
+
+  //----------------- 모든 매칭 요처 조회-----------------------//
+  @Get() // 퀵매칭 아이디
+  @UseGuards(RestAuthAccessGuard)
+  @ApiOperation({ summary: "모든 매칭 요청 조회" })
+  async getQuickMatching() {
+    return this.quickMatchingService.findAllRequestMatching();
+  }
+
   //----------------- 유저의 매칭 요청 조회-----------------------//
 
   @Get(":id") // 퀵매칭 아이디
@@ -78,7 +87,7 @@ export class QuickMatchingController {
   //----------------- 매칭 전 취소, 거절  -----------------------//
   @Delete(":id")
   @UseGuards(RestAuthAccessGuard)
-  @ApiOperation({ summary: "매칭 전 취소, 거절" })
+  @ApiOperation({ summary: "매칭 전 취소, 매칭 알림 후 거절" })
   async cancleMatching(@Param("id") id: string) {
     return this.quickMatchingService.cancel(id);
   }

@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "src/apis/users/entities/user.entity";
 import { UsersService } from "src/apis/users/users.service";
 import { MatchingChat } from "../matchingchat/entities/matchingchat.entity";
+import { MatchingChatService } from "../matchingchat/matchingchat.service";
 import { QuickMatching } from "../quickmatchings/entities/quickmatchings.entity";
 import { QuickMatchingService } from "../quickmatchings/quickmatchings.service";
 import { MatchingRoom } from "./entities/matchingroom.entity";
@@ -16,6 +17,11 @@ import { MatchingRoomService } from "./matchingroom.service";
 
   exports: [MatchingRoomService],
   controllers: [MatchingRoomController],
-  providers: [MatchingRoomService, UsersService, QuickMatchingService],
+  providers: [
+    MatchingRoomService,
+    UsersService,
+    QuickMatchingService,
+    MatchingChatService,
+  ],
 })
 export class MatchingRoomModule {}

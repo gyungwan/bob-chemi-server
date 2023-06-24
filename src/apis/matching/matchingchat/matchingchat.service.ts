@@ -1,31 +1,51 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like, Repository } from "typeorm";
+import { MatchingRoom } from "../matchingroom/entities/matchingroom.entity";
 import { MatchingChat } from "./entities/matchingchat.entity";
 
 @Injectable()
 export class MatchingChatService {
   constructor(
     @InjectRepository(MatchingChat)
-    private readonly matchingchatRepository: Repository<MatchingChat>
+    private readonly matchingChatRepository: Repository<MatchingChat>,
+    @InjectRepository(MatchingRoom)
+    private readonly matchingRoomRepository: Repository<MatchingRoom>
   ) {}
+
+  async createMatchingChat(matchingRoomId): Promise<MatchingChat> {
+    // Check if the matching room exists
+    const matchingRoom = await this.matchingRoomRepository.findOne(
+      matchingRoomId
+    );
+    if (!matchingRoom) {
+      throw new NotFoundException("Matching room not found");
+    }
+
+    // Create a new matching chat
+    const matchingChat = new MatchingChat();
+    matchingChat.matchingRoom = matchingRoom;
+
+    // Save the matching chat
+    return this.matchingChatRepository.save(matchingChat);
+  }
 
   async addChatLog(log: string): Promise<MatchingChat> {
     // 채팅기록 추가
     const matchingChat = new MatchingChat();
     matchingChat.log = log;
-    return this.matchingchatRepository.save(matchingChat);
+    return this.matchingChatRepository.save(matchingChat);
   }
 
   async getAllChatLogs(): Promise<MatchingChat[]> {
     // 모든 채팅기록 조회
-    return this.matchingchatRepository.find();
+    return this.matchingChatRepository.find();
   }
 
   // 유저의 모든 채팅 기록 보기
 
   async getUserChatLogs(userId): Promise<MatchingChat[]> {
-    return this.matchingchatRepository.find({
+    return this.matchingChatRepository.find({
       where: [{ sender: { id: userId } }, { receiver: { id: userId } }],
 
       //
@@ -37,7 +57,7 @@ export class MatchingChatService {
     userId: string,
     roomId: string
   ): Promise<MatchingChat[]> {
-    return this.matchingchatRepository.find({
+    return this.matchingChatRepository.find({
       where: [
         { sender: { id: userId }, roomId },
         { receiver: { id: userId }, roomId },
