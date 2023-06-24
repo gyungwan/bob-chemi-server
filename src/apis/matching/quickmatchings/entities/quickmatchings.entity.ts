@@ -47,9 +47,9 @@ export class QuickMatching {
   @ApiProperty({ description: "원하는 상대의 연령대" })
   targetAgeGroup: AgeGroup;
 
-  // @Column({ type: "boolean", default: false })
-  // @ApiProperty({ description: "매칭 여부" })
-  // isMatched: boolean;
+  @Column({ type: "boolean", default: false })
+  @ApiProperty({ description: "매칭 여부" })
+  isMatched: boolean;
 
   @ApiProperty({ description: "매칭 성사일" })
   @CreateDateColumn()
