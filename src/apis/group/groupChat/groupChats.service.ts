@@ -34,15 +34,14 @@ export class GroupChatService {
     return Array.from(this.chatRooms.values());
   }
 
-  //<<------------채팅방 검색------------>>
+  //<<------------방 검색------------>>
   findRoom(roomName: string): ChatRoom | undefined {
     return this.chatRooms.get(roomName);
   }
 
-  //<<------------채팅방 참여------------>>
-  //<<------------채팅방 나가기------------>>
-
-  //<<------------채팅방 삭제------------>>
+  //<<------------방 참여------------>>
+  //<<------------방 나가기------------>>
+  //<<------------방 삭제------------>>
   deleteRoom(roomName: string): boolean {
     return this.chatRooms.delete(roomName);
   }

@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -36,7 +37,7 @@ export class Member {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToOne(() => User, { onDelete: "CASCADE" })
+  @ManyToOne(() => User, { eager: true, onDelete: "CASCADE" })
   user: User;
 
   @ManyToOne(() => Group, (group) => group.members, { onDelete: "CASCADE" })
