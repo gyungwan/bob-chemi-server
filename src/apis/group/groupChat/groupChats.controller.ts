@@ -40,7 +40,11 @@ export class GroupChatsController {
     return this.groupChatService.findRoom(chatRoomId);
   }
 
-  //<<------------채팅 발송------------>>
+  //<<------------방 참여------------>>
+  //<<------------방 나가기------------>>
+  //<<------------방 삭제------------>>
+
+  //<<------------채팅 보내기------------>>
   @ApiOperation({
     summary: "채팅 발송",
     description: "채팅방 개설",

@@ -247,9 +247,7 @@ export class GroupsService {
       },
     });
 
-    if (pendingMembers.length === 0) {
-      throw new NotFoundException("가입 대기 중인 멤버가 없습니다.");
-    }
+    if (pendingMembers.length === 0) {return []} //prettier-ignore
 
     return pendingMembers;
   }
@@ -270,9 +268,7 @@ export class GroupsService {
       },
     });
 
-    if (confirmedMembers.length === 0) {
-      throw new NotFoundException("가입한 멤버가 없습니다.");
-    }
+    if (confirmedMembers.length === 0) {return []} //prettier-ignore
 
     return confirmedMembers;
   }
