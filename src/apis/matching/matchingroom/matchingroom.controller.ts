@@ -77,6 +77,7 @@ export class MatchingRoomController {
   async fetchQuickMatching(@Param("id") quickMatchingId: string) {
     //return this.matchingRoomService.findOne(id);
     return this.matchingRoomService.findTargetUser();
+    //return this.matchingRoomService.accept()
   }
 
   //----------------- 매칭 수락 -----------------------//

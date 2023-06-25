@@ -118,4 +118,20 @@ export class QuickMatchingService {
     }
     await this.quickMatchingRepository.remove(id); //remove
   }
+
+  async updateIsMatched(
+    applicant: QuickMatching,
+    otherUser: QuickMatching
+  ): Promise<void> {
+    // matching.forEach(async (match) => {
+    //   match.isMatched = true;
+    //   await this.quickMatchingRepository.save(match);
+    // });
+    applicant.isMatched = true;
+    otherUser.isMatched = true;
+    await Promise.all([
+      this.quickMatchingRepository.save(applicant),
+      this.quickMatchingRepository.save(otherUser),
+    ]);
+  }
 }

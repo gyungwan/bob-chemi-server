@@ -138,8 +138,12 @@ export class MatchingRoomService {
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
     const succeedMatching: Partial<QuickMatching[]> = [];
+    //let otherUser: QuickMatching; // otherUser 변수 선언
+    //const applicant: QuickMatching = quickMatching[i];
     for (let i = 0; i < quickMatching.length; i++) {
-      const applicant = quickMatching[i];
+      //const applicant = quickMatching[i];
+
+      const applicant: QuickMatching = quickMatching[i];
       //const userName = applicant.user.name;
 
       //const userId = applicant.user.id;
@@ -155,6 +159,7 @@ export class MatchingRoomService {
       const otherUsers = quickMatching.filter(
         (match) => match.user.id !== applicant.user.id // 자신의 정보를 제외
       );
+      let otherUser: QuickMatching | undefined;
       for (let j = 0; j < otherUsers.length; j++) {
         const otherUser = otherUsers[j].user;
         const otherUserTargetAgeGroup = otherUsers[j].targetAgeGroup;
@@ -162,6 +167,8 @@ export class MatchingRoomService {
         const otherUserAge = otherUser.age;
         const otherUserAgeGroup = this.getAgeGroup(otherUserAge);
 
+        // applicant.isMatched = true;
+        // otherUser.quickMatching.isMatched = true;
         if (
           // isMatched == true
           applicant.user.gender === otherUserTargetGender && // female ==
@@ -197,7 +204,8 @@ export class MatchingRoomService {
         break; // 1대1 매칭
       }
     }
-
+    await this.matchingRoomRepository.save(succeedMatching);
+    //await this.quickMatchingService.updateIsMatched(applicant, otherUser);
     return succeedMatching;
   }
 
@@ -240,6 +248,8 @@ export class MatchingRoomService {
   }
 
   async accept(quickMatchingId) {
+    // 매칭된 유저 둘 다 수락해야 최종 매칭, save
+    // 한명이 거절하면
     const matching = await this.quickMatchingService.findRequestMatching(
       quickMatchingId
     );
