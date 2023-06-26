@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ConsoleLogger,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -223,8 +224,12 @@ export class GroupsService {
 
   //<<------------소모임 신청에 대한 거절(삭제)------------>>
   async denyMember(memberId: any, groupId: number): Promise<void> {
-    const request = await this.memberRepository.findOne(memberId);
+    const request = await this.memberRepository.findOne({
+      where: { memberId },
+    });
+    console.log(request, "@@@@@@@@@@@@@@@");
     const group = await this.groupRepository.findOne({ where: { groupId } });
+    console.log(group, "@@@@@@@@@@@@@@@@@");
 
     if(!request) {throw new NotFoundException('찾을 수 없는 신청자 입니다.')} //prettier-ignore
     if(!group) {throw new NotFoundException('찾을 수 없는 소모임 입니다.')} //prettier-ignore
