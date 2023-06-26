@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
-import { ChatRoom } from "./entities/chat.rooms.entity";
+import { ChatRoom } from "./entities/chatRooms.entity";
 import { GroupChatService } from "./groupChats.service";
 
 @Controller("groupChat")
@@ -9,7 +9,6 @@ export class GroupChatsController {
   constructor(private readonly groupChatService: GroupChatService) {}
 
   //<<------------방 생성------------>>
-
   @ApiOperation({
     summary: "채팅방 개설",
     description: "채팅방 개설",
@@ -36,11 +35,19 @@ export class GroupChatsController {
     description: "ID로 채팅방 검색",
   })
   @Get("room/:chatRoomId")
-  getRoom(@Param("chatRoomId") chatRoomId: string): ChatRoom {
+  getRoom(@Param("chatRoomId") chatRoomId: string): Promise<ChatRoom> {
     return this.groupChatService.findRoom(chatRoomId);
   }
 
   //<<------------방 참여------------>>
+  @Post("Join/:chatroomId/userId")
+  joinRoom(
+    @Param("chatRoomId") chatRoomId: string,
+    @Param("userId") userId: string
+  ): Promise<string> {
+    return this.groupChatService.joinRoom(chatRoomId, userId);
+  }
+
   //<<------------방 나가기------------>>
   //<<------------방 삭제------------>>
 
