@@ -13,7 +13,7 @@ import { Member } from "./entites/members.entity";
 import { MemberStatus } from "./entites/members.status.enum";
 import { UsersService } from "src/apis/users/users.service";
 import { FileUploadService } from "src/apis/file-upload/file-upload.service";
-import { ChatRoom } from "../groupChat/entities/chat.rooms.entity";
+import { ChatRoom } from "../groupChat/entities/chatRooms.entity";
 import { GroupChatService } from "../groupChat/groupChats.service";
 import { User } from "src/apis/users/entities/user.entity";
 
@@ -157,6 +157,7 @@ export class GroupsService {
       where: {
         user: Equal(user.id),
         status: MemberStatus.PENDING,
+        group: { groupId: groupId },
       },
     });
 
@@ -164,6 +165,7 @@ export class GroupsService {
       where: {
         user: Equal(user.id),
         status: MemberStatus.CONFIRMED,
+        group: { groupId: groupId },
       },
     });
 

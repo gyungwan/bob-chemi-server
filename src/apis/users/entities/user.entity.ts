@@ -16,7 +16,8 @@ import { RestaurantMark } from "src/apis/restaurantMark/entities/restaurantMark.
 import { Group } from "src/apis/group/groupBoard/entites/groups.entity";
 import { MatchingRoom } from "src/apis/matching/matchingroom/entities/matchingroom.entity";
 import { Chat } from "src/apis/group/groupChat/entities/chats.entity";
-import { ChatRoom } from "src/apis/group/groupChat/entities/chat.rooms.entity";
+import { ChatRoom } from "src/apis/group/groupChat/entities/chatRooms.entity";
+import { ChatRoomUser } from "src/apis/group/groupChat/entities/chatRoomUsers.entity";
 
 export enum Gender {
   Male = "Male",
@@ -118,10 +119,8 @@ export class User {
   })
   chats: Chat[];
 
-  @OneToMany(() => ChatRoom, (chatRoom) => chatRoom.user)
-  @ApiProperty({
-    type: () => ChatRoom,
-    isArray: true,
+  @OneToMany(() => ChatRoomUser, (chatRoomUser) => chatRoomUser.user, {
+    cascade: true,
   })
-  chatRooms: ChatRoom[];
+  chatRoomUsers: ChatRoomUser[];
 }

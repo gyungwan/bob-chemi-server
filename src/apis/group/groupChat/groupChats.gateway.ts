@@ -33,7 +33,7 @@ export class GroupChatsGateway
   @WebSocketServer() nsp: Namespace;
 
   afterInit() {
-    this.nsp.adapter.on("delete-room", (room) => {
+    this.nsp.adapter.on("deleteRoom", (room) => {
       const deletedRoom = createdRooms.find(
         (createdRoom) => createdRoom === room
       );
@@ -75,13 +75,13 @@ export class GroupChatsGateway
   }
 
   //<<------------/------------>>
-  @SubscribeMessage("room-list")
+  @SubscribeMessage("getRooms")
   handleRoomList() {
     return this.groupChatService.getRooms();
   }
 
   //<<------------/------------>>
-  @SubscribeMessage("create-room")
+  @SubscribeMessage("createRoom")
   handleCreateRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() { roomName }: { roomName: string }
@@ -102,7 +102,7 @@ export class GroupChatsGateway
   }
 
   //<<------------/------------>>
-  @SubscribeMessage("join-room")
+  @SubscribeMessage("joinRoom")
   handleJoinRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() roomName: string
@@ -116,7 +116,7 @@ export class GroupChatsGateway
   }
 
   //<<------------/------------>>
-  @SubscribeMessage("leave-room")
+  @SubscribeMessage("leaveRoom")
   handleLeaveRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() roomName: string

@@ -1,21 +1,29 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/apis/users/entities/user.entity";
 import { UsersService } from "src/apis/users/users.service";
 import { Repository } from "typeorm";
-import { ChatRoom } from "./entities/chat.rooms.entity";
+import { ChatRoom } from "./entities/chatRooms.entity";
+import { ChatRoomUser } from "./entities/chatRoomUsers.entity";
 import { Chat } from "./entities/chats.entity";
 
 @Injectable()
 export class GroupChatService {
   @InjectRepository(ChatRoom)
   private chatRoomRepository: Repository<ChatRoom>;
-
   private readonly chatRooms: Map<string, ChatRoom> = new Map();
 
-  @InjectRepository(User)
-  private userService: UsersService;
-  private userRepository: Repository<User>;
+  @InjectRepository(Chat)
+  private chatRepository: Repository<Chat>;
+
+  @InjectRepository(ChatRoomUser)
+  private chatRoomUserRepository: Repository<ChatRoomUser>;
+
+  constructor(private readonly usersService: UsersService) {}
 
   //<<------------방 생성------------>>
   async createRoom(roomName: string): Promise<ChatRoom> {
@@ -35,15 +43,44 @@ export class GroupChatService {
   }
 
   //<<------------방 검색------------>>
-  findRoom(roomName: string): ChatRoom | undefined {
-    return this.chatRooms.get(roomName);
+  async findRoom(chatRoomId): Promise<ChatRoom> {
+    return await this.chatRoomRepository.findOne({ where: { chatRoomId } });
   }
 
   //<<------------방 참여------------>>
+
+  async joinRoom(chatRoomId: string, userId: string): Promise<string> {
+    const room = await this.findRoom(chatRoomId);
+    const user = await this.usersService.findOneId(userId);
+    if (!room) {throw new ConflictException("존재하지 않는 채팅방 입니다.")} //prettier-ignore
+    if (!user) {throw new ConflictException("존재하지 않는 유저입니다.")} //prettier-ignore
+
+    const chatRoomUser = new ChatRoomUser();
+    chatRoomUser.chatRoom = room;
+    chatRoomUser.user = user;
+    await this.chatRoomUserRepository.save(chatRoomUser);
+
+    return "참여 완료 되었습니다.";
+  }
   //<<------------방 나가기------------>>
+
+  async leaveRoom(chatRoomId: string, userId: string): Promise<boolean> {
+    const chatRoom = this.findRoom(chatRoomId);
+    if (!chatRoom) {
+      throw new ConflictException("존재하지 않는 채팅방입니다.");
+    }
+
+    const user = await this.usersService.findOneId(userId);
+    if (!user) {
+      throw new ConflictException("존재하지 않는 유저입니다.");
+    }
+
+    return true;
+  }
   //<<------------방 삭제------------>>
-  deleteRoom(roomName: string): boolean {
-    return this.chatRooms.delete(roomName);
+
+  deleteRoom(chatRoomId: string): boolean {
+    return this.chatRooms.delete(chatRoomId);
   }
 
   //<<------------채팅 보내기------------>>
@@ -52,19 +89,35 @@ export class GroupChatService {
     message: string,
     userId: string
   ): Promise<Chat> {
-    const chatRoom = this.findRoom(chatRoomId);
-    if (!chatRoom) {throw new ConflictException("존재하지 않는 채팅방 입니다.");} //prettier-ignore
+    if (!message) {
+      throw new BadRequestException("메세지를 입력해 주세요");
+    }
 
-    const user = await this.userService.findOneId(userId);
-    if (!user) {throw new ConflictException("존재하지 않는 유저입니다.");} //prettier-ignore
+    const chatRoom = await this.findRoom(chatRoomId);
+    console.log(chatRoom, "@@@@@@@@@@@@@@@@@");
+    if (!chatRoom) {
+      throw new ConflictException("존재하지 않는 채팅방 입니다.");
+    }
+
+    const user = await this.usersService.findOneId(userId);
+    console.log(user, "@@@@@@@@@@@@@@@@@");
+    if (!user) {
+      throw new ConflictException("존재하지 않는 유저입니다.");
+    }
 
     const chat: Chat = {
       chatId: Date.now().toString(),
       message,
-      chatRoom,
       user,
+      chatRoom,
     };
+    console.log(chat, "@@@@@@@@@@@@@@@@@@@@");
+
+    if (!chatRoom.chats) {
+      chatRoom.chats = [];
+    }
     chatRoom.chats.push(chat);
+    await this.chatRepository.save(chat);
     return chat;
   }
 }
