@@ -34,90 +34,90 @@ export class MatchingRoomService {
     private quickMatchingService: QuickMatchingService
   ) {}
 
-  async checkMatching({
-    userId,
-    targetGender,
-    targetAgeGroup,
-    quickMatchingId,
-  }: {
-    userId: string;
-    targetGender: Gender;
-    targetAgeGroup: AgeGroup;
-    quickMatchingId: QuickMatching;
-  }): Promise<MatchingRoom[]> {
-    // const existingUser = await this.matchingRoomRepository.findOne({
-    //   where: { user: { id: userId } },
-    // });
-    // if (existingUser) {
-    //   throw new ConflictException("유저가 이미 매칭 요청을 하였습니다.");
-    // }
+  // async checkMatching({
+  //   userId,
+  //   targetGender,
+  //   targetAgeGroup,
+  //   quickMatchingId,
+  // }: {
+  //   userId: string;
+  //   targetGender: Gender;
+  //   targetAgeGroup: AgeGroup;
+  //   quickMatchingId: QuickMatching;
+  // }): Promise<MatchingRoom[]> {
+  //   // const existingUser = await this.matchingRoomRepository.findOne({
+  //   //   where: { user: { id: userId } },
+  //   // });
+  //   // if (existingUser) {
+  //   //   throw new ConflictException("유저가 이미 매칭 요청을 하였습니다.");
+  //   // }
 
-    const user = await this.usersService.findOneId(userId); // 내정보
-    // const quickMatching = await this.quickMatchingService.create(userId, {
-    //   gender,
-    //   ageGroup,
-    // });
+  //   const user = await this.usersService.findOneId(userId); // 내정보
+  //   // const quickMatching = await this.quickMatchingService.create(userId, {
+  //   //   gender,
+  //   //   ageGroup,
+  //   // });
 
-    // 매칭이 되는걸 matchingRoom 이라고 하고 그걸 save
-    // const matchingRoom = new MatchingRoom();
-    // matchingRoom.quickMatching = quickMatchingId;
-    // //matchingRoom.user = user;
-    // //matchingRoom.targetUser = targetUser;
-    // matchingRoom.requestAgeGroup = targetAgeGroup;
-    // matchingRoom.requestGender = targetGender;
-    // matchingRoom.user = user;
-    //const savedMatchingRoom = await this.matchingRoomRepository.save(
-    //   matchingRoom
-    // );
-    const targetUser = await this.findTargetUser();
-    if (!targetUser) {
-      throw new NotFoundException("조건에 해당하는 유저를 찾을 수 없습니다.");
-    }
+  //   // 매칭이 되는걸 matchingRoom 이라고 하고 그걸 save
+  //   // const matchingRoom = new MatchingRoom();
+  //   // matchingRoom.quickMatching = quickMatchingId;
+  //   // //matchingRoom.user = user;
+  //   // //matchingRoom.targetUser = targetUser;
+  //   // matchingRoom.requestAgeGroup = targetAgeGroup;
+  //   // matchingRoom.requestGender = targetGender;
+  //   // matchingRoom.user = user;
+  //   //const savedMatchingRoom = await this.matchingRoomRepository.save(
+  //   //   matchingRoom
+  //   // );
+  //   const targetUser = await this.findTargetUser();
+  //   if (!targetUser) {
+  //     throw new NotFoundException("조건에 해당하는 유저를 찾을 수 없습니다.");
+  //   }
 
-    // const matchingRooms: Partial<MatchingRoom>[] = [];
+  //   // const matchingRooms: Partial<MatchingRoom>[] = [];
 
-    // for (const target of targetUser) {
-    //   const matchingRoom: Partial<MatchingRoom> = {
-    //     quickMatching: quickMatchingId,
-    //     requestAgeGroup: targetAgeGroup,
-    //     requestGender: targetGender,
-    //     user: user,
-    //     targetUser: target.user,
-    //   };
+  //   // for (const target of targetUser) {
+  //   //   const matchingRoom: Partial<MatchingRoom> = {
+  //   //     quickMatching: quickMatchingId,
+  //   //     requestAgeGroup: targetAgeGroup,
+  //   //     requestGender: targetGender,
+  //   //     user: user,
+  //   //     targetUser: target.user,
+  //   //   };
 
-    //   matchingRooms.push(matchingRoom);
-    // }
-    const savedMatchingRooms: MatchingRoom[] = [];
-    for (const target of targetUser) {
-      const matchingRoom = new MatchingRoom();
-      matchingRoom.quickMatching = quickMatchingId;
-      // matchingRoom.requestAgeGroup = targetAgeGroup;
-      // matchingRoom.requestGender = targetGender;
-      matchingRoom.user1 = user;
-      matchingRoom.user2 = target.user;
+  //   //   matchingRooms.push(matchingRoom);
+  //   // }
+  //   const savedMatchingRooms: MatchingRoom[] = [];
+  //   for (const target of targetUser) {
+  //     const matchingRoom = new MatchingRoom();
+  //     matchingRoom.quickMatching = quickMatchingId;
+  //     // matchingRoom.requestAgeGroup = targetAgeGroup;
+  //     // matchingRoom.requestGender = targetGender;
+  //     matchingRoom.user1 = user;
+  //     matchingRoom.user2 = target.user;
 
-      matchingRoom.isMatched = true; // 매칭이 성공한 경우 항상 true로 저장
+  //     matchingRoom.isMatched = true; // 매칭이 성공한 경우 항상 true로 저장
 
-      const savedMatchingRoom = await this.matchingRoomRepository.save(
-        matchingRoom
-      );
-      savedMatchingRooms.push(savedMatchingRoom);
-    }
+  //     const savedMatchingRoom = await this.matchingRoomRepository.save(
+  //       matchingRoom
+  //     );
+  //     savedMatchingRooms.push(savedMatchingRoom);
+  //   }
 
-    console.log(savedMatchingRooms, "11111111111111111111111");
-    //db 저장하는 save에 문제있음
-    // const savedMatchingRoom = await this.matchingRoomRepository.save(
-    //   matchingRooms
-    // );
+  //   console.log(savedMatchingRooms, "11111111111111111111111");
+  //   //db 저장하는 save에 문제있음
+  //   // const savedMatchingRoom = await this.matchingRoomRepository.save(
+  //   //   matchingRooms
+  //   // );
 
-    //const targetUser = await this.findTargetUser();
-    // const perfectMatching = await this.matchingRoomRepository.save(targetUser);
-    // console.log(
-    //   savedMatchingRoom,
-    //   "=========================================="
-    // );
-    return savedMatchingRooms;
-  }
+  //   //const targetUser = await this.findTargetUser();
+  //   // const perfectMatching = await this.matchingRoomRepository.save(targetUser);
+  //   // console.log(
+  //   //   savedMatchingRoom,
+  //   //   "=========================================="
+  //   // );
+  //   return savedMatchingRooms;
+  // }
 
   async findTargetUser(): Promise<QuickMatching[]> {
     // 1. isMatched ==false 인 모든 퀵매칭 요청을 찾아옴
