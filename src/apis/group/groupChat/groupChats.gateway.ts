@@ -1,4 +1,5 @@
 import { Logger } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import {
   ConnectedSocket,
   MessageBody,
@@ -20,6 +21,7 @@ interface MessagePayload {
 
 let createdRooms: string[] = [];
 
+@ApiTags("채팅방 socket.io")
 @WebSocketGateway({
   namespace: "groupChat",
   cors: { origin: "*" },
@@ -33,7 +35,7 @@ export class GroupChatsGateway
   @WebSocketServer() nsp: Namespace;
 
   afterInit() {
-    this.nsp.adapter.on("deleteRoom", (room) => {
+    this.nsp.adapter.on("delete-room", (room) => {
       const deletedRoom = createdRooms.find(
         (createdRoom) => createdRoom === room
       );
@@ -75,21 +77,21 @@ export class GroupChatsGateway
   }
 
   //<<------------/------------>>
-  @SubscribeMessage("getRooms")
+  @SubscribeMessage("room-list")
   handleRoomList() {
     return this.groupChatService.getRooms();
   }
 
   //<<------------/------------>>
-  @SubscribeMessage("createRoom")
+  @SubscribeMessage("create-room")
   handleCreateRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() { roomName }: { roomName: string }
   ) {
-    const exists = createdRooms.find((createdRoom) => createdRoom === roomName);
-    if (exists) {
-      return { success: false, payload: `${roomName} 방이 이미 존재합니다.` };
-    }
+    // const exists = createdRooms.find((createdRoom) => createdRoom === roomName);
+    // if (exists) {
+    //   return { success: false, payload: `${roomName} 방이 이미 존재합니다.` };
+    // }
 
     const chatRoom = this.groupChatService.createRoom(roomName);
     if (chatRoom) {
@@ -102,7 +104,7 @@ export class GroupChatsGateway
   }
 
   //<<------------/------------>>
-  @SubscribeMessage("joinRoom")
+  @SubscribeMessage("join-room")
   handleJoinRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() roomName: string
@@ -116,7 +118,7 @@ export class GroupChatsGateway
   }
 
   //<<------------/------------>>
-  @SubscribeMessage("leaveRoom")
+  @SubscribeMessage("leave-room")
   handleLeaveRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() roomName: string

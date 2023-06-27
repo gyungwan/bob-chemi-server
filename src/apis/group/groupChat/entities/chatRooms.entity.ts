@@ -23,6 +23,8 @@ export class ChatRoom {
   @ApiProperty({ type: () => Chat, isArray: true, description: "채팅 목록" })
   chats: Chat[];
 
-  @OneToMany(() => ChatRoomUser, (chatRoomUser) => chatRoomUser.chatRoom)
+  @OneToMany(() => ChatRoomUser, (chatRoomUser) => chatRoomUser.chatRoom, {
+    cascade: true,
+  })
   chatRoomUsers: ChatRoomUser[];
 }
