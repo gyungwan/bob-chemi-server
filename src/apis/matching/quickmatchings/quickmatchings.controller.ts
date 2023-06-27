@@ -37,13 +37,12 @@ export class QuickMatchingController {
     const { targetGender, targetAgeGroup, location } = createQuickingDto;
 
     const userId = (req.user as any).id;
-    const user = await this.usersService.findOneId(userId); // 내정보
+    const user = await this.usersService.findOneId(userId);
 
-    const myGender = user.gender; // 이미 user안에 gender가 있으니까..
+    const myGender = user.gender;
     const myAge = user.age;
     const myAgeGroup = this.getAgeGroup(myAge);
 
-    //console.log(user, myAge, myAgeGroup, userId); // 상대방의 정보 출력
     return this.quickMatchingService.request(userId, {
       targetGender: createQuickingDto.targetGender,
       targetAgeGroup: createQuickingDto.targetAgeGroup,
@@ -68,30 +67,20 @@ export class QuickMatchingController {
   }
 
   //----------------- 모든 매칭 요청 조회-----------------------//
-  @Get() // 퀵매칭 아이디
-  @UseGuards(RestAuthAccessGuard)
-  @ApiOperation({ summary: "모든 매칭 요청 조회, 실사용 API X" })
-  async getAllQuickMatching() {
-    return this.quickMatchingService.findAllRequestMatching();
-  }
+  // @Get() // 퀵매칭 아이디
+  // @UseGuards(RestAuthAccessGuard)
+  // @ApiOperation({ summary: "모든 매칭 요청 조회, 실사용 API X" })
+  // async getAllQuickMatching() {
+  //   return this.quickMatchingService.findAllRequestMatching();
+  // }
 
   //----------------- 유저의 매칭 요청 조회-----------------------//
 
-  @Get(":id") // 퀵매칭 아이디
+  @Get(":quickMatchingid") // 퀵매칭 아이디
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({ summary: "유저의 매칭 요청 조회" })
-  async getQuickMatching(@Param("id") id: string) {
-    return this.quickMatchingService.findRequestMatching(id);
-  }
-
-  //----------------- 매칭된 상대방 유저 정보 조회 -----------------------//
-  // 매칭된 유저의 정보 확인할 수 있도록
-  // 수정하기
-  @Get(":id") // 퀵매칭아이디
-  @UseGuards(RestAuthAccessGuard)
-  @ApiOperation({ summary: "매칭된 상대방 유저 정보 조회 " })
-  async getTargetUserInfo(@Param("id") quickMatchingId: string) {
-    return this.quickMatchingService.findTargetUser();
+  async getQuickMatching(@Param("quickMatchingId") quickMatchingId: string) {
+    return this.quickMatchingService.findRequestMatching(quickMatchingId);
   }
 
   //----------------- 매칭 전 취소, 거절  -----------------------//
@@ -102,13 +91,23 @@ export class QuickMatchingController {
     return this.quickMatchingService.cancel(id);
   }
 
-  //----------------- 매칭된 유저 삭제  -----------------------//
+  //----------------- 매칭 삭제  -----------------------//
   @Delete("/delete/:id")
   @UseGuards(RestAuthAccessGuard)
-  @ApiOperation({ summary: "매칭된 유저 삭제" })
+  @ApiOperation({ summary: "매칭 삭제" })
   async deleteMatchingUser(@Param("id") matchingRoomId: string) {
     await this.quickMatchingService.delete(matchingRoomId);
-    return { message: "매칭된 유저 삭제 완료" };
+    return { message: "매칭 삭제 완료" };
+  }
+
+  //----------------- 매칭된 상대방 유저 정보 조회 -----------------------//
+  // 매칭된 유저의 정보 확인할 수 있도록
+  // 수정하기
+  @Get(":matchingRoomId/user1") // 매칭룸아이디
+  @UseGuards(RestAuthAccessGuard)
+  @ApiOperation({ summary: "매칭된 상대방 유저 정보 조회 " })
+  async getTargetUserInfo(@Param("matchingRoomId") matchingRoomId: string) {
+    return this.quickMatchingService.findOne(matchingRoomId);
   }
 
   //----------------- 매칭 수락 -----------------------//
