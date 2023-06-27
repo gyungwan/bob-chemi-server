@@ -12,7 +12,7 @@ import { RestAuthAccessGuard } from "src/common/auth/rest-auth-guards";
 import { MatchingChat } from "./entities/matchingchat.entity";
 import { MatchingChatService } from "./matchingchat.service";
 
-@ApiTags("MATCHINGCHAT")
+@ApiTags("매칭챗 API")
 @Controller("matchingchat")
 export class MatchingChatController {
   constructor(private readonly matchingChatService: MatchingChatService) {}

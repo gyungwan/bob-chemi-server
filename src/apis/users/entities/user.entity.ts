@@ -102,7 +102,7 @@ export class User {
   @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.user)
   quickMatching: QuickMatching;
 
-  @OneToOne(() => MatchingRoom, (matchingRoom) => matchingRoom.targetUser)
+  @OneToOne(() => MatchingRoom, (matchingRoom) => matchingRoom.user2)
   matchingRoom: MatchingRoom;
 
   @OneToMany(() => RestaurantMark, (restaurantMark) => restaurantMark.user)

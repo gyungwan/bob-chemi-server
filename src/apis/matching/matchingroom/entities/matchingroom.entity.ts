@@ -29,21 +29,9 @@ export class MatchingRoom {
   @CreateDateColumn()
   createdAt: Date;
 
-  // @ApiProperty({ description: "매칭 취소일 / 거절일" })
-  // @DeleteDateColumn({ nullable: true })
-  // deletedAt: Date;
-
   @DeleteDateColumn({ nullable: true })
   @ApiProperty({ description: "매칭룸에서 제거일" })
   removalDate: Date;
-
-  @Column({ nullable: true }) // 값 바꿔주기
-  @ApiProperty({ description: "원하는 상대방의 성별" })
-  requestGender: string;
-
-  @Column({ nullable: true }) // 값 바꿔주기
-  @ApiProperty({ description: "원하는 상대방의 나이대" })
-  requestAgeGroup: string;
 
   @OneToOne(() => QuickMatching, (quickMatching) => quickMatching.matchingRoom)
   @JoinColumn({ name: "quickMatchingId" })
@@ -55,12 +43,23 @@ export class MatchingRoom {
 
   @OneToOne(() => User, (user) => user.matchingRoom)
   @JoinColumn({ name: "userId" })
-  user: User;
+  user1: User;
 
-  @OneToOne(() => User, (targetUser) => targetUser.matchingRoom)
+  @OneToOne(() => User, (user) => user.matchingRoom)
   @JoinColumn({ name: "targetUserId" })
-  targetUser: User;
+  user2: User;
 }
+// @ApiProperty({ description: "매칭 취소일 / 거절일" })
+// @DeleteDateColumn({ nullable: true })
+// deletedAt: Date;
+
+// @Column({ nullable: true }) // 값 바꿔주기
+// @ApiProperty({ description: "원하는 상대방의 성별" })
+// requestGender: string;
+
+// @Column({ nullable: true }) // 값 바꿔주기
+// @ApiProperty({ description: "원하는 상대방의 나이대" })
+// requestAgeGroup: string;
 
 // @Column({ nullable: true })
 // @ApiProperty({ description: "매칭 대기 시작 시간" })

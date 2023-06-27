@@ -47,6 +47,10 @@ export class QuickMatching {
   @ApiProperty({ description: "원하는 상대의 연령대" })
   targetAgeGroup: AgeGroup;
 
+  @Column()
+  @ApiProperty({ description: "사용자 위치" })
+  location: string;
+
   @Column({ type: "boolean", default: false })
   @ApiProperty({ description: "매칭 여부" })
   isMatched: boolean;

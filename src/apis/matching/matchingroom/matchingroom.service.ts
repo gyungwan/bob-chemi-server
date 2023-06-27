@@ -91,10 +91,11 @@ export class MatchingRoomService {
     for (const target of targetUser) {
       const matchingRoom = new MatchingRoom();
       matchingRoom.quickMatching = quickMatchingId;
-      matchingRoom.requestAgeGroup = targetAgeGroup;
-      matchingRoom.requestGender = targetGender;
-      matchingRoom.user = user;
-      matchingRoom.targetUser = target.user;
+      // matchingRoom.requestAgeGroup = targetAgeGroup;
+      // matchingRoom.requestGender = targetGender;
+      matchingRoom.user1 = user;
+      matchingRoom.user2 = target.user;
+
       matchingRoom.isMatched = true; // 매칭이 성공한 경우 항상 true로 저장
 
       const savedMatchingRoom = await this.matchingRoomRepository.save(
