@@ -81,8 +81,8 @@ export class UsersController {
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({ summary: "유저의 케미지수 조회" })
   async fetchChemiRating(
-    @Param("id") id: string,
-    @Query("chemiRating") chemiRating: number
+    @Param("id") id: string
+    //@Query("chemiRating") chemiRating: number
   ) {
     console.log(id, "==================");
     return this.usersService.findOneChemiRating(id);

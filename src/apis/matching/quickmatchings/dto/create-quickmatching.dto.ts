@@ -31,4 +31,12 @@ export class CreateQuickMatchingDto {
     //required: true,
   })
   targetAgeGroup: AgeGroup;
+
+  @ApiProperty({
+    description: "현재 위치",
+    example: "서울시 구로구",
+
+    //required: true,
+  })
+  location: string;
 }
