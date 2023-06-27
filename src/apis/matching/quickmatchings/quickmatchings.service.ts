@@ -8,8 +8,6 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { classToPlain } from "class-transformer";
-import { identity } from "rxjs";
 import { Repository } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/users.service";
@@ -32,8 +30,8 @@ export class QuickMatchingService {
     private usersService: UsersService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @Inject(forwardRef(() => MatchingRoomService))
-    private matchingRoomService: MatchingRoomService,
+    // @Inject(forwardRef(() => MatchingRoomService))
+    // private matchingRoomService: MatchingRoomService,
     @InjectRepository(MatchingRoom)
     private readonly matchingRoomRepository: Repository<MatchingRoom>
   ) {}
@@ -74,14 +72,7 @@ export class QuickMatchingService {
     // );
 
     await this.quickMatchingRepository.save(quickMatching);
-    const targetUser = await this.matchingRoomService.findTargetUser();
-    // 없어도 빈배열 반환
-
-    // if (targetUser) {
-    //   return targetUser;
-    // } else {
-    //   throw new NotFoundException("현재 유저를 찾을 수 없습니다.");
-    // }
+    const targetUser = await this.findTargetUser();
     return targetUser;
   }
 
@@ -127,20 +118,23 @@ export class QuickMatchingService {
     ]);
   }
 
+  async findMathedUser(id) {
+    const matchingRoom = await this.matchingRoomRepository.findOne(id);
+  }
+
   //----------------- MatchingRoom Service -----------------------//
   async findTargetUser(): Promise<QuickMatching[]> {
     // 1. isMatched ==false 인 모든 퀵매칭 요청을 찾아옴
     const quickMatching = await this.findAllRequestMatching();
 
     //2. 조건 매칭
-    // 요청을 한 사람이 0이라면 조건 추가
-    console.log(quickMatching, "3333333333333333333333333333333");
+
     const sortedMatching = quickMatching.sort(
       (a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
     const succeedMatching: Partial<QuickMatching[]> = [];
-    //let otherUser: QuickMatching; // otherUser 변수 선언
+
     //const applicant: QuickMatching = quickMatching[i];
     for (let i = 0; i < quickMatching.length; i++) {
       //const applicant = quickMatching[i];
@@ -154,44 +148,54 @@ export class QuickMatchingService {
       const otherUsers = quickMatching.filter(
         (match) => match.user.id !== applicant.user.id // 자신의 정보를 제외
       );
-      console.log(
-        otherUsers,
-        "===================================================="
-      );
-      //let otherUser: QuickMatching | undefined;
+
       for (let j = 0; j < otherUsers.length; j++) {
         const otherUser = otherUsers[j].user;
         const otherUserTargetAgeGroup = otherUsers[j].targetAgeGroup;
         const otherUserTargetGender = otherUsers[j].targetGender;
         const otherUserLocation = otherUsers[j].location;
+        //const otherUserIsMatched = otherUsers[j].isMatched;
         const otherUserAge = otherUser.age;
         const otherUserAgeGroup = this.getAgeGroup(otherUserAge);
 
         // applicant.isMatched = true;
         // otherUser.quickMatching.isMatched = true;
-        if (otherUsers.length == 0) {
-          throw new NotFoundException("현재 매칭을 요청하는 유저가 없습니다");
-        } else if (
-          // location 추가
+        if (
           applicant.user.gender === otherUserTargetGender &&
           userAgeGroup === otherUserTargetAgeGroup &&
           applicant.targetGender === otherUser.gender &&
           applicant.targetAgeGroup === otherUserAgeGroup &&
           applicant.location == otherUserLocation
         ) {
+          const matchingRoom = new MatchingRoom();
+          matchingRoom.isMatched = true;
+          matchingRoom.user1 = applicant.user;
+          matchingRoom.user2 = otherUser;
+
+          await this.matchingRoomRepository.save(matchingRoom);
+
+          applicant.isMatched = true;
+          otherUsers[j].isMatched = true;
+          await Promise.all([
+            this.quickMatchingRepository.save(applicant),
+            this.quickMatchingRepository.save(otherUsers),
+          ]);
+
           interface MatchedQuickMatching extends QuickMatching {
             MatchedUserName: string;
             MatchedUserId: string;
+            //IsMatched : boolean
           }
 
           const matchedOtherUser: MatchedQuickMatching = {
             MatchedUserName: applicant.user.name,
             MatchedUserId: applicant.user.id,
+            //IsMatched: applicant.isMatched,
             ...applicant,
             user: otherUser,
           };
           succeedMatching.push(matchedOtherUser);
-          console.log(succeedMatching, "6666666666666666666666666");
+
           break;
         } else {
           throw new NotFoundException("해당되는 유저가 없습니다");
@@ -201,14 +205,22 @@ export class QuickMatchingService {
       if (succeedMatching.length === 0) {
         // 없을 경우 계속 반복하게 둬야 하는거 아닌가
         // 해당되는 유저가 없을 경우 예외 처리
+        throw new NotFoundException("현재 매칭을 요청하는 유저가 없습니다");
       }
 
       if (succeedMatching.length > 0) {
         break;
       }
     }
-    await this.matchingRoomRepository.save(succeedMatching);
-    //await this.quickMatchingService.updateIsMatched(applicant, otherUser);
+    // console.log(matchingRoom, "33333638726423053098540986509");
+    // if (matchingRoom) {
+    //   await Promise.all([
+    //     this.matchingRoomRepository.save(matchingRoom),
+    //     this.matchingRoomRepository.save(succeedMatching),
+    //   ]);
+    // }
+    //await this.matchingRoomRepository.save(succeedMatching);
+
     return succeedMatching;
   }
 
@@ -228,13 +240,14 @@ export class QuickMatchingService {
     }
   }
 
-  async findOne(id): Promise<MatchingRoom> {
+  async findOne(id): Promise<User> {
     const quickMatching = await this.matchingRoomRepository.findOne({
       where: { id },
-      relations: ["user"], // matchingChat
+      relations: ["user1"], // matchingChat
     });
-    console.log(quickMatching, "111111111");
-    return quickMatching;
+    const matchedUser = quickMatching.user1;
+    console.log(matchedUser, "111111111");
+    return matchedUser;
   }
 
   async performMatching(
@@ -283,12 +296,25 @@ export class QuickMatchingService {
   //   await this.quickMatchingRepository.remove(quickMatching);
   // }
 
-  async delete(id) {
+  async delete(id): Promise<void> {
     const matchingRoom = await this.matchingRoomRepository.findOne({
       // where: { id: id },
       where: { id },
     });
 
+    const user1 = matchingRoom.user1;
+    const user2 = matchingRoom.user2;
+
     await this.matchingRoomRepository.softDelete(matchingRoom.id);
+
+    // const requestMatching1 = await this.quickMatchingRepository.findOne({
+    //   where: { user: user1 },
+    // });
+    // await this.quickMatchingRepository.remove(requestMatching1);
+
+    // const requestMatching2 = await this.quickMatchingRepository.findOne({
+    //   where: { user: user2 },
+    // });
+    // await this.quickMatchingRepository.remove(requestMatching2);
   }
 }

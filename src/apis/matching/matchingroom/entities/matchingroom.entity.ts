@@ -42,11 +42,11 @@ export class MatchingRoom {
   matchingChat: MatchingChat;
 
   @OneToOne(() => User, (user) => user.matchingRoom)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: "user1" })
   user1: User;
 
   @OneToOne(() => User, (user) => user.matchingRoom)
-  @JoinColumn({ name: "targetUserId" })
+  @JoinColumn({ name: "user2" })
   user2: User;
 }
 // @ApiProperty({ description: "매칭 취소일 / 거절일" })
