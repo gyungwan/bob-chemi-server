@@ -9,7 +9,7 @@ export class Chat {
   @ApiProperty({ description: "채팅 고유 ID" })
   chatId: string;
 
-  @Column()
+  @Column({ nullable: true })
   @ApiProperty({ description: "채팅 메세지" })
   message: string;
 

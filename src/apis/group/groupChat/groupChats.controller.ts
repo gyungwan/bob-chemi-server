@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { ChatRoom } from "./entities/chatRooms.entity";
 import { GroupChatService } from "./groupChats.service";
@@ -14,9 +14,9 @@ export class GroupChatsController {
     description: "채팅방 개설",
   })
   @Post("room")
-  createRoom(@Body() roomName: string): any {
+  createRoom(@Body("roomName") roomName: string): any {
     const room = this.groupChatService.createRoom(roomName);
-    return { success: !!room, payload: room };
+    return room;
   }
 
   //<<------------방 조회------------>>
@@ -25,7 +25,7 @@ export class GroupChatsController {
     description: "모든 채팅방 개설",
   })
   @Get("room")
-  getRooms(): ChatRoom[] {
+  getRooms(): Promise<ChatRoom[]> {
     return this.groupChatService.getRooms();
   }
 
@@ -40,16 +40,28 @@ export class GroupChatsController {
   }
 
   //<<------------방 참여------------>>
-  @Post("Join/:chatroomId/userId")
+  @Post("join")
   joinRoom(
-    @Param("chatRoomId") chatRoomId: string,
-    @Param("userId") userId: string
+    @Body("chatRoomId") chatRoomId: string,
+    @Body("userId") userId: string
   ): Promise<string> {
     return this.groupChatService.joinRoom(chatRoomId, userId);
   }
 
   //<<------------방 나가기------------>>
+  @Delete("leave/:chatRoomId/:userId")
+  leaveRoom(
+    @Param("chatRoomId") chatRoomId: string,
+    @Param("userId") userId: string
+  ): Promise<boolean> {
+    return this.groupChatService.leaveRoom(chatRoomId, userId);
+  }
+
   //<<------------방 삭제------------>>
+  @Delete("delete/:chatRoomId")
+  deleteRoom(@Param("chatRoomId") chatRoomId: string): Promise<boolean> {
+    return this.groupChatService.deleteRoom(chatRoomId);
+  }
 
   //<<------------채팅 보내기------------>>
   @ApiOperation({

@@ -29,6 +29,7 @@ export class GroupChatService {
   async createRoom(roomName: string): Promise<ChatRoom> {
     const chatRoom = new ChatRoom();
     chatRoom.roomName = roomName;
+
     chatRoom.chats = [];
 
     await this.chatRooms.set(chatRoom.chatRoomId, chatRoom);
@@ -38,34 +39,49 @@ export class GroupChatService {
   }
 
   //<<------------방 조회------------>>
-  getRooms(): ChatRoom[] {
-    return Array.from(this.chatRooms.values());
+  async getRooms(): Promise<ChatRoom[]> {
+    return this.chatRoomRepository.find();
   }
 
   //<<------------방 검색------------>>
-  async findRoom(chatRoomId): Promise<ChatRoom> {
-    return await this.chatRoomRepository.findOne({ where: { chatRoomId } });
+  async findRoom(chatRoomId: string): Promise<ChatRoom> {
+    const room = await this.chatRoomRepository.findOne({
+      where: { chatRoomId },
+    });
+    return room;
   }
 
   //<<------------방 참여------------>>
-
   async joinRoom(chatRoomId: string, userId: string): Promise<string> {
     const room = await this.findRoom(chatRoomId);
     const user = await this.usersService.findOneId(userId);
+
     if (!room) {throw new ConflictException("존재하지 않는 채팅방 입니다.")} //prettier-ignore
     if (!user) {throw new ConflictException("존재하지 않는 유저입니다.")} //prettier-ignore
+
+    const isUser = await this.chatRoomUserRepository.findOne({
+      where: {
+        chatRoom: { chatRoomId: room.chatRoomId },
+        user: { id: user.id },
+      },
+    });
+
+    if (isUser) {
+      throw new ConflictException("이미 가입된 채팅방입니다.");
+    }
 
     const chatRoomUser = new ChatRoomUser();
     chatRoomUser.chatRoom = room;
     chatRoomUser.user = user;
+
     await this.chatRoomUserRepository.save(chatRoomUser);
 
-    return "참여 완료 되었습니다.";
+    return "참여 완료";
   }
   //<<------------방 나가기------------>>
 
   async leaveRoom(chatRoomId: string, userId: string): Promise<boolean> {
-    const chatRoom = this.findRoom(chatRoomId);
+    const chatRoom = await this.findRoom(chatRoomId);
     if (!chatRoom) {
       throw new ConflictException("존재하지 않는 채팅방입니다.");
     }
@@ -75,12 +91,18 @@ export class GroupChatService {
       throw new ConflictException("존재하지 않는 유저입니다.");
     }
 
+    await this.chatRoomUserRepository.softDelete({
+      chatRoom: { chatRoomId: chatRoom.chatRoomId },
+      user: { id: user.id },
+    });
+
     return true;
   }
   //<<------------방 삭제------------>>
 
-  deleteRoom(chatRoomId: string): boolean {
-    return this.chatRooms.delete(chatRoomId);
+  async deleteRoom(chatRoomId: string): Promise<boolean> {
+    await this.chatRooms.delete(chatRoomId);
+    return true;
   }
 
   //<<------------채팅 보내기------------>>
@@ -94,13 +116,11 @@ export class GroupChatService {
     }
 
     const chatRoom = await this.findRoom(chatRoomId);
-    console.log(chatRoom, "@@@@@@@@@@@@@@@@@");
     if (!chatRoom) {
       throw new ConflictException("존재하지 않는 채팅방 입니다.");
     }
 
     const user = await this.usersService.findOneId(userId);
-    console.log(user, "@@@@@@@@@@@@@@@@@");
     if (!user) {
       throw new ConflictException("존재하지 않는 유저입니다.");
     }
