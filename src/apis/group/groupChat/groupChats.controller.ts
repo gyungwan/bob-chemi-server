@@ -40,6 +40,10 @@ export class GroupChatsController {
   }
 
   //<<------------방 참여------------>>
+  @ApiOperation({
+    summary: "채팅방 참여",
+    description: "채팅방 ID와 유저ID로 참여",
+  })
   @Post("join")
   joinRoom(
     @Body("chatRoomId") chatRoomId: string,
@@ -49,6 +53,10 @@ export class GroupChatsController {
   }
 
   //<<------------방 나가기------------>>
+  @ApiOperation({
+    summary: "채팅방 나가기",
+    description: "채팅방ID와 유저ID로 채팅방 나가기",
+  })
   @Delete("leave/:chatRoomId/:userId")
   leaveRoom(
     @Param("chatRoomId") chatRoomId: string,
@@ -58,6 +66,10 @@ export class GroupChatsController {
   }
 
   //<<------------방 삭제------------>>
+  @ApiOperation({
+    summary: "채팅방 삭제",
+    description: "채팅방 삭제",
+  })
   @Delete("delete/:chatRoomId")
   deleteRoom(@Param("chatRoomId") chatRoomId: string): Promise<boolean> {
     return this.groupChatService.deleteRoom(chatRoomId);
@@ -66,7 +78,7 @@ export class GroupChatsController {
   //<<------------채팅 보내기------------>>
   @ApiOperation({
     summary: "채팅 발송",
-    description: "채팅방 개설",
+    description: "채팅 발송",
   })
   @Post("room/:chatRoomId/:userId/chats")
   addChat(
