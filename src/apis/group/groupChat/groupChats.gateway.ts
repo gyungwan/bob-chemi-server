@@ -1,5 +1,5 @@
 import { Logger } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import {
   ConnectedSocket,
   MessageBody,
@@ -40,27 +40,23 @@ export class GroupChatsGateway
         (createdRoom) => createdRoom === room
       );
       if (!deletedRoom) return;
-
-      // this.nsp.emit("delete-room", deletedRoom);
-      // createdRooms = createdRooms.filter(
-      //   (createdRoom) => createdRoom !== deletedRoom
-      // ); // 유저가 생성한 room 목록 중에 삭제되는 room 있으면 제거
     });
 
     this.logger.log("웹소켓 서버 초기화 ✅");
   }
 
-  //<<------------/------------>>
+  //<<------------소켓연결------------>>
+
   handleConnection(@ConnectedSocket() socket: Socket) {
     this.logger.log(`${socket.id} 소켓 연결`);
   }
 
-  //<<------------/------------>>
+  //<<------------소켓 연결 해제------------>>
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.logger.log(`${socket.id} 소켓 연결 해제 ❌`);
   }
 
-  //<<------------/------------>>
+  //<<------------메세지 발송------------>>
   @SubscribeMessage("message")
   handleMessage(
     @ConnectedSocket() socket: Socket,
@@ -76,13 +72,13 @@ export class GroupChatsGateway
     return { username: socket.id, message };
   }
 
-  //<<------------/------------>>
+  //<<------------방 조회------------>>
   @SubscribeMessage("room-list")
   handleRoomList() {
     return this.groupChatService.getRooms();
   }
 
-  //<<------------/------------>>
+  //<<------------방 생성------------>>
   @SubscribeMessage("create-room")
   handleCreateRoom(
     @ConnectedSocket() socket: Socket,
@@ -103,31 +99,49 @@ export class GroupChatsGateway
     return { success: false, payload: "방 생성에 실패했습니다." };
   }
 
-  //<<------------/------------>>
+  //<<------------방 참여------------>>
   @SubscribeMessage("join-room")
-  handleJoinRoom(
+  async handleJoinRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() roomName: string
   ) {
-    socket.join(roomName); // join room
-    socket.broadcast
-      .to(roomName)
-      .emit("message", { message: `${socket.id}가 들어왔습니다.` });
+    {
+      try {
+        const response = await this.groupChatService.joinRoom(
+          roomName,
+          socket.id
+        );
+        socket.join(roomName);
+        socket.broadcast
+          .to(roomName)
+          .emit("message", { message: `${socket.id}가 들어왔습니다.` });
 
-    return { success: true };
+        return { success: true, message: response };
+      } catch (error) {
+        return { success: false, message: error.message };
+      }
+    }
   }
 
-  //<<------------/------------>>
+  //<<------------방 나가기------------>>
   @SubscribeMessage("leave-room")
-  handleLeaveRoom(
+  async handleLeaveRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() roomName: string
   ) {
-    socket.leave(roomName); // leave room
-    socket.broadcast
-      .to(roomName)
-      .emit("message", { message: `${socket.id}가 나갔습니다.` });
+    try {
+      const response = await this.groupChatService.leaveRoom(
+        roomName,
+        socket.id
+      );
+      socket.leave(roomName);
+      socket.broadcast
+        .to(roomName)
+        .emit("message", { message: `${socket.id}가 나갔습니다.` });
 
-    return { success: true };
+      return { success: true, message: response };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
   }
 }
