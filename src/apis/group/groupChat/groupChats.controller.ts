@@ -10,7 +10,7 @@ export class GroupChatsController {
 
   //<<------------방 생성------------>>
   @ApiOperation({
-    summary: "채팅방 개설",
+    summary: "채팅방 개설 Api + Socket",
     description: "채팅방 개설",
   })
   @Post("room")
@@ -21,7 +21,7 @@ export class GroupChatsController {
 
   //<<------------방 조회------------>>
   @ApiOperation({
-    summary: "모든 채팅방 조회",
+    summary: "모든 채팅방 조회, Event name : room-list",
     description: "모든 채팅방 개설",
   })
   @Get("room")
@@ -41,7 +41,7 @@ export class GroupChatsController {
 
   //<<------------방 참여------------>>
   @ApiOperation({
-    summary: "채팅방 참여",
+    summary: "채팅방 참여, Event name : join-room",
     description: "채팅방 ID와 유저ID로 참여",
   })
   @Post("join")
@@ -54,7 +54,7 @@ export class GroupChatsController {
 
   //<<------------방 나가기------------>>
   @ApiOperation({
-    summary: "채팅방 나가기",
+    summary: "채팅방 나가기, Event name : leave-list",
     description: "채팅방ID와 유저ID로 채팅방 나가기",
   })
   @Delete("leave/:chatRoomId/:userId")
@@ -77,7 +77,7 @@ export class GroupChatsController {
 
   //<<------------채팅 보내기------------>>
   @ApiOperation({
-    summary: "채팅 발송",
+    summary: "채팅 발송 Event name : message",
     description: "채팅 발송",
   })
   @Post("room/:chatRoomId/:userId/chats")
