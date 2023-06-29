@@ -24,6 +24,11 @@ export class GroupChatService {
 
   constructor(private readonly usersService: UsersService) {}
 
+  //<<------------방 조회------------>>
+  async getRooms(): Promise<ChatRoom[]> {
+    return this.chatRoomRepository.find();
+  }
+
   //<<------------방 생성------------>>
   async createRoom(roomName: string): Promise<ChatRoom> {
     const chatRoom = new ChatRoom();
@@ -35,11 +40,6 @@ export class GroupChatService {
     await this.chatRoomRepository.save(chatRoom);
 
     return chatRoom;
-  }
-
-  //<<------------방 조회------------>>
-  async getRooms(): Promise<ChatRoom[]> {
-    return this.chatRoomRepository.find();
   }
 
   //<<------------방 검색------------>>
