@@ -2,10 +2,13 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/users.service";
+import { ChatGateway } from "../ChatGateway/\bchatGateway";
+import { ChatGatewayModule } from "../ChatGateway/chatGateway.module";
+//import { ChatGateway } from "../ChatGateway/\bchatGateway";
 import { MatchingChat } from "../matchingchat/entities/matchingchat.entity";
 import { MatchingChatService } from "../matchingchat/matchingchat.service";
 import { MatchingRoom } from "../matchingroom/entities/matchingroom.entity";
-import { MatchingRoomService } from "../matchingroom/matchingroom.service";
+// import { MatchingRoomService } from "../matchingroom/matchingroom.service";
 import { QuickMatching } from "./entities/quickmatchings.entity";
 import { QuickMatchingController } from "./quickmatchings.controller";
 import { QuickMatchingService } from "./quickmatchings.service";
@@ -13,6 +16,7 @@ import { QuickMatchingService } from "./quickmatchings.service";
 @Module({
   imports: [
     TypeOrmModule.forFeature([QuickMatching, User, MatchingRoom, MatchingChat]),
+    ChatGatewayModule,
   ],
 
   exports: [QuickMatchingService],
@@ -20,8 +24,9 @@ import { QuickMatchingService } from "./quickmatchings.service";
   providers: [
     QuickMatchingService,
     UsersService,
-    MatchingRoomService,
+    //MatchingRoomService,
     MatchingChatService,
+    ChatGateway,
   ],
 })
 export class QuickMatchingModule {}
