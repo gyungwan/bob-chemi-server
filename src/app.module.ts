@@ -21,6 +21,7 @@ import { GroupChatsModule } from "./apis/group/groupChat/groupChats.module";
 import { QuickMatchingModule } from "./apis/matching/quickmatchings/quickmatchings.module";
 import { RestaurantMarkModule } from "./apis/restaurantMark/restaurantMark.module";
 import { MatchingRoomModule } from "./apis/matching/matchingroom/matchingroom.module";
+import { ChatGatewayModule } from "./apis/matching/ChatGateway/chatGateway.module";
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { MatchingRoomModule } from "./apis/matching/matchingroom/matchingroom.mo
     }),
     UsersModule,
     AuthModule,
+    ChatGatewayModule,
     ReviewsModule,
     RestaurantMarkModule,
     MatchingChatModule,

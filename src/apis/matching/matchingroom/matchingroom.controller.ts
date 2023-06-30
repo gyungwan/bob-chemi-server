@@ -17,6 +17,7 @@ import { QuickMatching } from "../quickmatchings/entities/quickmatchings.entity"
 import { QuickMatchingService } from "../quickmatchings/quickmatchings.service";
 import { MatchingRoom } from "./entities/matchingroom.entity";
 import { MatchingRoomService } from "./matchingroom.service";
+// import { MatchingRoomService } from "./matchingroom.service";
 
 //@ApiTags("매칭룸 API")
 @Controller("matchingRoom")

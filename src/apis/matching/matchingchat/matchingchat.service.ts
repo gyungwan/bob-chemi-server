@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Like, Repository } from "typeorm";
 import { MatchingRoom } from "../matchingroom/entities/matchingroom.entity";
 import { MatchingChat } from "./entities/matchingchat.entity";
-
+import { Socket } from "socket.io";
 @Injectable()
 export class MatchingChatService {
   constructor(
@@ -70,5 +70,20 @@ export class MatchingChatService {
     // 예를 들어, 채팅방의 참여자 목록에서 해당 유저를 제거하거나
     // 채팅방의 상태를 업데이트하여 해당 유저를 제외한 참여자만 남도록 처리할 수 있습니다.
     // 필요에 따라 데이터베이스 작업 등을 수행할 수 있습니다.
+  }
+
+  //-------------- 경완 수정 부분 ----------
+
+  async create(chat: MatchingChat): Promise<MatchingChat> {
+    return this.matchingChatRepository.save(chat);
+  }
+
+  async deleteChatRoomMessages(roomId: string): Promise<void> {
+    await this.matchingChatRepository.delete({ matchingRoom: { id: roomId } });
+  }
+
+  async test(client: Socket, data) {
+    console.log(data);
+    client.emit("test", { message: "test" });
   }
 }
