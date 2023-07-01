@@ -11,6 +11,7 @@ import {
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  Query,
 } from "@nestjs/common";
 import multerS3 from "multer-s3";
 import { S3Client } from "@aws-sdk/client-s3";
@@ -88,7 +89,7 @@ export class FoodieBoardController {
   @UseGuards(RestAuthAccessGuard)
   @ApiOperation({
     summary: "맛잘알 단일 조회 ",
-    description: "맛잘알 단일 조회API",
+    description: "맛잘알 게시글 유저별 조회API",
   })
   async findUser(
     @Req() req: Request, //
@@ -106,6 +107,16 @@ export class FoodieBoardController {
   })
   async findAll() {
     return await this.foodieBoardService.findAll();
+  }
+
+  //<<------------맛잘알 게시글 상세조회------------>>
+  @Get("detail")
+  @ApiOperation({
+    summary: "맛잘알 게시글 상세 조회",
+    description: "게시글 id를 통해 게시글 상세 조회",
+  })
+  async findDetail(@Query("id") id: string) {
+    return await this.foodieBoardService.findDetail(id);
   }
 
   //<<------------맛잘알 게시글 수정------------>>

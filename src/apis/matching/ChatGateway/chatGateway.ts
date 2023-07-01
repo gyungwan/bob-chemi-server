@@ -34,7 +34,9 @@ import { User } from "src/apis/users/entities/user.entity";
   namespace: "/match",
 })
 @ApiTags("1:1 채팅API ")
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(
     @Inject(forwardRef(() => MatchingChatService))
     private readonly matchingChatService: MatchingChatService,
@@ -48,6 +50,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
   //post 부분에서 연결해서 클라이언트 소켓 아이디를 받아오고 그연결 된 상태에서 소켓아이디를 이용해서 매칭된 정보를 넘기고 하면 될거 같은데
+
+  afterInit() {
+    // this.server.adapter.on("delete-room", (room) => {
+    //   const deletedRoom = createdRooms.find(
+    //     (createdRoom) => createdRoom === room
+    //   );
+    //   if (!deletedRoom) return;
+    // });
+    // this.logger.log("웹소켓 서버 초기화✅");
+  }
 
   // 유저가 연결 되었을때
   async handleConnection(client: Socket, ...args: any[]) {
