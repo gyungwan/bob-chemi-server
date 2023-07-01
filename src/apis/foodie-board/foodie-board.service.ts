@@ -55,8 +55,9 @@ export class FoodieBoardService {
     return foodieBoard;
   }
   //<<------------맛잘알 게시글 전체조회------------>>
+
   async findAll() {
-    return await this.foodieBoardRepository.find();
+    return await this.foodieBoardRepository.find({ relations: ["user"] });
   }
 
   ///수정 하기 유저아이디 받아와서
@@ -69,6 +70,13 @@ export class FoodieBoardService {
     });
   }
 
+  //<<------------맛잘알 게시글 상세조회------------>>
+  async findDetail(id: string) {
+    return await this.foodieBoardRepository.findOne({
+      where: { id },
+      relations: ["user"],
+    });
+  }
   //<<------------맛잘알 게시글 수정------------>>
   async update(
     id: string, //
