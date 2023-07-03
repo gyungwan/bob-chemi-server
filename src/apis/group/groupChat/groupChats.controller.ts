@@ -4,13 +4,13 @@ import { ChatRoom } from "./entities/chatRooms.entity";
 import { GroupChatService } from "./groupChats.service";
 
 @Controller("groupChat")
-@ApiTags("채팅방 API")
+@ApiTags("채팅방 API / Socket namespace : groupChat")
 export class GroupChatsController {
   constructor(private readonly groupChatService: GroupChatService) {}
 
   //<<------------방 생성------------>>
   @ApiOperation({
-    summary: "채팅방 개설 Api + Socket",
+    summary: "채팅방 개설 / Event: create-room",
     description: "채팅방 개설",
   })
   @Post("room")
@@ -21,7 +21,7 @@ export class GroupChatsController {
 
   //<<------------방 조회------------>>
   @ApiOperation({
-    summary: "모든 채팅방 조회, Event name : room-list",
+    summary: "모든 채팅방 조회 / Event: room-list",
     description: "모든 채팅방 개설",
   })
   @Get("room")
@@ -41,7 +41,7 @@ export class GroupChatsController {
 
   //<<------------방 참여------------>>
   @ApiOperation({
-    summary: "채팅방 참여, Event name : join-room",
+    summary: "채팅방 참여 / Event: join-room",
     description: "채팅방 ID와 유저ID로 참여",
   })
   @Post("join")
@@ -54,7 +54,7 @@ export class GroupChatsController {
 
   //<<------------방 나가기------------>>
   @ApiOperation({
-    summary: "채팅방 나가기, Event name : leave-list",
+    summary: "채팅방 나가기 / Event: leave-list",
     description: "채팅방ID와 유저ID로 채팅방 나가기",
   })
   @Delete("leave/:chatRoomId/:userId")
@@ -77,7 +77,7 @@ export class GroupChatsController {
 
   //<<------------채팅 보내기------------>>
   @ApiOperation({
-    summary: "채팅 발송 Event name : message",
+    summary: "채팅 발송 / Event: message",
     description: "채팅 발송",
   })
   @Post("room/:chatRoomId/:userId/chats")

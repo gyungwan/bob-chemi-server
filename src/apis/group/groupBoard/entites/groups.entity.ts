@@ -23,7 +23,7 @@ export class Group extends BaseEntity {
   @ApiProperty({ description: "소모임 게시글 고유 ID" })
   groupId: number;
 
-  @ApiProperty({ description: "소모임 게시글 제목" })
+  @ApiProperty({ description: "소모임 게시글 제목", example: "단체 채팅방" })
   @Column()
   title: string;
 

@@ -16,7 +16,7 @@ export class ChatRoom {
   chatRoomId: string;
 
   @Column()
-  @ApiProperty({ description: "채팅방 이름, 소모임의 이름을 가져옴" })
+  @ApiProperty({ description: "채팅방 이름", example: "채팅방" })
   roomName: string;
 
   @OneToMany(() => Chat, (chat) => chat.chatRoom, { cascade: true })
