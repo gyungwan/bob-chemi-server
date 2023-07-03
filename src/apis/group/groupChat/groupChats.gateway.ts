@@ -50,14 +50,13 @@ export class GroupChatsGateway
   }
 
   //<<------------소켓연결------------>>
-
   handleConnection(@ConnectedSocket() socket: Socket) {
-    this.logger.log(`${socket.id} 소켓 연결✅`);
+    this.logger.log(`socketId : ${socket.id} 소켓 연결✅`);
   }
 
   //<<------------소켓 연결 해제------------>>
   handleDisconnect(@ConnectedSocket() socket: Socket) {
-    this.logger.log(`${socket.id} 소켓 연결 해제 ❌`);
+    this.logger.log(`socketId : ${socket.id} 소켓 연결 해제 ❌`);
   }
 
   //<<------------방 조회------------>>
@@ -83,7 +82,7 @@ export class GroupChatsGateway
       socket.join(roomName); // 기존에 없던 room으로 join하면 room이 생성됨
       createdRooms.push(roomName); // 유저가 생성한 room 목록에 추가
       this.nsp.emit("create-room", roomName); // 대기실 방 생성
-      return { success: true, payload: roomName };
+      return { success: true, payload: chatRoom };
     }
     return { success: false, payload: "방 생성에 실패했습니다." };
   }
