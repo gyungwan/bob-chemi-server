@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  ConsoleLogger,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -12,11 +11,10 @@ import { Equal, FindOneOptions, Repository } from "typeorm";
 import { UpdateGroupDto } from "./dto/update.group.dto";
 import { Member } from "./entites/members.entity";
 import { MemberStatus } from "./entites/members.status.enum";
-import { UsersService } from "src/apis/users/users.service";
 import { FileUploadService } from "src/apis/file-upload/file-upload.service";
 import { ChatRoom } from "../groupChat/entities/chatRooms.entity";
 import { GroupChatService } from "../groupChat/groupChats.service";
-import { User } from "src/apis/users/entities/user.entity";
+import { UsersService } from "src/apis/users/users.service";
 
 @Injectable()
 export class GroupsService {
