@@ -4,7 +4,7 @@ import {
   Injectable,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UsersService } from "src/apis/users/users.service";
+import { UsersService } from "../../users/users.service";
 import { Repository } from "typeorm";
 import { ChatRoom } from "./entities/chatRooms.entity";
 import { ChatRoomUser } from "./entities/chatRoomUsers.entity";
