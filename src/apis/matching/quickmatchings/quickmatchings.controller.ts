@@ -34,7 +34,7 @@ export class QuickMatchingController {
   async requestQuickMatching(
     @Body() createQuickingDto: CreateQuickMatchingDto,
     @Req() req: Request
-  ): Promise<QuickMatching[]> {
+  ): Promise<QuickMatching> {
     const { targetGender, targetAgeGroup, location } = createQuickingDto;
 
     const userId = (req.user as any).id;

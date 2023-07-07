@@ -48,7 +48,7 @@ export class QuickMatchingService {
       targetAgeGroup,
       location,
     }: { targetGender: Gender; targetAgeGroup: AgeGroup; location: string }
-  ): Promise<QuickMatching[]> {
+  ): Promise<QuickMatching> {
     const existingMatching = await this.quickMatchingRepository.findOne({
       where: { user: { id: userId } },
     });
@@ -77,8 +77,8 @@ export class QuickMatchingService {
     // );
 
     await this.quickMatchingRepository.save(quickMatching);
-    const targetUser = await this.findTargetUser();
-    return targetUser;
+    //const targetUser = await this.findTargetUser();
+    return quickMatching;
   }
 
   async findRequestMatching(id): Promise<QuickMatching> {
