@@ -20,8 +20,6 @@ import { GroupsModule } from "./apis/group/groupBoard/groups.module";
 import { GroupChatsModule } from "./apis/group/groupChat/groupChats.module";
 import { QuickMatchingModule } from "./apis/matching/quickmatchings/quickmatchings.module";
 import { RestaurantMarkModule } from "./apis/restaurantMark/restaurantMark.module";
-import { MatchingRoomModule } from "./apis/matching/matchingroom/matchingroom.module";
-import { ChatGatewayModule } from "./apis/matching/ChatGateway/chatGateway.module";
 
 @Module({
   imports: [
@@ -56,7 +54,6 @@ import { ChatGatewayModule } from "./apis/matching/ChatGateway/chatGateway.modul
     }),
     UsersModule,
     AuthModule,
-    ChatGatewayModule,
     ReviewsModule,
     RestaurantMarkModule,
     MatchingChatModule,
@@ -65,7 +62,6 @@ import { ChatGatewayModule } from "./apis/matching/ChatGateway/chatGateway.modul
     GroupChatsModule,
     FileUploadModule,
     QuickMatchingModule,
-    MatchingRoomModule,
     CacheModule.register({
       store: redisStore,
       // host: "localhost", // Redis 호스트 주소

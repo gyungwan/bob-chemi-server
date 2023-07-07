@@ -14,7 +14,7 @@ import { Review } from "src/apis/reviews/entities/reviews.entity";
 import { QuickMatching } from "src/apis/matching/quickmatchings/entities/quickmatchings.entity";
 import { RestaurantMark } from "src/apis/restaurantMark/entities/restaurantMark.entity";
 import { Group } from "src/apis/group/groupBoard/entites/groups.entity";
-import { MatchingRoom } from "src/apis/matching/matchingroom/entities/matchingroom.entity";
+import { MatchingRoom } from "src/apis/matching/quickmatchings/entities/matchingroom.entity";
 import { Chat } from "src/apis/group/groupChat/entities/chats.entity";
 import { ChatRoom } from "src/apis/group/groupChat/entities/chatRooms.entity";
 import { ChatRoomUser } from "src/apis/group/groupChat/entities/chatRoomUsers.entity";

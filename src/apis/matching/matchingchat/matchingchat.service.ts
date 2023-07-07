@@ -1,16 +1,20 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like, Repository } from "typeorm";
-import { MatchingRoom } from "../matchingroom/entities/matchingroom.entity";
-import { MatchingChat } from "./entities/matchingchat.entity";
+
 import { Socket } from "socket.io";
+import { QuickMatching } from "../quickmatchings/entities/quickmatchings.entity";
+import { MatchingChat } from "./entities/matchingchat.entity";
+import { MatchingRoom } from "../quickmatchings/entities/matchingroom.entity";
 @Injectable()
 export class MatchingChatService {
   constructor(
     @InjectRepository(MatchingChat)
     private readonly matchingChatRepository: Repository<MatchingChat>,
     @InjectRepository(MatchingRoom)
-    private readonly matchingRoomRepository: Repository<MatchingRoom>
+    private readonly matchingRoomRepository: Repository<MatchingRoom>,
+    @InjectRepository(QuickMatching)
+    private readonly quickMatchingRepository: Repository<QuickMatching>
   ) {}
 
   async createMatchingChat(matchingRoomId): Promise<MatchingChat> {
@@ -79,7 +83,27 @@ export class MatchingChatService {
   }
 
   async deleteChatRoomMessages(roomId: string): Promise<void> {
+    const user = await this.matchingChatRepository.findOne({
+      where: { id: roomId },
+      relations: ["matchingRoom", "matchingRoom.user1", "matchingRoom.user2"],
+    });
+    if (
+      user &&
+      user.matchingRoom &&
+      user.matchingRoom.user1 &&
+      user.matchingRoom.user2
+    ) {
+      await this.quickMatchingRepository.delete(user.matchingRoom.user1.id);
+      await this.quickMatchingRepository.delete(user.matchingRoom.user2.id);
+    }
     await this.matchingChatRepository.delete({ matchingRoom: { id: roomId } });
+  }
+
+  async getChatHistory(chatRoomId: string): Promise<MatchingChat[]> {
+    return this.matchingChatRepository.find({
+      where: { matchingRoom: { id: chatRoomId } },
+      order: { timestamp: "ASC" }, // Optional: Sort the chat messages by timestamp
+    });
   }
 
   async test(client: Socket, data) {

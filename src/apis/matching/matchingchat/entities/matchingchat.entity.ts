@@ -11,7 +11,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { MatchingRoom } from "../../matchingroom/entities/matchingroom.entity";
+import { MatchingRoom } from "../../quickmatchings/entities/matchingroom.entity";
 @Entity()
 export class MatchingChat {
   @PrimaryGeneratedColumn("uuid")

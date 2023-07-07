@@ -10,11 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { MatchingChat } from "../../matchingchat/entities/matchingchat.entity";
-import {
-  AgeGroup,
-  Gender,
-  QuickMatching,
-} from "../../quickmatchings/entities/quickmatchings.entity";
+import { AgeGroup, Gender, QuickMatching } from "./quickmatchings.entity";
 
 @Entity()
 export class MatchingRoom {

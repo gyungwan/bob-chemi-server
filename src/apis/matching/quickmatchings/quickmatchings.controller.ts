@@ -33,7 +33,6 @@ export class QuickMatchingController {
   @ApiOperation({ summary: "매칭 요청" })
   async requestQuickMatching(
     @Body() createQuickingDto: CreateQuickMatchingDto,
-    @Body() socketId: string,
     @Req() req: Request
   ): Promise<QuickMatching[]> {
     const { targetGender, targetAgeGroup, location } = createQuickingDto;
@@ -45,7 +44,7 @@ export class QuickMatchingController {
     const myAge = user.age;
     const myAgeGroup = this.getAgeGroup(myAge);
 
-    return this.quickMatchingService.request(userId, socketId, {
+    return this.quickMatchingService.request(userId, {
       targetGender: createQuickingDto.targetGender,
       targetAgeGroup: createQuickingDto.targetAgeGroup,
       location: createQuickingDto.location,
