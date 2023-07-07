@@ -1,5 +1,4 @@
 import { Logger } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import {
   ConnectedSocket,
   MessageBody,
@@ -10,7 +9,9 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
+
 import { Namespace, Socket } from "socket.io";
+import { io } from "socket.io-client";
 import { GroupChatService } from "./groupChats.service";
 
 interface MessagePayload {
@@ -19,11 +20,14 @@ interface MessagePayload {
   message: string;
 }
 
-interface UserPayload {
-  chatRoomId: string;
-}
-
 let createdRooms: string[] = [];
+
+const socket = io();
+
+socket.on("disconnect", () => {
+  // 연결이 끊어졌을 때 재연결 로직 실행
+  socket.connect();
+});
 
 @WebSocketGateway({
   namespace: "groupChat",
@@ -49,9 +53,9 @@ export class GroupChatsGateway
     this.logger.log("웹소켓 서버 초기화✅");
   }
 
-  //<<------------소켓연결------------>>
+  //<<------------소켓 연결------------>>
   handleConnection(@ConnectedSocket() socket: Socket) {
-    this.logger.log(`socketId : ${socket.id} 소켓 연결✅`);
+    this.logger.log(`socketId : ${socket.id} 소켓 연결 ✅`);
   }
 
   //<<------------소켓 연결 해제------------>>
@@ -69,7 +73,7 @@ export class GroupChatsGateway
   @SubscribeMessage("create-room")
   handleCreateRoom(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() roomName: string
+    @MessageBody() { roomName }: { roomName: string }
   ) {
     const exists = createdRooms.find((createdRoom) => createdRoom === roomName);
 
@@ -87,30 +91,16 @@ export class GroupChatsGateway
     return { success: false, payload: "방 생성에 실패했습니다." };
   }
 
-  //<<------------메세지 발송------------>>
-  @SubscribeMessage("message")
-  handleMessage(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() { chatRoomId, userId, message }: MessagePayload
-  ) {
-    const chat = this.groupChatService.addChat(chatRoomId, message, userId);
-
-    if (chat) {
-      socket.broadcast
-        .to(chatRoomId)
-        .emit("message", { userSocket: socket.id, message });
-    }
-    return { userSocket: socket.id, message };
-  }
-
   //<<------------방 참여------------>>
   @SubscribeMessage("join-room")
   handleJoinRoom(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() { chatRoomId }: UserPayload
+    @MessageBody()
+    { chatRoomId, userId }: { chatRoomId: string; userId: string }
   ) {
     {
       try {
+        this.groupChatService.joinRoom(chatRoomId, userId);
         socket.join(chatRoomId);
         socket.broadcast
           .to(chatRoomId)
@@ -127,15 +117,37 @@ export class GroupChatsGateway
   @SubscribeMessage("leave-room")
   handleLeaveRoom(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() { chatRoomId }: UserPayload
+    @MessageBody()
+    { chatRoomId, userId }: { chatRoomId: string; userId: string }
   ) {
     try {
+      this.groupChatService.leaveRoom(chatRoomId, userId);
       socket.leave(chatRoomId);
       socket.broadcast
         .to(chatRoomId)
         .emit("message", { message: `${socket.id}가 나갔습니다.` });
 
       return { success: true, message: "나가기 성공" };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+
+  //<<------------메세지 발송------------>>
+  @SubscribeMessage("message")
+  handleMessage(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() { chatRoomId, userId, message }: MessagePayload
+  ) {
+    const chat = this.groupChatService.addChat(chatRoomId, message, userId);
+
+    try {
+      if (chat) {
+        socket.broadcast
+          .to(chatRoomId)
+          .emit("message", { userSocket: socket.id, message });
+      }
+      return { userSocket: socket.id, message };
     } catch (error) {
       return { success: false, message: error.message };
     }
