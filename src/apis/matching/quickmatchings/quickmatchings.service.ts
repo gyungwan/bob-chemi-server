@@ -11,9 +11,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/users.service";
-import { ChatGateway } from "../ChatGateway/\bchatGateway";
+
 import { MatchingChat } from "../matchingchat/entities/matchingchat.entity";
-import { MatchingRoom } from "../matchingroom/entities/matchingroom.entity";
+import { MatchingRoom } from "./entities/matchingroom.entity";
 // import { MatchingRoomService } from "../matchingroom/matchingroom.service";
 import { CreateQuickMatchingDto } from "./dto/create-quickmatching.dto";
 import {
@@ -23,27 +23,26 @@ import {
 } from "./entities/quickmatchings.entity";
 import { Socket } from "socket.io";
 import { Client } from "socket.io/dist/client";
+import { find } from "rxjs";
 
 @Injectable()
 export class QuickMatchingService {
   constructor(
     @InjectRepository(QuickMatching)
     private readonly quickMatchingRepository: Repository<QuickMatching>,
-    @Inject(forwardRef(() => UsersService))
-    private usersService: UsersService,
+    // @Inject(forwardRef(() => UsersService))
+    // private usersService: UsersService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     // @Inject(forwardRef(() => MatchingRoomService))
     // private matchingRoomService: MatchingRoomService,
     @InjectRepository(MatchingRoom)
-    private readonly matchingRoomRepository: Repository<MatchingRoom>,
-    @Inject(forwardRef(() => ChatGateway))
-    private readonly chatGateway: ChatGateway
+    private readonly matchingRoomRepository: Repository<MatchingRoom>
   ) {}
 
   async request(
     userId: string,
-    socketId: string,
+
     {
       targetGender,
       targetAgeGroup,
@@ -58,7 +57,7 @@ export class QuickMatchingService {
       throw new ConflictException("QuickMatching already exists");
     }
 
-    const user = await this.usersService.findOneId(userId); // My Info
+    const user = await this.userRepository.findOne({ where: { id: userId } }); // My Info
     // QuickMatching 객체 생성 및 저장
     const quickMatching = new QuickMatching();
     quickMatching.targetGender = targetGender;
@@ -78,7 +77,7 @@ export class QuickMatchingService {
     // );
 
     await this.quickMatchingRepository.save(quickMatching);
-    const targetUser = await this.findTargetUser(socketId);
+    const targetUser = await this.findTargetUser();
     return targetUser;
   }
 
@@ -129,7 +128,7 @@ export class QuickMatchingService {
   }
 
   //----------------- MatchingRoom Service -----------------------//
-  async findTargetUser(socketId: string): Promise<QuickMatching[]> {
+  async findTargetUser(): Promise<QuickMatching[]> {
     // 1. isMatched ==false 인 모든 퀵매칭 요청을 찾아옴
     const quickMatching = await this.findAllRequestMatching();
 
@@ -215,7 +214,6 @@ export class QuickMatchingService {
       }
 
       if (succeedMatching.length > 0) {
-        await this.processMatchings(socketId, succeedMatching);
         break;
       }
     }
@@ -229,34 +227,6 @@ export class QuickMatchingService {
     //await this.matchingRoomRepository.save(succeedMatching);
 
     return succeedMatching;
-  }
-  async processMatchings(socketId: string, succeedMatching: QuickMatching[]) {
-    for (let succeedMatchings of succeedMatching) {
-      console.log("socket ----------------", succeedMatchings);
-      if (
-        succeedMatchings.matchingRoom &&
-        succeedMatchings.matchingRoom.user1
-      ) {
-        const user1Id = succeedMatchings.matchingRoom.user1.id;
-        const user2Id = succeedMatchings.matchingRoom.user2.id;
-        const chatRoomId = succeedMatchings.matchingRoom.id;
-
-        //socketId를 사용하여 연결된 소켓 가져오기
-        const connectedSocket =
-          this.chatGateway.server.sockets.sockets.get(socketId);
-        if (connectedSocket) {
-          // chatRoomId를 사용하여 방에 참여하십시오.
-
-          connectedSocket.join(chatRoomId);
-
-          // 클라이언트에 '참여한 방' 이벤트를 내보냅니다.
-          connectedSocket.emit("joined room", chatRoomId);
-
-          // 사용자에게 이제 연결되었음을 알립니다.
-          this.chatGateway.onUsersMatched(user1Id, user2Id, chatRoomId);
-        }
-      }
-    }
   }
 
   getAgeGroup(age: number): string {

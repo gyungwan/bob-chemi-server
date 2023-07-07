@@ -12,7 +12,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { MatchingRoom } from "../../matchingroom/entities/matchingroom.entity";
+import { MatchingRoom } from "./matchingroom.entity";
 
 //성별, 나이대
 
