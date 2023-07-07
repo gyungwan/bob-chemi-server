@@ -9,6 +9,7 @@ import { Repository } from "typeorm";
 import { ChatRoom } from "./entities/chatRooms.entity";
 import { ChatRoomUser } from "./entities/chatRoomUsers.entity";
 import { Chat } from "./entities/chats.entity";
+import { isUUID } from "class-validator";
 
 @Injectable()
 export class GroupChatService {
@@ -33,7 +34,6 @@ export class GroupChatService {
   async createRoom(roomName: string): Promise<ChatRoom> {
     const chatRoom = new ChatRoom();
     chatRoom.roomName = roomName;
-
     chatRoom.chats = [];
 
     await this.chatRooms.set(chatRoom.chatRoomId, chatRoom);
@@ -65,30 +65,23 @@ export class GroupChatService {
       },
     });
 
-    if (isUser) {
-      throw new ConflictException("이미 가입된 채팅방입니다.");
-    }
+    if (isUser) {throw new ConflictException("이미 가입된 채팅방입니다.")} //prettier-ignore
 
     const chatRoomUser = new ChatRoomUser();
     chatRoomUser.chatRoom = room;
     chatRoomUser.user = user;
 
     await this.chatRoomUserRepository.save(chatRoomUser);
-
     return "참여 완료";
   }
   //<<------------방 나가기------------>>
 
   async leaveRoom(chatRoomId: string, userId: string): Promise<boolean> {
     const chatRoom = await this.findRoom(chatRoomId);
-    if (!chatRoom) {
-      throw new ConflictException("존재하지 않는 채팅방입니다.");
-    }
+    if (!chatRoom) {throw new ConflictException("존재하지 않는 채팅방입니다.")} //prettier-ignore
 
     const user = await this.usersService.findOneId(userId);
-    if (!user) {
-      throw new ConflictException("존재하지 않는 유저입니다.");
-    }
+    if (!user) {throw new ConflictException("존재하지 않는 유저입니다.")} //prettier-ignore
 
     await this.chatRoomUserRepository.softDelete({
       chatRoom: { chatRoomId: chatRoom.chatRoomId },
@@ -110,19 +103,14 @@ export class GroupChatService {
     message: string,
     userId: string
   ): Promise<Chat> {
-    if (!message) {
-      throw new BadRequestException("메세지를 입력해 주세요");
-    }
-
     const chatRoom = await this.findRoom(chatRoomId);
-    if (!chatRoom) {
-      throw new ConflictException("존재하지 않는 채팅방 입니다.");
-    }
+
+    if (!message) {throw new BadRequestException("메세지를 입력해 주세요")} //prettier-ignore
+    if (!chatRoom) {throw new ConflictException("존재하지 않는 채팅방 입니다.")} //prettier-ignore
+    if (!isUUID(userId, "4")) {throw new ConflictException("유효하지않은 UUID 형식의 유저ID 입니다.");} //prettier-ignore
 
     const user = await this.usersService.findOneId(userId);
-    if (!user) {
-      throw new ConflictException("존재하지 않는 유저입니다.");
-    }
+    if (!user) {throw new ConflictException("존재하지 않는 유저입니다.")} //prettier-ignore
 
     const chat: Chat = {
       chatId: Date.now().toString(),
@@ -130,7 +118,6 @@ export class GroupChatService {
       user,
       chatRoom,
     };
-    console.log(chat, "@@@@@@@@@@@@@@@@@@@@");
 
     if (!chatRoom.chats) {
       chatRoom.chats = [];

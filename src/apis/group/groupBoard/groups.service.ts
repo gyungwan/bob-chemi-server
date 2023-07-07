@@ -13,8 +13,9 @@ import { Member } from "./entites/members.entity";
 import { MemberStatus } from "./entites/members.status.enum";
 import { FileUploadService } from "src/apis/file-upload/file-upload.service";
 import { ChatRoom } from "../groupChat/entities/chatRooms.entity";
-import { GroupChatService } from "../groupChat/groupChats.service";
 import { UsersService } from "src/apis/users/users.service";
+import { GroupChatsGateway } from "../groupChat/groupChats.gateway";
+import { GroupChatService } from "../groupChat/groupChats.service";
 
 @Injectable()
 export class GroupsService {
@@ -28,8 +29,9 @@ export class GroupsService {
     private readonly fileUploadService: FileUploadService,
 
     @InjectRepository(ChatRoom)
-    private chatRoomRepository: Repository<ChatRoom>, // ChatRoom Repository 주입
-    private readonly groupChatService: GroupChatService
+    private chatRoomRepository: Repository<ChatRoom>,
+    private groupChatGateway: GroupChatsGateway,
+    private groupChatService: GroupChatService
   ) {}
 
   //<<------------소모임 조회------------>>
@@ -94,8 +96,14 @@ export class GroupsService {
       status: MemberStatus.CONFIRMED,
     });
 
+    const chatRoom = this.chatRoomRepository.create({
+      roomName: createGroupDto.title,
+    });
+
+    const chatRoomId = chatRoom.chatRoomId;
+    await this.chatRoomRepository.save(chatRoom);
     await this.memberRepository.save(firstMember);
-    await this.groupChatService.createRoom(newGroup.title);
+    this.groupChatGateway.handleJoinRoom(null, { chatRoomId, userId });
 
     return newGroup;
   }
@@ -151,7 +159,6 @@ export class GroupsService {
   async joinGroup(email: string, groupId: any): Promise<Member> {
     const user = await this.usersServices.findOneEmail(email);
     const group = await this.groupRepository.findOne({ where: { groupId } });
-
     const isPending = await this.memberRepository.findOne({
       where: {
         user: Equal(user.id),
@@ -202,12 +209,8 @@ export class GroupsService {
       },
     });
 
-    if (!checkRequest) {
-      throw new NotFoundException("가입 신청이 없는 멤버입니다.");
-    }
-    if (checkRequest.status === MemberStatus.CONFIRMED) {
-      throw new NotFoundException("이미 수락한 신청자 입니다.");
-    }
+    if (!checkRequest) {throw new NotFoundException("가입 신청이 없는 멤버입니다.")} //prettier-ignore
+    if (checkRequest.status === MemberStatus.CONFIRMED) {throw new NotFoundException("이미 수락한 신청자 입니다.")} //prettier-ignore
 
     const groupMembersCount = group.members.length + 1;
 
@@ -225,9 +228,8 @@ export class GroupsService {
     const request = await this.memberRepository.findOne({
       where: { memberId },
     });
-    console.log(request, "@@@@@@@@@@@@@@@");
+
     const group = await this.groupRepository.findOne({ where: { groupId } });
-    console.log(group, "@@@@@@@@@@@@@@@@@");
 
     if(!request) {throw new NotFoundException('찾을 수 없는 신청자 입니다.')} //prettier-ignore
     if(!group) {throw new NotFoundException('찾을 수 없는 소모임 입니다.')} //prettier-ignore
@@ -241,9 +243,7 @@ export class GroupsService {
 
     const foundGroup = await this.groupRepository.findOne(group);
 
-    if (!foundGroup) {
-      throw new NotFoundException("찾을 수 없는 소모임입니다.");
-    }
+    if (!foundGroup) {throw new NotFoundException("찾을 수 없는 소모임입니다.")} //prettier-ignore
 
     const pendingMembers = await this.memberRepository.find({
       where: {
@@ -253,7 +253,6 @@ export class GroupsService {
     });
 
     if (pendingMembers.length === 0) {return []} //prettier-ignore
-
     return pendingMembers;
   }
 
@@ -262,9 +261,7 @@ export class GroupsService {
     const group: FindOneOptions<Group> = { where: { groupId: groupId } };
     const foundGroup = await this.groupRepository.findOne(group);
 
-    if (!foundGroup) {
-      throw new NotFoundException("찾을 수 없는 소모임입니다.");
-    }
+    if (!foundGroup) {throw new NotFoundException("찾을 수 없는 소모임입니다.")} //prettier-ignore
 
     const confirmedMembers = await this.memberRepository.find({
       where: {

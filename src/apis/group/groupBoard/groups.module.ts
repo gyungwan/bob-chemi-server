@@ -15,6 +15,8 @@ import { ChatRoom } from "../groupChat/entities/chatRooms.entity";
 import { GroupChatService } from "../groupChat/groupChats.service";
 import { ChatRoomUser } from "../groupChat/entities/chatRoomUsers.entity";
 import { Chat } from "../groupChat/entities/chats.entity";
+import { GroupChatsGateway } from "../groupChat/groupChats.gateway";
+
 //import { multerOptionsFactory } from "src/common/utils/multer.options";
 @Module({
   imports: [
@@ -29,7 +31,6 @@ import { Chat } from "../groupChat/entities/chats.entity";
     ConfigModule,
     FileUploadModule,
   ],
-
   exports: [GroupsService],
   controllers: [GroupsController],
   providers: [
@@ -37,6 +38,7 @@ import { Chat } from "../groupChat/entities/chats.entity";
     Repository,
     UsersService,
     FileUploadService,
+    GroupChatsGateway,
     GroupChatService,
   ],
 })
