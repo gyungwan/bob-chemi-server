@@ -38,7 +38,8 @@ import { QuickMatchingService } from "../quickmatchings/quickmatchings.service";
     origin: [
       "http://localhost:3000",
       "https://localhost:3000",
-
+      "https://mean-hornets-drive.loca.lt",
+      "211.225.153.38",
       // "https://price-crush-client.vercel.app",
     ],
   },
@@ -106,15 +107,15 @@ export class ChatGateway
     console.log(`Client disconnected: ${client.id}`);
 
     //대화방에서 사용자 제거
-    const rooms = this.server.sockets.adapter.rooms;
-    for (const roomId of rooms.keys()) {
-      if (client.rooms.has(roomId)) {
-        client.leave(roomId);
-        // 채팅방에서 사용자 제거를 처리하는 추가 코드,
-        // 방의 참가자 목록을 업데이트하거나 방을 비활성으로 표시하는 것과 같은
-        break;
-      }
-    }
+    // const rooms = this.server.sockets.adapter.rooms;
+    // for (const roomId of rooms.keys()) {
+    //   if (client.rooms.has(roomId)) {
+    //     client.leave(roomId);
+    //     // 채팅방에서 사용자 제거를 처리하는 추가 코드,
+    //     // 방의 참가자 목록을 업데이트하거나 방을 비활성으로 표시하는 것과 같은
+    //     break;
+    //   }
+    // }
   }
 
   //유저의 조건 정보를 받아와서 조건에 맞는 유저 매칭,매칭데이터 리턴
@@ -391,7 +392,7 @@ export class ChatGateway
     }
   ) {
     const { sender, receiver, message, roomId } = messageData;
-
+    //console.log(roomId, "---------------=======");
     const senderUser = await this.userRepository.findOne({
       where: { id: sender },
     });
@@ -411,15 +412,19 @@ export class ChatGateway
     chatMessage.roomId = roomId;
     chatMessage.timestamp = new Date();
     await this.matchingChatService.create(chatMessage);
-
-    const receivedChat: ReceivedChat = {
-      message: chatMessage.message,
-      sender: chatMessage.sender.id,
-      time: chatMessage.timestamp.toISOString(), // Add the current timestamp or use a library to format the timestamp
-    };
+    console.log(chatMessage, "---------------=======");
+    // const receivedChat: ReceivedChat = {
+    //   message: chatMessage.message,
+    //   sender: chatMessage.sender.id,
+    //   time: chatMessage.timestamp.toISOString(), // Add the current timestamp or use a library to format the timestamp
+    // };
 
     // Emit the message to the room
-    this.server.to(roomId).emit("chated", receivedChat);
+    this.server.to(roomId).emit("chated", {
+      message: chatMessage.message,
+      sender: chatMessage.sender.id,
+      timestamp: chatMessage.timestamp.toISOString(),
+    });
   }
 
   @SubscribeMessage("getChatHistory")
@@ -428,7 +433,10 @@ export class ChatGateway
     const chatHistory = await this.matchingChatService.getChatHistory(
       chatRoomId
     );
-
+    console.log(
+      chatHistory,
+      "chatHistorychatHistorychatHistorychatHistorychatHistorychatHistory----------+++++++++++++++"
+    );
     // Emit the chat history to the client
     client.emit("chatHistory", chatHistory);
   }
@@ -442,8 +450,8 @@ export class ChatGateway
     await this.matchingChatService.deleteChatRoomMessages(chatRoomId);
   }
 }
-export interface ReceivedChat {
-  message: string;
-  sender: string;
-  time: string;
-}
+// export interface ReceivedChat {
+//   message: string;
+//   sender: string;
+//   time: string;
+// }

@@ -101,7 +101,7 @@ export class MatchingChatService {
 
   async getChatHistory(chatRoomId: string): Promise<MatchingChat[]> {
     return this.matchingChatRepository.find({
-      where: { matchingRoom: { id: chatRoomId } },
+      where: { roomId: chatRoomId },
       order: { timestamp: "ASC" }, // Optional: Sort the chat messages by timestamp
     });
   }
