@@ -27,7 +27,7 @@ export class FoodieBoard {
 
   @CreateDateColumn()
   @ApiProperty({ description: "맛집 게시물 생성일" })
-  creadeAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
   @ApiProperty({ description: "맛집 게시물 수정일" })
