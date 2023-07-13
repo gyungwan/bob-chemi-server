@@ -14,7 +14,7 @@ import {
   ApiResponse,
 } from "@nestjs/swagger";
 import { FileUploadService } from "./file-upload.service";
-import multerS3 from "multer-s3";
+import * as multerS3 from "multer-s3";
 import path from "path";
 import { S3Client } from "@aws-sdk/client-s3";
 
