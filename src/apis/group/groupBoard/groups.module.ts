@@ -7,8 +7,7 @@ import { GroupsController } from "./groups.controller";
 import { GroupsService } from "./groups.service";
 import { UsersService } from "src/apis/users/users.service";
 import { Member } from "./entites/members.entity";
-import { MulterModule } from "@nestjs/platform-express";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import { FileUploadModule } from "src/apis/file-upload/file-upload.module";
 import { FileUploadService } from "src/apis/file-upload/file-upload.service";
 import { ChatRoom } from "../groupChat/entities/chatRooms.entity";
@@ -17,7 +16,6 @@ import { ChatRoomUser } from "../groupChat/entities/chatRoomUsers.entity";
 import { Chat } from "../groupChat/entities/chats.entity";
 import { GroupChatsGateway } from "../groupChat/groupChats.gateway";
 
-//import { multerOptionsFactory } from "src/common/utils/multer.options";
 @Module({
   imports: [
     TypeOrmModule.forFeature([

@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsString, Max, Min } from "class-validator";
-import { User } from "src/apis/users/entities/user.entity";
+import { User } from "../../../users/entities/user.entity";
 import {
   Column,
   CreateDateColumn,

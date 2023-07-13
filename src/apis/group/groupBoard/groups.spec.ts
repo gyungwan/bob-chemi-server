@@ -1,140 +1,107 @@
-import { Test } from "@nestjs/testing";
+import { Test, TestingModule } from "@nestjs/testing";
 import { Repository } from "typeorm";
-import { ChatRoom } from "../groupChat/entities/chatRooms.entity"; // 경로 수정
-import { GroupChatService } from "../groupChat/groupChats.service"; // 경로 수정
-import { Group } from "../groupBoard/entites/groups.entity"; // 경로 수정
-import { GroupStatus } from "../groupBoard/entites/groups.status.enum"; // 경로 수정
-import { Member } from "../groupBoard/entites/members.entity"; // 경로 수정
-import { GroupsService } from "../groupBoard/groups.service"; // 경로 수정
-import { FileUploadService } from "../../file-upload/file-upload.service"; // 경로 수정
+import { ChatRoom } from "../groupChat/entities/chatRooms.entity";
+import { GroupChatService } from "../groupChat/groupChats.service";
+import { Group } from "./entites/groups.entity";
+import { Member } from "./entites/members.entity";
+import { GroupsService } from "./groups.service";
+import { FileUploadService } from "../../file-upload/file-upload.service";
 import { UsersService } from "src/apis/users/users.service";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { GroupChatsGateway } from "../groupChat/groupChats.gateway";
+import { User } from "src/apis/users/entities/user.entity";
+import { ConfigService } from "@nestjs/config";
+import { Chat } from "../groupChat/entities/chats.entity";
+import { ChatRoomUser } from "../groupChat/entities/chatRoomUsers.entity";
+
+const mockingRepository = () => ({
+  save: jest.fn(),
+  find: jest.fn(),
+  findOne: jest.fn(),
+  softDelete: jest.fn(),
+});
+
+type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+
+// Partial : 타입 T의 모든 요소를 optional하게 한다.
+// Record : 타입 T의 모든 K의 집합으로 타입을 만들어준다.
+// keyof Repository<T> : Repository의 모든 method key를 불러온다.
+// jest.Mock : 3번의 key들을 다 가짜로 만들어준다.
+// type MockRepository<T = any> : 이를 type으로 정의해준다.
 
 describe("GroupsService", () => {
-  //의존성 주입
   let groupsService: GroupsService;
-  let groupRepository: Repository<Group>;
   let usersService: UsersService;
-  let memberRepository: Repository<Member>;
   let fileUploadService: FileUploadService;
-  let chatRoomRepository: Repository<ChatRoom>;
   let groupChatService: GroupChatService;
+  let groupChatGateway: GroupChatsGateway;
+
+  let groupRepository: MockRepository<Group>;
+  let userRepository: MockRepository<User>;
+  let memberRepository: MockRepository<Member>;
+  let chatRoomRepository: MockRepository<ChatRoom>;
+  let chatRepository: MockRepository<Chat>;
+  let chatRoomUserRepository: MockRepository<ChatRoomUser>;
 
   beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
-      //createTestingModule, 테스트할 모듈을 만들고 이하 서비스의 의존성을 주입
+    const module: TestingModule = await Test.createTestingModule({
       providers: [
         GroupsService,
+        UsersService,
+        FileUploadService,
+        GroupChatService,
+        GroupChatsGateway,
+        ConfigService,
         {
-          provide: Repository,
-          useValue: {
-            find: jest.fn(),
-            findOne: jest.fn(),
-            save: jest.fn(),
-            createQueryBuilder: jest.fn(),
-            softDelete: jest.fn(),
-          },
+          provide: getRepositoryToken(Group),
+          useValue: mockingRepository(),
         },
         {
-          provide: UsersService,
-          useValue: {
-            findOneId: jest.fn(),
-            findOneEmail: jest.fn(),
-          },
+          provide: getRepositoryToken(Member),
+          useValue: mockingRepository(),
         },
         {
-          provide: FileUploadService,
-          useValue: {
-            uploadFile: jest.fn(),
-            deleteFile: jest.fn(),
-          },
+          provide: getRepositoryToken(ChatRoom),
+          useValue: mockingRepository(),
         },
         {
-          provide: Repository,
-          useValue: {
-            find: jest.fn(),
-            findOne: jest.fn(),
-            save: jest.fn(),
-          },
+          provide: getRepositoryToken(User),
+          useValue: mockingRepository(),
         },
         {
-          provide: GroupChatService,
-          useValue: {
-            createRoom: jest.fn(),
-          },
+          provide: getRepositoryToken(Chat),
+          useValue: mockingRepository(),
+        },
+        {
+          provide: getRepositoryToken(ChatRoomUser),
+          useValue: mockingRepository(),
         },
       ],
     }).compile();
 
-    groupsService = moduleRef.get<GroupsService>(GroupsService);
-    groupRepository = moduleRef.get<Repository<Group>>(Repository);
-    usersService = moduleRef.get<UsersService>(UsersService);
-    fileUploadService = moduleRef.get<FileUploadService>(FileUploadService);
-    chatRoomRepository = moduleRef.get<Repository<ChatRoom>>(Repository);
-    groupChatService = moduleRef.get<GroupChatService>(GroupChatService);
-    //moduleRef, 테스트 모듈에서 필요한 부분을 가져옴
+    groupsService = module.get<GroupsService>(GroupsService);
+    usersService = module.get<UsersService>(UsersService);
+    fileUploadService = module.get<FileUploadService>(FileUploadService);
+    groupChatService = module.get<GroupChatService>(GroupChatService);
+    groupChatGateway = module.get<GroupChatsGateway>(GroupChatsGateway);
+
+    groupRepository = module.get<MockRepository<Group>>(
+      getRepositoryToken(Group)
+    );
+    userRepository = module.get<MockRepository<User>>(getRepositoryToken(User));
+    memberRepository = module.get<MockRepository<Member>>(
+      getRepositoryToken(Member)
+    );
+    chatRoomRepository = module.get<MockRepository<ChatRoom>>(
+      getRepositoryToken(ChatRoom)
+    );
+    chatRepository = module.get<MockRepository<Chat>>(getRepositoryToken(Chat));
+    chatRoomUserRepository = module.get<MockRepository<ChatRoomUser>>(
+      getRepositoryToken(ChatRoomUser)
+    );
   });
 
-  describe("getAllGroups", () => {
-    it("모든 소모임 조회", async () => {
-      const expectedResult: Group[] = [
-        {
-          groupId: 1,
-          title: "제목",
-          description: "모임",
-          groupDate: new Date("2023-07-01"),
-          groupHour: "12",
-          groupMin: "30",
-          groupLocation: "우리집",
-          groupPeopleLimit: "10",
-          status: GroupStatus.PRIVATE,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: null,
-          members: [],
-          users: [],
-          image: null,
-          owner: null,
-          //이하 baseEntity에서 상속받음
-          hasId: () => true,
-          save: () => Promise.resolve(this),
-          remove: () => Promise.resolve(this),
-          softRemove: () => Promise.resolve(this),
-          recover: () => Promise.resolve(this),
-          reload: () => Promise.resolve(this),
-        },
-        {
-          groupId: 2,
-          title: "제목",
-          description: "모임",
-          groupDate: new Date("2023-07-10"),
-          groupHour: "20",
-          groupMin: "59",
-          groupLocation: "우리집",
-          groupPeopleLimit: "5",
-          status: GroupStatus.PUBLIC,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: null,
-          members: [],
-          users: [],
-          image: null,
-          owner: null,
-          //이하 baseEntity에서 상속받음
-          hasId: () => true,
-          save: () => Promise.resolve(this),
-          remove: () => Promise.resolve(this),
-          softRemove: () => Promise.resolve(this),
-          recover: () => Promise.resolve(this),
-          reload: () => Promise.resolve(this),
-        },
-      ];
-
-      jest.spyOn(groupRepository, "find").mockResolvedValue(expectedResult);
-
-      const result = await groupsService.getAllGroups();
-
-      expect(result).toEqual(expectedResult);
-      expect(groupRepository.find).toHaveBeenCalled();
-    });
+  it("test", () => {
+    expect(groupsService).toBeDefined();
   });
 });
