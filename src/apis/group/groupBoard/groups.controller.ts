@@ -13,7 +13,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
-import multerS3 from "multer-s3";
+import * as multerS3 from "multer-s3";
 import { S3Client } from "@aws-sdk/client-s3";
 import path from "path";
 import { CreateGroupDto } from "./dto/create.group.dto";
