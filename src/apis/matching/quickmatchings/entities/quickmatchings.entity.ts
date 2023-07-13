@@ -1,7 +1,7 @@
 // 빠른식사(퀵매칭) - 거리 반경..
 
 import { ApiProperty } from "@nestjs/swagger";
-import { User } from "src/apis/users/entities/user.entity";
+import { User } from "../../../users/entities/user.entity";
 import {
   Column,
   CreateDateColumn,

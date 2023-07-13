@@ -30,8 +30,7 @@ export class GroupsService {
 
     @InjectRepository(ChatRoom)
     private chatRoomRepository: Repository<ChatRoom>,
-    private groupChatGateway: GroupChatsGateway,
-    private groupChatService: GroupChatService
+    private groupChatGateway: GroupChatsGateway
   ) {}
 
   //<<------------소모임 조회------------>>
